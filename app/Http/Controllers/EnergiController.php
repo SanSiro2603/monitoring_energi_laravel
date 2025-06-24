@@ -39,6 +39,7 @@ class EnergiController extends Controller
             'listrik' => 'required|numeric',
             'air' => 'required|numeric',
             'bbm' => 'required|numeric',
+            'jenis_bbm' => 'required|string',
             'kertas' => 'required|numeric',
         ]);
 
@@ -66,10 +67,11 @@ class EnergiController extends Controller
                 'listrik' => 'required|numeric',
                 'air' => 'required|numeric',
                 'bbm' => 'required|numeric',
+                'jenis_bbm' => 'required|string',
                 'kertas' => 'required|numeric',
             ]);
-            
             $item->update($validated);
+
             return redirect()->back()->with('success', '✅ Data berhasil diperbarui.');
         } catch (\Exception $e) {
             return back()->with('error', '❌ Gagal memperbarui: '.$e->getMessage());

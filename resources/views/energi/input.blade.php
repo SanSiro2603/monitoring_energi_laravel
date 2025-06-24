@@ -52,6 +52,19 @@
                     <input name="kertas" type="number" class="form-control" required>
                 </div>
             </div>
+            <div class="row mb-3">
+                <div class="col">
+                    <label>Jenis BBM</label>
+                    <select name="jenis_bbm" class="form-select" required>
+                        <option value="">-- Pilih Jenis BBM --</option>
+                        <option value="Pertalite">Pertalite</option>
+                        <option value="Pertamax">Pertamax</option>
+                        <option value="Solar">Solar</option>
+                        <option value="Dexlite">Dexlite</option>
+                        <option value="Pertamina Dex">Pertamina Dex</option>
+                    </select>
+                </div>
+            </div>
             <button type="submit" class="btn btn-success">💾 Simpan</button>
         </form>
     </div>
