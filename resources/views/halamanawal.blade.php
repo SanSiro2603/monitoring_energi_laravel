@@ -419,7 +419,7 @@
             <nav class="nav-links">
                 @if (Route::has('login'))
                     @auth
-                        <a href="{{ url('/home') }}" class="nav-link login">Home</a>
+                
                     @else
                         <a href="{{ route('tentang') }}" class="nav-link tentang">Tentang</a>
                         <a href="{{ route('login') }}" class="nav-link login">Login</a>

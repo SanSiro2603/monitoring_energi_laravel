@@ -12,23 +12,27 @@ class User extends Authenticatable
     use HasApiTokens, HasFactory, Notifiable;
 
     /**
-     * Kolom-kolom yang bisa diisi secara massal
+     * Kolom-kolom yang dapat diisi secara massal
+     *
+     * @var array<int, string>
      */
     protected $fillable = [
-    'name',
-    'username',
-    'email',
-    'password',
-    'unit_bagian',
-    'level_gol',
-    'wilayah',
-    'unit_kerja',
-    'foto',
-    'role',
-];
+        'name',
+        'username',
+        'email',
+        'password',
+        'unit_bagian',
+        'level_gol',
+        'wilayah',
+        'unit_kerja',
+        'foto',
+        'role',
+    ];
 
     /**
-     * Kolom yang disembunyikan saat serialisasi (misal ke JSON)
+     * Kolom yang disembunyikan saat serialisasi
+     *
+     * @var array<int, string>
      */
     protected $hidden = [
         'password',
@@ -36,10 +40,16 @@ class User extends Authenticatable
     ];
 
     /**
-     * Casting otomatis tipe data kolom
+     * Kolom yang akan dicasting secara otomatis
+     *
+     * @var array<string, string>
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+    /**
+     * Relasi atau method tambahan bisa ditambahkan di bawah ini
+     */
 }

@@ -8,23 +8,49 @@
     <div class="alert alert-success">{{ session('success') }}</div>
     @endif
 
+    @php
+        $role = Auth::user()->role;
+        $prefix = $role === 'super_user' ? 'admin' : ($role === 'divisi_user' ? 'divisi' : '');
+    @endphp
+
     <!-- Tombol Toggle -->
     <button class="btn btn-success mb-3" onclick="toggleForm()">➕ Tambah Data Manual</button>
 
     <!-- Form Manual -->
     <div id="formManual" style="display: none;">
-        <form method="POST" action="/energi/store">
+        <form method="POST" action="{{ url("$prefix/energi") }}">
             @csrf
             <div class="row mb-3">
-                <div class="col"><label>Kantor</label><input name="kantor" class="form-control" required></div>
-                <div class="col"><label>Bulan</label><input name="bulan" class="form-control" required></div>
-                <div class="col"><label>Tahun</label><input name="tahun" type="number" class="form-control" required></div>
+                <div class="col">
+                    <label>Kantor</label>
+                    <input name="kantor" class="form-control" required>
+                </div>
+                <div class="col">
+                    <label>Bulan</label>
+                    <input name="bulan" class="form-control" required>
+                </div>
+                <div class="col">
+                    <label>Tahun</label>
+                    <input name="tahun" type="number" class="form-control" required>
+                </div>
             </div>
             <div class="row mb-3">
-                <div class="col"><label>Listrik (kWh)</label><input name="listrik" type="number" class="form-control" required></div>
-                <div class="col"><label>Air (m³)</label><input name="air" type="number" class="form-control" required></div>
-                <div class="col"><label>BBM (liter)</label><input name="bbm" type="number" class="form-control" required></div>
-                <div class="col"><label>Kertas (rim)</label><input name="kertas" type="number" class="form-control" required></div>
+                <div class="col">
+                    <label>Listrik (kWh)</label>
+                    <input name="listrik" type="number" class="form-control" required>
+                </div>
+                <div class="col">
+                    <label>Air (m³)</label>
+                    <input name="air" type="number" class="form-control" required>
+                </div>
+                <div class="col">
+                    <label>BBM (liter)</label>
+                    <input name="bbm" type="number" class="form-control" required>
+                </div>
+                <div class="col">
+                    <label>Kertas (rim)</label>
+                    <input name="kertas" type="number" class="form-control" required>
+                </div>
             </div>
             <button type="submit" class="btn btn-success">💾 Simpan</button>
         </form>
@@ -33,7 +59,7 @@
     <hr>
 
     <h5>⬆️ Import Data Energi dari Excel</h5>
-    <form method="POST" action="/energi/import" enctype="multipart/form-data">
+    <form method="POST" action="{{ url('/energi/import') }}" enctype="multipart/form-data">
         @csrf
         <input type="file" name="fileexcel" accept=".xlsx, .xls" class="form-control mb-3" required>
         <button type="submit" class="btn btn-primary">Import Excel</button>

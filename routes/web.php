@@ -6,7 +6,9 @@ use App\Http\Controllers\EnergiController;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\ProfilController;
 use App\Http\Controllers\ChartController;
-
+use App\Http\Controllers\Auth\ForgotPasswordController;
+use App\Http\Controllers\Auth\ResetPasswordController;
+use App\Http\Controllers\Auth\RegisterController;
 
 Route::get('/', function () {
     return view('halamanawal');      // Halaman utama
@@ -64,7 +66,7 @@ Route::middleware(['auth', 'role:user_umum'])->group(function () {
     Route::get('/umum/summary', [EnergiController::class, 'summary']);
 });
 
-
+// ✅ PERBAIKAN: Route dengan nama 'dashboard'
 Route::get('/dashboard', function () {
     $role = Auth::user()->role;
 
@@ -75,12 +77,19 @@ Route::get('/dashboard', function () {
     } else {
         return view('dashboard.umum'); // fallback
     }
-})->middleware('auth');
-
+})->middleware('auth')->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profil', [ProfilController::class, 'index'])->name('profil.index');
     Route::post('/profil/upload', [ProfilController::class, 'uploadFoto'])->name('profil.upload');
 });
 
+// Lupa Password
+Route::get('forgot-password', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
+Route::post('forgot-password', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
 
+Route::get('reset-password/{token}', [ResetPasswordController::class, 'showResetForm'])->name('password.reset');
+Route::post('reset-password', [ResetPasswordController::class, 'reset'])->name('password.update');
+
+Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
+Route::post('/register', [RegisterController::class, 'register']);

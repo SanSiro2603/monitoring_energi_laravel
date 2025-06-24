@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Login - Hemat Energi</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"> 
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
   <style>
     body {
@@ -89,20 +89,19 @@
     }
 
     .footer-bank {
-  background-color: #fff;
-  width: 100%;
-  padding: 15px 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: fixed;
-  bottom: 0;
-}
-.footer-bank img {
-  width: 160px;
-}
+      background-color: #fff;
+      width: 100%;
+      padding: 15px 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: fixed;
+      bottom: 0;
+    }
 
-
+    .footer-bank img {
+      width: 160px;
+    }
   </style>
 </head>
 <body>
@@ -139,16 +138,16 @@
       <button type="submit" class="btn btn-login">Login</button>
     </form>
 
+    <!-- Bagian lupa password -->
     <div class="bottom-text">
-      <a href="#">Lupa password?</a>
+      <a href="{{ route('password.request') }}">Lupa password?</a>
     </div>
   </div>
 
   <!-- Footer Logo Bank Full Width -->
-<div class="footer-bank">
-  <img src="{{ asset('assets/img/banklpg.png') }}" alt="Bank Lampung">
-</div>
-
+  <div class="footer-bank">
+    <img src="{{ asset('assets/img/banklpg.png') }}" alt="Bank Lampung">
+  </div>
 
 </body>
 </html>
