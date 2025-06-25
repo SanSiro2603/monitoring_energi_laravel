@@ -81,9 +81,7 @@
       <div>
         @auth
           👤 <strong>{{ Auth::user()->name }}</strong>
-          | <form method="POST" action="{{ route('logout') }}" style="display:inline">@csrf
-              <button class="btn btn-sm btn-light text-danger">Logout</button>
-            </form>
+          | <button class="btn btn-sm btn-light text-danger" data-bs-toggle="modal" data-bs-target="#logoutModal">Logout</button>
         @else
           <a href="{{ route('login') }}" class="btn btn-sm btn-outline-success">Login</a>
         @endauth
@@ -138,6 +136,29 @@
     Hak Cipta ©2025 PT. Bank Lampung
   </div>
 
+  <!-- ✅ Modal Logout -->
+  <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content shadow-lg" style="border-radius: 12px; max-width: 350px; margin: auto;">
+        <div class="modal-header border-0 pb-0">
+          <h5 class="modal-title fw-bold text-center w-100" id="logoutLabel">LOGOUT</h5>
+        </div>
+        <div class="modal-body text-center">
+          Apakah Anda yakin ingin logout?
+        </div>
+        <div class="modal-footer justify-content-center border-0">
+          <button type="button" class="btn btn-outline-success px-4" data-bs-dismiss="modal">Batal</button>
+          <form method="POST" action="{{ route('logout') }}">
+            @csrf
+            <button type="submit" class="btn btn-success px-4">Logout</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
   @stack('scripts')
+  <!-- ✅ Bootstrap JS untuk modal -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
