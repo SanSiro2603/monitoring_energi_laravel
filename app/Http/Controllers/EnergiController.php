@@ -162,10 +162,10 @@ class EnergiController extends Controller
         return view('admin.laporan', compact('data', 'total', 'kantor', 'bulan', 'tahun'));
     }
 
-    public function exportExcel()
-    {
-        return Excel::download(new EnergiExport, 'laporan_energi.xlsx');
-    }
+public function export()
+{
+    return Excel::download(new EnergiExport, 'laporan_energi.xlsx');
+}
 
     public function exportPdf(Request $request)
     {

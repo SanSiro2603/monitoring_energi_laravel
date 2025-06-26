@@ -35,6 +35,7 @@ Route::middleware(['auth', 'role:super_user'])->group(function () {
     Route::get('/laporan/admin/json', [EnergiController::class, 'laporanJson']);
     Route::get('/laporan/admin/export-pdf', [EnergiController::class, 'exportPdf']);
     Route::get('/laporan/admin/export-excel', [EnergiController::class, 'exportExcel']);
+    Route::get('/export-energi', [EnergiController::class, 'export'])->name('export.energi');
 
     // ✅ Sudah diberi nama agar tidak error saat redirect
     Route::get('/admin/energi', [EnergiController::class, 'index'])->name('energi.index');
