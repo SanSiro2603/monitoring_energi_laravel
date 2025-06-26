@@ -16,20 +16,17 @@ use Illuminate\Support\Facades\Validator;
 
 class EnergiController extends Controller
 {
-    // Tampilkan semua data energi
     public function index()
     {
         $data = Energi::latest()->get();
         return view('energi.index', compact('data'));
     }
 
-    // Form input data energi
     public function create()
     {
         return view('energi.input');
     }
 
-    // Simpan data energi baru
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -37,9 +34,9 @@ class EnergiController extends Controller
             'bulan' => 'required|string',
             'tahun' => 'required|numeric',
             'listrik' => 'required|numeric',
+            'daya_listrik' => 'nullable|numeric',
             'air' => 'required|numeric',
             'bbm' => 'required|numeric',
-            'jenis_bbm' => 'required|string',
             'kertas' => 'required|numeric',
         ]);
 
@@ -48,14 +45,12 @@ class EnergiController extends Controller
         return redirect()->route('energi.index')->with('success', '✅ Data energi berhasil ditambahkan!');
     }
 
-    // Edit data energi
     public function edit($id)
     {
         $item = Energi::findOrFail($id);
         return view('energi.edit', compact('item'));
     }
 
-    // Update data energi
     public function update(Request $request, $id)
     {
         try {
@@ -65,20 +60,19 @@ class EnergiController extends Controller
                 'bulan' => 'required|string',
                 'tahun' => 'required|numeric',
                 'listrik' => 'required|numeric',
+                'daya_listrik' => 'nullable|numeric',
                 'air' => 'required|numeric',
                 'bbm' => 'required|numeric',
-                'jenis_bbm' => 'required|string',
                 'kertas' => 'required|numeric',
             ]);
-            $item->update($validated);
 
+            $item->update($validated);
             return redirect()->back()->with('success', '✅ Data berhasil diperbarui.');
         } catch (\Exception $e) {
             return back()->with('error', '❌ Gagal memperbarui: '.$e->getMessage());
         }
     }
 
-    // Hapus data energi
     public function destroy($id)
     {
         try {
@@ -90,14 +84,12 @@ class EnergiController extends Controller
         }
     }
 
-    // Ringkasan energi (untuk user umum)
     public function summary()
     {
         $data = Energi::latest()->get();
         return view('energi.summary', compact('data'));
     }
 
-    // Import data dari Excel
     public function import(Request $request)
     {
         $request->validate([
@@ -111,7 +103,7 @@ class EnergiController extends Controller
 
             $imported = 0;
             foreach ($sheet as $i => $row) {
-                if ($i === 0 || empty($row[0])) continue; // Skip header dan baris kosong
+                if ($i === 0 || empty($row[0])) continue;
 
                 Energi::updateOrCreate(
                     [
@@ -121,9 +113,10 @@ class EnergiController extends Controller
                     ],
                     [
                         'listrik' => $row[3],
-                        'air' => $row[4],
-                        'bbm' => $row[5],
-                        'kertas' => $row[6]
+                        'daya_listrik' => $row[4] ?? null,
+                        'air' => $row[5],
+                        'bbm' => $row[6],
+                        'kertas' => $row[7] ?? 0
                     ]
                 );
                 $imported++;
@@ -135,7 +128,6 @@ class EnergiController extends Controller
         }
     }
 
-    // Halaman laporan energi
     public function laporan(Request $request)
     {
         $kantor = $request->kantor;
@@ -155,6 +147,7 @@ class EnergiController extends Controller
         $total = [
             'air' => $data->sum('air'),
             'listrik' => $data->sum('listrik'),
+            'daya_listrik' => $data->sum('daya_listrik'),
             'bbm' => $data->sum('bbm'),
             'kertas' => $data->sum('kertas')
         ];
@@ -162,10 +155,10 @@ class EnergiController extends Controller
         return view('admin.laporan', compact('data', 'total', 'kantor', 'bulan', 'tahun'));
     }
 
-public function export()
-{
-    return Excel::download(new EnergiExport, 'laporan_energi.xlsx');
-}
+    public function exportExcel()
+    {
+        return Excel::download(new EnergiExport, 'laporan_energi.xlsx');
+    }
 
     public function exportPdf(Request $request)
     {
@@ -208,6 +201,7 @@ public function export()
             $total = [
                 'air' => $data->sum('air'),
                 'listrik' => $data->sum('listrik'),
+                'daya_listrik' => $data->sum('daya_listrik'),
                 'bbm' => $data->sum('bbm'),
                 'kertas' => $data->sum('kertas'),
             ];

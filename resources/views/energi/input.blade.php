@@ -40,6 +40,10 @@
                     <input name="listrik" type="number" class="form-control" required>
                 </div>
                 <div class="col">
+                    <label>Daya Listrik (VA)</label>
+                    <input name="daya_listrik" type="number" class="form-control" placeholder="Contoh: 1300">
+                </div>
+                <div class="col">
                     <label>Air (m³)</label>
                     <input name="air" type="number" class="form-control" required>
                 </div>

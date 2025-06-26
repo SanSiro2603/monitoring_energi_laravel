@@ -32,10 +32,16 @@
                 <label>Listrik (kWh)</label>
                 <input value="{{ $item->listrik }}" name="listrik" type="number" class="form-control" required>
             </div>
+            
             <div class="col">
                 <label>Air (m³)</label>
                 <input value="{{ $item->air }}" name="air" type="number" class="form-control" required>
             </div>
+            <div class="col">
+              <label>Daya Listrik (VA)</label>
+              <input name="daya_listrik" type="number" class="form-control" value="{{ $item->daya_listrik }}">
+            </div>
+
             <div class="col">
                 <label>BBM (liter)</label>
                 <input value="{{ $item->bbm }}" name="bbm" type="number" class="form-control" required>

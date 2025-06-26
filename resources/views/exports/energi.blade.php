@@ -6,6 +6,7 @@
             <th>Bulan</th>
             <th>Tahun</th>
             <th>Listrik</th>
+            <th>Daya Listrik</th> {{-- ✅ Tambahkan ini --}}
             <th>Air</th>
             <th>BBM</th>
             <th>Jenis BBM</th> 
@@ -20,6 +21,7 @@
             <td>{{ $row->bulan }}</td>
             <td>{{ $row->tahun }}</td>
             <td>{{ $row->listrik }}</td>
+            <td>{{ $row->daya_listrik ?? '-' }}</td> {{-- ✅ Tambahkan ini --}}
             <td>{{ $row->air }}</td>
             <td>{{ $row->bbm }}</td>
             <td>{{ $row->jenis_bbm ?? '-' }}</td>
