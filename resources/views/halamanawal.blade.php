@@ -11,12 +11,56 @@
             box-sizing: border-box;
         }
 
+        html {
+            scroll-behavior: smooth;
+        }
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* Section 1: Main Landing */
+        .section-1 {
             background: linear-gradient(135deg, #a8e6cf 0%, #88d8a3 50%, #68c783 100%);
             min-height: 100vh;
             position: relative;
-            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Section 2: About */
+        .section-2 {
+            background: linear-gradient(135deg, #a8e6cf 0%, #88d8a3 50%, #68c783 100%);
+            min-height: 100vh;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Background decorative elements */
+        .section-2::before {
+            content: '';
+            position: absolute;
+            top: 20%;
+            right: -10%;
+            width: 400px;
+            height: 400px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            z-index: 0;
+        }
+
+        .section-2::after {
+            content: '';
+            position: absolute;
+            bottom: -10%;
+            right: 20%;
+            width: 300px;
+            height: 300px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 50%;
+            z-index: 0;
         }
 
         .container {
@@ -33,8 +77,19 @@
             justify-content: space-between;
             align-items: center;
             padding: 1.5rem 2rem;
-            position: relative;
-            z-index: 10;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            background: rgba(168, 230, 207, 0.95);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .header.scrolled {
+            background: rgba(168, 230, 207, 0.98);
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
         }
 
         .logo {
@@ -44,8 +99,8 @@
         }
 
         .logo-icon {
-            width: 200px;
-            height: 200px;
+            width: 50pxx;
+            height: 50px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -58,7 +113,7 @@
         }
 
         .logo-text {
-            font-size: 1.5rem;
+            font-size: 1.2rem;
             font-weight: bold;
             color: #2c3e50;
         }
@@ -86,6 +141,7 @@
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
+            cursor: pointer;
         }
 
         .nav-link.tentang {
@@ -120,11 +176,15 @@
             align-items: center;
             padding: 2rem;
             gap: 4rem;
+            margin-top: 100px;
         }
 
         .content-left {
             flex: 1;
             max-width: 500px;
+            opacity: 0;
+            transform: translateX(-50px);
+            animation: slideInLeft 1s ease 0.3s forwards;
         }
 
         .title {
@@ -168,6 +228,9 @@
             justify-content: center;
             align-items: center;
             position: relative;
+            opacity: 0;
+            transform: translateX(50px);
+            animation: slideInRight 1s ease 0.6s forwards;
         }
 
         .dashboard-container {
@@ -347,12 +410,104 @@
             background: #5a6268;
         }
 
+        /* About Section Chart */
+        .chart-container {
+            width: 350px;
+            height: 250px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 20px;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .chart-container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .chart {
+            display: flex;
+            align-items: end;
+            justify-content: space-between;
+            height: 150px;
+            gap: 1rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .chart .bar {
+            background: linear-gradient(to top, #27ae60, #2ecc71, #58d68d);
+            border-radius: 8px 8px 0 0;
+            min-width: 40px;
+            transition: all 0.3s ease;
+            position: relative;
+            box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
+        }
+
+        .chart .bar:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(39, 174, 96, 0.4);
+        }
+
+        .chart .bar:nth-child(1) { height: 60%; }
+        .chart .bar:nth-child(2) { height: 80%; }
+        .chart .bar:nth-child(3) { height: 95%; }
+        .chart .bar:nth-child(4) { height: 100%; }
+
+        /* Animations */
+        @keyframes slideInLeft {
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes slideInRight {
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in-up {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease;
+        }
+
+        .fade-in-up.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
         /* Responsive Design */
         @media (max-width: 768px) {
             .header {
                 flex-direction: column;
                 gap: 1rem;
                 padding: 1rem;
+                position: relative;
             }
 
             .nav-links {
@@ -365,6 +520,7 @@
                 text-align: center;
                 gap: 2rem;
                 padding: 1rem;
+                margin-top: 120px;
             }
 
             .title {
@@ -379,6 +535,11 @@
 
             .dashboard-content {
                 flex-direction: column;
+            }
+
+            .chart-container {
+                width: 100%;
+                max-width: 300px;
             }
         }
 
@@ -404,8 +565,10 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <!-- Header -->
+    <!-- Section 1: Main Landing -->
+    <section id="home" class="section-1">
+        <div class="container">
+           <!-- Header -->
         <header class="header">
             <div class="logo">
                 <div class="logo-icon">
@@ -415,103 +578,166 @@
                 </div>
             </div>
 
-            <!-- Laravel Authentication Routes -->
-            <nav class="nav-links">
-                @if (Route::has('login'))
-                    @auth
-                
-                    @else
-                        <a href="{{ route('tentang') }}" class="nav-link tentang">Tentang</a>
-                        <a href="{{ route('login') }}" class="nav-link login">Login</a>
-                    @endauth
-                @endif
-            </nav>
-        </header>
+                <nav class="nav-links">
+                    <a href="#about" class="nav-link tentang">Tentang</a>
+                    <a href="/login" class="nav-link login">Login</a>
+                    <a href="/register" class="nav-link login">Register</a>
+                </nav>
+            </header>
 
-        <!-- Main Content -->
-        <main class="main-content">
-            <div class="content-left">
-                <h1 class="title">
-                    Selamat Datang Di<br>
-                    Sistem Monitoring<br>
-                    Energi
-                </h1>
-                <p class="description">
-                    Efesiensi dan Transparansi energi untuk operasional Ramah Lingkungan di Bank Lampung
-                </p>
-                @auth
-                    <a href="{{ route('dashboard') }}" class="cta-button">Masuk Sekarang</a>
-                @else
-                    <a href="{{ route('login') }}" class="cta-button">Masuk Sekarang</a>
-                @endauth
-            </div>
+            <!-- Main Content -->
+            <main class="main-content">
+                <div class="content-left">
+                    <h1 class="title">
+                        Selamat Datang Di<br>
+                        Sistem Monitoring<br>
+                        Energi
+                    </h1>
+                    <p class="description">
+                        Efisiensi dan Transparansi energi untuk operasional Ramah Lingkungan di Bank Lampung
+                    </p>
+                    <a href="/login" class="cta-button">Masuk Sekarang</a>
+                </div>
 
-            <div class="content-right">
-                <div class="dashboard-container">
-                    <!-- Dashboard Header -->
-                    <div class="dashboard-header">
-                        <h3>Hemat Energi</h3>
-                        <div class="dashboard-buttons">
-                            <button class="dashboard-btn active">Input Data</button>
-                            <button class="dashboard-btn">Report</button>
-                        </div>
-                    </div>
-
-                    <!-- Grass Decoration -->
-                    <div class="grass"></div>
-
-                    <!-- Dashboard Content -->
-                    <div class="dashboard-content">
-                        <!-- Chart Section -->
-                        <div class="chart-section">
-                            <div class="chart-bars">
-                                <div class="bar"></div>
-                                <div class="bar"></div>
-                                <div class="bar"></div>
-                                <div class="bar"></div>
+                <div class="content-right">
+                    <div class="dashboard-container">
+                        <!-- Dashboard Header -->
+                        <div class="dashboard-header">
+                            <h3>Hemat Energi</h3>
+                            <div class="dashboard-buttons">
+                                <button class="dashboard-btn active">Input Data</button>
+                                <button class="dashboard-btn">Report</button>
                             </div>
                         </div>
 
-                        <!-- Data Section -->
-                        <div class="data-section">
-                            <div class="data-row">
-                                <span class="data-label">Listrik</span>
-                                <span class="data-value">1,245 kWh</span>
+                        <!-- Grass Decoration -->
+                        <div class="grass"></div>
+
+                        <!-- Dashboard Content -->
+                        <div class="dashboard-content">
+                            <!-- Chart Section -->
+                            <div class="chart-section">
+                                <div class="chart-bars">
+                                    <div class="bar"></div>
+                                    <div class="bar"></div>
+                                    <div class="bar"></div>
+                                    <div class="bar"></div>
+                                </div>
                             </div>
-                            <div class="data-row">
-                                <span class="data-label">Air</span>
-                                <span class="data-value">850 L</span>
-                            </div>
-                            <div class="data-row">
-                                <span class="data-label">Kertas</span>
-                                <span class="data-value">125 Rim</span>
-                            </div>
-                            <div class="data-row">
-                                <span class="data-label">BBM</span>
-                                <span class="data-value">45 L</span>
-                            </div>
-                            <div class="data-row">
-                                <span class="data-label">Gas</span>
-                                <span class="data-value">25 m³</span>
-                            </div>
-                            <div class="data-row">
-                                <span class="data-label">Total</span>
-                                <span class="data-value">2,290</span>
+
+                            <!-- Data Section -->
+                            <div class="data-section">
+                                <div class="data-row">
+                                    <span class="data-label">Listrik</span>
+                                    <span class="data-value">1,245 kWh</span>
+                                </div>
+                                <div class="data-row">
+                                    <span class="data-label">Air</span>
+                                    <span class="data-value">850 L</span>
+                                </div>
+                                <div class="data-row">
+                                    <span class="data-label">Kertas</span>
+                                    <span class="data-value">125 Rim</span>
+                                </div>
+                                <div class="data-row">
+                                    <span class="data-label">BBM</span>
+                                    <span class="data-value">45 L</span>
+                                </div>
+                                <div class="data-row">
+                                    <span class="data-label">Gas</span>
+                                    <span class="data-value">25 m³</span>
+                                </div>
+                                <div class="data-row">
+                                    <span class="data-label">Total</span>
+                                    <span class="data-value">2,290</span>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Dashboard Footer -->
-                    <div class="dashboard-footer">
-                        <button class="footer-btn">View</button>
-                        <button class="footer-btn">Edit</button>
+                        <!-- Dashboard Footer -->
+                        <div class="dashboard-footer">
+                            <button class="footer-btn">View</button>
+                            <button class="footer-btn">Edit</button>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </main>
-    </div>
+            </main>
+        </div>
+    </section>
+
+    <!-- Section 2: About -->
+    <section id="about" class="section-2">
+        <div class="container">
+            <!-- Main Content -->
+            <main class="main-content">
+                <div class="content-left fade-in-up">
+                    <h1 class="title">
+                        Tentang Sistem<br>
+                        Monitoring Energi
+                    </h1>
+                    <p class="description">
+                        Sistem Monitoring Energi Bank Lampung adalah sebuah inisiatif digital yang bertujuan untuk mendukung operasional ramah lingkungan melalui pemantauan penggunaan energi secara efisien dan transparan. Sistem ini mencatat dan menganalisis data konsumsi listrik, air, kertas, dan BBM di seluruh unit kerja Bank Lampung.
+                    </p>
+                    <a href="/login" class="cta-button">Masuk Sekarang</a>
+                </div>
+
+                <div class="content-right fade-in-up">
+                    <div class="chart-container">
+                        <div class="chart">
+                            <div class="bar"></div>
+                            <div class="bar"></div>
+                            <div class="bar"></div>
+                            <div class="bar"></div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </section>
 
     <script>
+        // Smooth scroll for navigation
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Header scroll effect
+        window.addEventListener('scroll', () => {
+            const header = document.querySelector('.header');
+            if (window.scrollY > 100) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        });
+
+        // Intersection Observer for fade-in animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.fade-in-up').forEach(el => {
+            observer.observe(el);
+        });
+
         // Interactive dashboard buttons
         const dashboardBtns = document.querySelectorAll('.dashboard-btn');
         dashboardBtns.forEach(btn => {
@@ -536,12 +762,14 @@
         });
 
         // CTA button click animation
-        const ctaButton = document.querySelector('.cta-button');
-        ctaButton.addEventListener('click', (e) => {
-            ctaButton.style.transform = 'scale(0.95)';
-            setTimeout(() => {
-                ctaButton.style.transform = 'scale(1)';
-            }, 150);
+        const ctaButtons = document.querySelectorAll('.cta-button');
+        ctaButtons.forEach(button => {
+            button.addEventListener('click', (e) => {
+                button.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    button.style.transform = 'scale(1)';
+                }, 150);
+            });
         });
 
         // Footer button interactions
@@ -552,6 +780,18 @@
                 setTimeout(() => {
                     btn.style.transform = 'scale(1)';
                 }, 100);
+            });
+        });
+
+        // Chart bars in about section
+        const chartBars = document.querySelectorAll('.chart .bar');
+        chartBars.forEach((bar, index) => {
+            bar.addEventListener('mouseenter', () => {
+                bar.style.transform = 'scale(1.05) translateY(-5px)';
+            });
+            
+            bar.addEventListener('mouseleave', () => {
+                bar.style.transform = 'scale(1) translateY(0)';
             });
         });
     </script>
