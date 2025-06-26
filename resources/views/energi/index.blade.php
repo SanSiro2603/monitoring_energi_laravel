@@ -11,8 +11,16 @@
     <table class="table table-bordered table-striped mt-3">
         <thead class="table-success">
             <tr>
-                <th>No</th><th>Kantor</th><th>Bulan</th><th>Tahun</th>
-                <th>Listrik</th><th>Air</th><th>BBM</th><th>Kertas</th><th>Aksi</th>
+                <th>No</th>
+                <th>Kantor</th>
+                <th>Bulan</th>
+                <th>Tahun</th>
+                <th>Listrik</th>
+                <th>Air</th>
+                <th>BBM</th>
+                <th>Jenis BBM</th> {{-- tambahkan kolom ini --}}
+                <th>Kertas</th>
+                <th>Aksi</th>
             </tr>
         </thead>
         <tbody>
@@ -25,6 +33,7 @@
                 <td>{{ $row->listrik }}</td>
                 <td>{{ $row->air }}</td>
                 <td>{{ $row->bbm }}</td>
+                <td>{{ $row->jenis_bbm ?? '-' }}</td> {{-- tampilkan jenis BBM --}}
                 <td>{{ $row->kertas }}</td>
                 <td>
                     @if(Auth::user()->role === 'super_user')
