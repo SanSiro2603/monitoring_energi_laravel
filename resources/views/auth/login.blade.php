@@ -17,6 +17,15 @@
       align-items: center;
       padding-top: 40px;
       font-family: 'Segoe UI', sans-serif;
+      position: relative;
+    }
+
+    .btn-back {
+      position: absolute;
+      left: 20px;
+      top: 40px;
+      z-index: 10;
+      background-color: #fff;
     }
 
     .top-logo {
@@ -106,6 +115,15 @@
 </head>
 <body>
 
+  <!-- ✅ Tombol Halaman Awal di kiri -->
+  <div class="btn-back">
+    <form action="{{ url('/') }}" method="GET">
+      <button type="submit" class="btn btn-outline-success btn-sm">
+        <i class="bi bi-arrow-left-circle"></i> Halaman Awal
+      </button>
+    </form>
+  </div>
+
   <!-- Bagian Atas: Logo & Judul -->
   <div class="top-logo">
     <img src="{{ asset('assets/img/ataslogin.png') }}" alt="Icon Energi">
@@ -138,7 +156,6 @@
       <button type="submit" class="btn btn-login">Login</button>
     </form>
 
-    <!-- Bagian lupa password -->
     <div class="bottom-text">
       <a href="{{ route('password.request') }}">Lupa password?</a>
     </div>

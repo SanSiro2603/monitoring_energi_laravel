@@ -26,7 +26,7 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 // SUPER USER
-Route::middleware(['auth', 'role:super_user'])->group(function () {
+Route::middleware(['auth', 'role:super_user', 'no_cache'])->group(function () {
     Route::get('/admin/dashboard', function () {
         return view('dashboard.admin');
     });
@@ -37,7 +37,6 @@ Route::middleware(['auth', 'role:super_user'])->group(function () {
     Route::get('/laporan/admin/export-excel', [EnergiController::class, 'exportExcel']);
     Route::get('/export-energi', [EnergiController::class, 'export'])->name('export.energi');
 
-    // ✅ Sudah diberi nama agar tidak error saat redirect
     Route::get('/admin/energi', [EnergiController::class, 'index'])->name('energi.index');
     Route::get('/admin/energi/create', [EnergiController::class, 'create']);
     Route::post('/admin/energi', [EnergiController::class, 'store']);
@@ -46,6 +45,7 @@ Route::middleware(['auth', 'role:super_user'])->group(function () {
     Route::delete('/admin/energi/{id}', [EnergiController::class, 'destroy']);
     Route::post('/energi/import', [EnergiController::class, 'import']);
 });
+
 
 // DIVISI USER
 Route::middleware(['auth', 'role:divisi_user'])->group(function () {
