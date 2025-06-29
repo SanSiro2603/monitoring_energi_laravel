@@ -16,16 +16,31 @@ use Illuminate\Support\Facades\Validator;
 
 class EnergiController extends Controller
 {
-    public function index()
-    {
-        $data = Energi::latest()->get();
-        return view('energi.index', compact('data'));
+ public function index(Request $request)
+{
+    $query = Energi::query();
+
+    if ($request->kantor) {
+        $query->where('kantor', 'like', "%{$request->kantor}%");
+    }
+    if ($request->bulan) {
+        $query->where('bulan', 'like', "%{$request->bulan}%");
+    }
+    if ($request->tahun) {
+        $query->where('tahun', $request->tahun);
     }
 
-    public function create()
-    {
-        return view('energi.input');
-    }
+    $data = $query->orderByDesc('tahun')
+                  ->orderByDesc('bulan')
+                  ->paginate(10) // <- ganti sesuai jumlah per halaman
+                  ->withQueryString();
+    return view('energi.index', compact('data'));
+}
+public function create()
+{
+    return view('energi.input');
+}
+
 
     public function store(Request $request)
     {
@@ -116,7 +131,8 @@ class EnergiController extends Controller
                         'daya_listrik' => $row[4] ?? null,
                         'air' => $row[5],
                         'bbm' => $row[6],
-                        'kertas' => $row[7] ?? 0
+                        'jenis_bbm' => $row[7],
+                        'kertas' => $row[8] ?? 0
                     ]
                 );
                 $imported++;

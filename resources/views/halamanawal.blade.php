@@ -594,7 +594,7 @@
                         Energi
                     </h1>
                     <p class="description">
-                        Efisiensi dan Transparansi energi untuk operasional Ramah Lingkungan di Bank Lampung
+                        Efisiensi dan transparansi energi menjadi fondasi dalam mewujudkan operasional Bank Lampung yang ramah lingkungan, berorientasi pada masa depan, dan memberi dampak positif bagi masyarakat serta lingkungan sekitar.
                     </p>
                     <a href="/login" class="cta-button">Masuk Sekarang</a>
                 </div>
