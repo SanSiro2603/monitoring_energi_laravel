@@ -12,7 +12,8 @@ class Energi extends Model
     protected $table = 'energis'; // nama tabel (jamak)
 
    protected $fillable = [
-    'kantor', 'bulan', 'tahun', 'listrik','daya_listrik', 'air', 'bbm','jenis_bbm', 'kertas'
+    'kantor', 'bulan', 'tahun', 'listrik', 'daya_listrik',
+    'air', 'bbm', 'jenis_bbm', 'kertas'
 ];
 }
 

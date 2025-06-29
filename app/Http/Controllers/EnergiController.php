@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Energi;
 use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use App\Exports\EnergiExport;
 use Maatwebsite\Excel\Facades\Excel;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -16,31 +18,32 @@ use Illuminate\Support\Facades\Validator;
 
 class EnergiController extends Controller
 {
- public function index(Request $request)
-{
-    $query = Energi::query();
+    public function index(Request $request)
+    {
+        $query = Energi::query();
 
-    if ($request->kantor) {
-        $query->where('kantor', 'like', "%{$request->kantor}%");
-    }
-    if ($request->bulan) {
-        $query->where('bulan', 'like', "%{$request->bulan}%");
-    }
-    if ($request->tahun) {
-        $query->where('tahun', $request->tahun);
+        // ✅ Perbaiki parameter sesuai dengan form
+        if ($request->cari_kantor) {
+            $query->where('kantor', 'like', "%{$request->cari_kantor}%");
+        }
+        if ($request->cari_bulan) {
+            $query->where('bulan', 'like', "%{$request->cari_bulan}%");
+        }
+        if ($request->cari_tahun) {
+            $query->where('tahun', $request->cari_tahun);
+        }
+
+        $data = $query->orderByDesc('tahun')
+                      ->orderByDesc('bulan')
+                      ->paginate(10)
+                      ->withQueryString();
+        return view('energi.index', compact('data'));
     }
 
-    $data = $query->orderByDesc('tahun')
-                  ->orderByDesc('bulan')
-                  ->paginate(10) // <- ganti sesuai jumlah per halaman
-                  ->withQueryString();
-    return view('energi.index', compact('data'));
-}
-public function create()
-{
-    return view('energi.input');
-}
-
+    public function create()
+    {
+        return view('energi.input');
+    }
 
     public function store(Request $request)
     {
@@ -52,12 +55,17 @@ public function create()
             'daya_listrik' => 'nullable|numeric',
             'air' => 'required|numeric',
             'bbm' => 'required|numeric',
+            'jenis_bbm' => 'required|string',
             'kertas' => 'required|numeric',
         ]);
 
         Energi::create($validated);
 
-        return redirect()->route('energi.index')->with('success', '✅ Data energi berhasil ditambahkan!');
+        // Redirect berdasarkan role user
+        $user = auth()->user();
+        $redirectRoute = $user->role === 'super_user' ? 'admin.energi.index' : 'divisi.energi.index';
+        
+        return redirect()->route($redirectRoute)->with('success', '✅ Data energi berhasil ditambahkan!');
     }
 
     public function edit($id)
@@ -78,6 +86,7 @@ public function create()
                 'daya_listrik' => 'nullable|numeric',
                 'air' => 'required|numeric',
                 'bbm' => 'required|numeric',
+                'jenis_bbm' => 'required|string',
                 'kertas' => 'required|numeric',
             ]);
 
@@ -108,7 +117,7 @@ public function create()
     public function import(Request $request)
     {
         $request->validate([
-            'fileexcel' => 'required|file|mimes:xlsx,xls,csv'
+            'fileexcel' => 'required|file|mimes:xlsx,xls,csv|max:2048'
         ]);
 
         try {
@@ -117,30 +126,105 @@ public function create()
             $sheet = $spreadsheet->getActiveSheet()->toArray();
 
             $imported = 0;
-            foreach ($sheet as $i => $row) {
-                if ($i === 0 || empty($row[0])) continue;
+            $errors = [];
 
-                Energi::updateOrCreate(
-                    [
-                        'kantor' => $row[0],
-                        'bulan' => $row[1],
-                        'tahun' => $row[2]
-                    ],
-                    [
-                        'listrik' => $row[3],
-                        'daya_listrik' => $row[4] ?? null,
-                        'air' => $row[5],
-                        'bbm' => $row[6],
-                        'jenis_bbm' => $row[7],
-                        'kertas' => $row[8] ?? 0
-                    ]
-                );
-                $imported++;
+            foreach ($sheet as $i => $row) {
+                if ($i === 0 || empty($row[0])) continue; // Skip header atau baris kosong
+
+                // Validasi data sebelum insert
+                if (empty($row[0]) || empty($row[1]) || empty($row[2])) {
+                    $errors[] = "Baris " . ($i + 1) . ": Data kantor, bulan, atau tahun kosong";
+                    continue;
+                }
+
+                try {
+                    Energi::updateOrCreate(
+                        [
+                            'kantor' => trim($row[0]),
+                            'bulan' => trim($row[1]),
+                            'tahun' => (int)$row[2],
+                        ],
+                        [
+                            'listrik' => (float)($row[3] ?? 0),
+                            'daya_listrik' => !empty($row[4]) ? (float)$row[4] : null,
+                            'air' => (float)($row[5] ?? 0),
+                            'bbm' => (float)($row[6] ?? 0),
+                            'jenis_bbm' => trim($row[7] ?? 'Pertalite'),
+                            'kertas' => (float)($row[8] ?? 0),
+                        ]
+                    );
+                    $imported++;
+                } catch (\Exception $e) {
+                    $errors[] = "Baris " . ($i + 1) . ": " . $e->getMessage();
+                }
             }
 
-            return back()->with('success', "✅ $imported data berhasil diimpor/diperbarui!");
+            $message = "✅ Berhasil mengimpor $imported data energi.";
+            if (!empty($errors)) {
+                $message .= " Terdapat " . count($errors) . " error: " . implode(', ', array_slice($errors, 0, 3));
+            }
+
+            return back()->with('success', $message);
         } catch (\Exception $e) {
-            return back()->with('error', '❌ Gagal mengimpor: '.$e->getMessage());
+            return back()->with('error', '❌ Gagal mengimpor: ' . $e->getMessage());
+        }
+    }
+
+    public function downloadTemplate()
+    {
+        try {
+            $spreadsheet = new Spreadsheet();
+            $sheet = $spreadsheet->getActiveSheet();
+            
+            // Header
+            $headers = [
+                'A1' => 'Kantor',
+                'B1' => 'Bulan', 
+                'C1' => 'Tahun',
+                'D1' => 'Listrik (kWh)',
+                'E1' => 'Daya Listrik (VA)',
+                'F1' => 'Air (m³)',
+                'G1' => 'BBM (liter)',
+                'H1' => 'Jenis BBM',
+                'I1' => 'Kertas (rim)'
+            ];
+
+            foreach ($headers as $cell => $value) {
+                $sheet->setCellValue($cell, $value);
+                $sheet->getStyle($cell)->getFont()->setBold(true);
+            }
+
+            // Contoh data
+            $exampleData = [
+                ['Kantor Pusat', 'Januari', 2025, 1500, 1300, 150, 200, 'Pertalite', 50],
+                ['Kantor Cabang A', 'Januari', 2025, 800, 900, 80, 100, 'Pertamax', 25],
+                ['Kantor Cabang B', 'Januari', 2025, 600, 700, 60, 80, 'Solar', 20]
+            ];
+
+            $row = 2;
+            foreach ($exampleData as $data) {
+                $col = 'A';
+                foreach ($data as $value) {
+                    $sheet->setCellValue($col . $row, $value);
+                    $col++;
+                }
+                $row++;
+            }
+
+            // Auto-size columns
+            foreach (range('A', 'I') as $column) {
+                $sheet->getColumnDimension($column)->setAutoSize(true);
+            }
+
+            $writer = new Xlsx($spreadsheet);
+            $filename = 'template_import_energi.xlsx';
+            $tempFile = tempnam(sys_get_temp_dir(), 'template');
+            
+            $writer->save($tempFile);
+
+            return response()->download($tempFile, $filename)->deleteFileAfterSend(true);
+        } catch (\Exception $e) {
+            return back()->with('error', '❌ Gagal membuat template: ' . $e->getMessage());
         }
     }
 

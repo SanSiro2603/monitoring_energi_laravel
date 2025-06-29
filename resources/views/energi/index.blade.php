@@ -8,7 +8,6 @@
     <div class="alert alert-success">{{ session('success') }}</div>
     @endif
 
-
     <form method="GET" action="{{ url()->current() }}" class="row g-2 mb-3">
         <div class="col-md-3">
             <input type="text" name="cari_kantor" class="form-control" placeholder="Cari Kantor" value="{{ request('cari_kantor') }}">
@@ -36,6 +35,7 @@
                 <th>Daya Listrik (VA)</th>
                 <th>Air</th>
                 <th>BBM</th>
+                <th>Jenis BBM</th> {{-- ✅ Tambahkan kolom Jenis BBM --}}
                 <th>Kertas</th>
                 <th>Aksi</th>
             </tr>
@@ -51,6 +51,7 @@
                 <td>{{ $row->daya_listrik }}</td>
                 <td>{{ $row->air }}</td>
                 <td>{{ $row->bbm }}</td>
+                <td>{{ $row->jenis_bbm }}</td> {{-- ✅ Tampilkan jenis BBM --}}
                 <td>{{ $row->kertas }}</td>
                 <td>
                     @if(Auth::user()->role === 'super_user')
