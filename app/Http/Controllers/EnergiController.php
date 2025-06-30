@@ -15,6 +15,8 @@ use Amenadiel\JpGraph\Graph;
 use Amenadiel\JpGraph\Plot;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Date;
+
 
 class EnergiController extends Controller
 {
@@ -229,31 +231,37 @@ class EnergiController extends Controller
     }
 
     public function laporan(Request $request)
-    {
-        $kantor = $request->kantor;
-        $bulan = $request->bulan;
-        $tahun = $request->tahun;
+{
+    $kantor = $request->kantor;
+    $bulan = $request->bulan;
+    $tahun = $request->tahun;
 
-        $query = Energi::query();
+    $query = Energi::query();
 
-        if ($kantor) $query->where('kantor', 'like', "%$kantor%");
-        if ($bulan) $query->where('bulan', 'like', "%$bulan%");
-        if ($tahun) $query->where('tahun', $tahun);
+    if ($kantor) $query->where('kantor', 'like', "%$kantor%");
+    if ($bulan) $query->where('bulan', 'like', "%$bulan%");
+    if ($tahun) $query->where('tahun', $tahun);
 
-        $data = $query->orderByDesc('tahun')
-                     ->orderByDesc('bulan')
-                     ->get();
+    $data = $query->orderByDesc('tahun')
+                 ->orderByDesc('bulan')
+                 ->get();
 
-        $total = [
-            'air' => $data->sum('air'),
-            'listrik' => $data->sum('listrik'),
-            'daya_listrik' => $data->sum('daya_listrik'),
-            'bbm' => $data->sum('bbm'),
-            'kertas' => $data->sum('kertas')
-        ];
+    $total = [
+        'air' => $data->sum('air'),
+        'listrik' => $data->sum('listrik'),
+        'daya_listrik' => $data->sum('daya_listrik'),
+        'bbm' => $data->sum('bbm'),
+        'kertas' => $data->sum('kertas')
+    ];
 
-        return view('admin.laporan', compact('data', 'total', 'kantor', 'bulan', 'tahun'));
+    // Convert angka bulan ke nama bulan (opsional)
+    $bulan_nama = null;
+    if ($bulan && is_numeric($bulan) && $bulan >= 1 && $bulan <= 12) {
+        $bulan_nama = Date::createFromFormat('!m', $bulan)->translatedFormat('F');
     }
+
+    return view('admin.laporan', compact('data', 'total', 'kantor', 'bulan', 'tahun', 'bulan_nama'));
+}
 
     public function exportExcel()
     {
