@@ -103,6 +103,7 @@
         <a href="/admin/energi">📋 Kelola Data</a>
         <a href="/admin/laporan">📊 Laporan</a>
         <a href="{{ route('profil.index') }}">👤 Profil Saya</a>
+        <a href="/admin/users">👥 Kelola User</a>
       @endif
 
       {{-- Menu Divisi --}}

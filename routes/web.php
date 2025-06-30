@@ -9,6 +9,7 @@ use App\Http\Controllers\ChartController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\UserController;
 
 Route::get('/', function () {
     return view('halamanawal');      // Halaman utama
@@ -30,7 +31,10 @@ Route::middleware(['auth', 'role:super_user', 'no_cache'])->group(function () {
     Route::get('/admin/dashboard', function () {
         return view('dashboard.admin');
     });
-
+    
+Route::prefix('admin')->group(function () {
+    Route::resource('users', UserController::class);
+});
     Route::get('/admin/laporan', [EnergiController::class, 'laporan']);
     Route::get('/laporan/admin/json', [EnergiController::class, 'laporanJson']);
     Route::get('/laporan/admin/export-pdf', [EnergiController::class, 'exportPdf']);
