@@ -244,7 +244,8 @@ class EnergiController extends Controller
 
     $data = $query->orderByDesc('tahun')
                  ->orderByDesc('bulan')
-                 ->get();
+                 ->paginate(10)
+                  ->appends($request->all());
 
     $total = [
         'air' => $data->sum('air'),
