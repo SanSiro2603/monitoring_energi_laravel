@@ -101,3 +101,6 @@ Route::post('reset-password', [ResetPasswordController::class, 'reset'])->name('
 // ✅ Pastikan route register hanya ada sekali
 Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
 Route::post('/register', [RegisterController::class, 'register']);
+Route::get('/profil/edit', [ProfilController::class, 'edit'])->name('profil.edit');
+Route::put('/profil/update', [ProfilController::class, 'update'])->name('profil.update');
+

@@ -22,6 +22,10 @@
         @endif
     </div>
 
+  <div class="mb-3 text-end">
+       <a href="{{ route('profil.edit') }}" class="btn btn-success">✏️ Edit Profil</a>
+    </div>
+
     <div class="table-responsive">
         <table class="table table-bordered table-striped">
             <tr><th>Nama Lengkap</th><td>{{ $user->name }}</td></tr>
