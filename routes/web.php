@@ -40,7 +40,7 @@ Route::middleware(['auth', 'role:super_user', 'no_cache'])->group(function () {
     Route::get('/laporan/admin/json', [EnergiController::class, 'laporanJson']);
     Route::get('/laporan/admin/export-pdf', [EnergiController::class, 'exportPdf']);
     Route::get('/laporan/admin/export-excel', [EnergiController::class, 'exportExcel']);
-    Route::get('/export-energi', [EnergiController::class, 'export'])->name('export.energi');
+    Route::get('/export-energi', [EnergiController::class, 'exportExcel'])->name('export.energi');
 
     // ✅ FIXED: tambahkan name admin.energi.index
     Route::get('/admin/energi', [EnergiController::class, 'index'])->name('admin.energi.index');

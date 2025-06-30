@@ -22,7 +22,7 @@
 
     <!-- Tombol Export -->
     <div class="mb-3 d-flex gap-2">
-        <a href="{{ route('export.energi') }}" class="btn btn-success">Export Excel</a>
+        <a href="{{ url('/export-energi') }}" class="btn btn-success">🗃️Export Excel</a>
         <a href="{{ url('/laporan/admin/export-pdf') }}" class="btn btn-danger">📄 Export ke PDF</a>
         <button onclick="downloadChartImage()" class="btn btn-outline-secondary">🖼 Download Gambar Chart</button>
     </div>
