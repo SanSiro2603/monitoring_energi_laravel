@@ -242,27 +242,23 @@ class EnergiController extends Controller
     if ($bulan) $query->where('bulan', 'like', "%$bulan%");
     if ($tahun) $query->where('tahun', $tahun);
 
-    $data = $query->orderByDesc('tahun')
-                 ->orderByDesc('bulan')
-                 ->paginate(10)
-                  ->appends($request->all());
+    // Untuk grafik: semua data
+    $dataAll = $query->orderByDesc('tahun')->orderByDesc('bulan')->get();
+
+    // Untuk tabel: hanya 10 per halaman
+    $data = (clone $query)->orderByDesc('tahun')->orderByDesc('bulan')->paginate(10);
 
     $total = [
-        'air' => $data->sum('air'),
-        'listrik' => $data->sum('listrik'),
-        'daya_listrik' => $data->sum('daya_listrik'),
-        'bbm' => $data->sum('bbm'),
-        'kertas' => $data->sum('kertas')
+        'air' => $dataAll->sum('air'),
+        'listrik' => $dataAll->sum('listrik'),
+        'daya_listrik' => $dataAll->sum('daya_listrik'),
+        'bbm' => $dataAll->sum('bbm'),
+        'kertas' => $dataAll->sum('kertas')
     ];
 
-    // Convert angka bulan ke nama bulan (opsional)
-    $bulan_nama = null;
-    if ($bulan && is_numeric($bulan) && $bulan >= 1 && $bulan <= 12) {
-        $bulan_nama = Date::createFromFormat('!m', $bulan)->translatedFormat('F');
-    }
-
-    return view('admin.laporan', compact('data', 'total', 'kantor', 'bulan', 'tahun', 'bulan_nama'));
+    return view('admin.laporan', compact('data', 'dataAll', 'total', 'kantor', 'bulan', 'tahun'));
 }
+
 
     public function exportExcel()
     {

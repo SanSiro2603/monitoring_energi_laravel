@@ -44,28 +44,30 @@
                     </tr>
                 </thead>
                 <tbody>
-              @forelse ($data as $i => $row)
-              <tr>
-                  <td>{{ ($data->currentPage() - 1) * $data->perPage() + $i + 1 }}</td>
-                  <td>{{ $row->kantor }}</td>
-                  <td>{{ $row->bulan }}</td>
-                  <td>{{ $row->tahun }}</td>
-                  <td>{{ $row->listrik }}</td>
-                  <td>{{ $row->air }}</td>
-                  <td>{{ $row->bbm }}</td>
-                  <td>{{ $row->kertas }}</td>
-              </tr>
-              @empty
-              <tr>
-                  <td colspan="8" class="text-center">Tidak ada data</td>
-              </tr>
-              @endforelse
-              </tbody>
+                    @forelse ($data as $i => $row)
+                    <tr>
+                        <td>{{ $i + 1 }}</td>
+                        <td>{{ $row->kantor }}</td>
+                        <td>{{ $row->bulan }}</td>
+                        <td>{{ $row->tahun }}</td>
+                        <td>{{ $row->listrik }}</td>
+                        <td>{{ $row->air }}</td>
+                        <td>{{ $row->bbm }}</td>
+                        <td>{{ $row->kertas }}</td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="8" class="text-center">Tidak ada data</td>
+                    </tr>
+                    @endforelse
+                </tbody>
             </table>
-        </div>
-<div class="d-flex justify-content-left mt-3">
+            <div class="mt-3">
     {{ $data->links() }}
 </div>
+
+        </div>
+
         <!-- Kontrol Grafik -->
         <div class="row mt-4 mb-3">
             <div class="col-md-12">
@@ -123,7 +125,8 @@
 </div>
 
 <!-- Hidden div untuk menyimpan data -->
-<div id="energiData" style="display: none;">{!! json_encode($data) !!}</div>
+<div id="energiData" style="display: none;">{!! json_encode($dataAll) !!}</div>
+
 
 @endsection
 
