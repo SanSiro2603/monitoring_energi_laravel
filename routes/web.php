@@ -12,11 +12,11 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\UserController;
 
 Route::get('/', function () {
-    return view('halamanawal');      // Halaman utama
+    return view('halamanawal'); // Halaman utama
 })->name('home');
 
 Route::get('/tentang', function () {
-    return view('welcome');          // Halaman tentang
+    return view('welcome'); // Halaman tentang
 })->name('tentang');
 
 // AUTH ROUTES
@@ -31,17 +31,19 @@ Route::middleware(['auth', 'role:super_user', 'no_cache'])->group(function () {
     Route::get('/admin/dashboard', function () {
         return view('dashboard.admin');
     });
-    
-Route::prefix('admin')->group(function () {
-    Route::resource('users', UserController::class);
-});
+
+    Route::prefix('admin')->group(function () {
+        Route::resource('users', UserController::class);
+    });
+
     Route::get('/admin/laporan', [EnergiController::class, 'laporan']);
     Route::get('/laporan/admin/json', [EnergiController::class, 'laporanJson']);
     Route::get('/laporan/admin/export-pdf', [EnergiController::class, 'exportPdf']);
     Route::get('/laporan/admin/export-excel', [EnergiController::class, 'exportExcel']);
     Route::get('/export-energi', [EnergiController::class, 'export'])->name('export.energi');
 
-    Route::get('/admin/energi', [EnergiController::class, 'index'])->name('energi.index');
+    // ✅ FIXED: tambahkan name admin.energi.index
+    Route::get('/admin/energi', [EnergiController::class, 'index'])->name('admin.energi.index');
     Route::get('/admin/energi/create', [EnergiController::class, 'create']);
     Route::post('/admin/energi', [EnergiController::class, 'store']);
     Route::get('/admin/energi/{id}/edit', [EnergiController::class, 'edit']);
@@ -50,14 +52,14 @@ Route::prefix('admin')->group(function () {
     Route::post('/energi/import', [EnergiController::class, 'import']);
 });
 
-
 // DIVISI USER
 Route::middleware(['auth', 'role:divisi_user'])->group(function () {
     Route::get('/divisi/dashboard', function () {
         return view('dashboard.divisi');
     });
 
-    Route::get('/divisi/energi', [EnergiController::class, 'index']);
+    // ✅ Tambahkan name divisi.energi.index
+    Route::get('/divisi/energi', [EnergiController::class, 'index'])->name('divisi.energi.index');
     Route::get('/divisi/energi/create', [EnergiController::class, 'create']);
     Route::post('/divisi/energi', [EnergiController::class, 'store']);
     Route::delete('/divisi/energi/{id}', [EnergiController::class, 'destroy']);
@@ -72,7 +74,7 @@ Route::middleware(['auth', 'role:user_umum'])->group(function () {
     Route::get('/umum/summary', [EnergiController::class, 'summary']);
 });
 
-// ✅ PERBAIKAN: Route dengan nama 'dashboard'
+// ✅ Route dengan nama 'dashboard'
 Route::get('/dashboard', function () {
     $role = Auth::user()->role;
 
@@ -93,9 +95,9 @@ Route::middleware('auth')->group(function () {
 // Lupa Password
 Route::get('forgot-password', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
 Route::post('forgot-password', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
-
 Route::get('reset-password/{token}', [ResetPasswordController::class, 'showResetForm'])->name('password.reset');
 Route::post('reset-password', [ResetPasswordController::class, 'reset'])->name('password.update');
 
+// ✅ Pastikan route register hanya ada sekali
 Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
 Route::post('/register', [RegisterController::class, 'register']);

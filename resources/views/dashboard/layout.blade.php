@@ -102,8 +102,12 @@
         <a href="/admin/energi/create">➕ Input Data Energi</a>
         <a href="/admin/energi">📋 Kelola Data</a>
         <a href="/admin/laporan">📊 Laporan</a>
-        <a href="{{ route('profil.index') }}">👤 Profil Saya</a>
-        <a href="/admin/users">👥 Kelola User</a>
+        <a href="/admin/users">
+    <img src="{{ asset('assets/img/IconKelolaUser.png') }}" alt="Kelola User" style="height: 20px; margin-right: 6px;">
+    Kelola User
+</a>
+<a href="{{ route('profil.index') }}">👤 Profil Saya</a>
+
       @endif
 
       {{-- Menu Divisi --}}
