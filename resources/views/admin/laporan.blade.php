@@ -119,6 +119,10 @@
         </div>
     </div>
 </div>
+
+<!-- Hidden div untuk menyimpan data -->
+<div id="energiData" style="display: none;">{!! json_encode($data) !!}</div>
+
 @endsection
 
 @push('scripts')
@@ -127,10 +131,19 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 let chartEnergi;
-let allData = @json($data); 
+let allData = [];
 
 // Inisialisasi
 document.addEventListener('DOMContentLoaded', function() {
+    // Ambil data dari hidden div
+    const dataElement = document.getElementById('energiData');
+    try {
+        allData = JSON.parse(dataElement.textContent);
+    } catch (e) {
+        console.error('Error parsing data:', e);
+        allData = [];
+    }
+    
     populateFilters();
     initChart();
 });
@@ -143,6 +156,8 @@ function populateFilters() {
     // Clear existing options
     kantorSelect.innerHTML = '<option value="">Semua Kantor</option>';
     tahunSelect.innerHTML = '<option value="">Pilih Tahun</option>';
+    
+    if (allData.length === 0) return;
     
     // Get unique values
     const uniqueKantor = [...new Set(allData.map(item => item.kantor))];
@@ -212,7 +227,7 @@ function updateChart() {
     const chartType = document.getElementById('chartType').value;
     const energyType = document.getElementById('energyType').value;
     
-    let filteredData = allData;
+    let filteredData = [...allData];
     
     // Filter by kantor
     if (kantor) {
