@@ -69,9 +69,10 @@
 <body>
 
  <!-- ✅ Icon Energi Atas -->
-    <div class="icon-group">
-        <img src="{{ asset('assets/img/ataslogin.png') }}" alt="Ikon Energi">
-    </div>
+   <div class="icon-group" style="margin-top: 1cm; text-align: center;">
+    <img src="{{ asset('assets/img/ataslogin.png') }}" alt="Ikon Energi" style="width: 150px; height: auto;">
+</div>
+
 <h2 class="text-center fw-bold mb-2">Hemat Energi</h2>
 
 <div class="register-container">
@@ -107,6 +108,5 @@
   <img src="{{ asset('assets/img/banklpg.png') }}" alt="Bank Lampung"><br>
   ©2025 PT. Bank Lampung - Sistem Monitoring Energi
 </div>
-
 </body>
-</html>
+</html> 
