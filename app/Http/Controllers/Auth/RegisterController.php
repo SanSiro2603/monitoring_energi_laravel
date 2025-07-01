@@ -42,7 +42,7 @@ class RegisterController extends Controller
         ]);
 
         $data['password'] = Hash::make($request->password);
-        $data['role'] = 'user_umum'; // default role
+        $data['role'] = 'user_umum'; // Default role
         $data['foto'] = null;
 
         if ($request->hasFile('foto')) {
@@ -51,9 +51,13 @@ class RegisterController extends Controller
 
         $user = User::create($data);
 
-        // Auto login setelah registrasi (opsional)
-        auth()->login($user);
+        // ✅ Langsung login (jika diinginkan), dan arahkan ke dashboard
+        //auth()->login($user);
 
+        // ✅ Kirim flash message ke dashboard
         return redirect('/dashboard')->with('success', 'Registrasi berhasil. Selamat datang!');
+        
+        // ⛔️ Jika tidak ingin langsung login, ganti ke ini:
+        // return redirect()->route('login')->with('success', 'Registrasi berhasil. Silakan login.');
     }
 }
