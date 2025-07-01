@@ -42,7 +42,6 @@ Route::middleware(['auth', 'role:super_user', 'no_cache'])->group(function () {
     Route::get('/laporan/admin/export-excel', [EnergiController::class, 'exportExcel']);
     Route::get('/export-energi', [EnergiController::class, 'exportExcel'])->name('export.energi');
 
-    // ✅ FIXED: tambahkan name admin.energi.index
     Route::get('/admin/energi', [EnergiController::class, 'index'])->name('admin.energi.index');
     Route::get('/admin/energi/create', [EnergiController::class, 'create']);
     Route::post('/admin/energi', [EnergiController::class, 'store']);
@@ -58,7 +57,6 @@ Route::middleware(['auth', 'role:divisi_user'])->group(function () {
         return view('dashboard.divisi');
     });
 
-    // ✅ Tambahkan name divisi.energi.index
     Route::get('/divisi/energi', [EnergiController::class, 'index'])->name('divisi.energi.index');
     Route::get('/divisi/energi/create', [EnergiController::class, 'create']);
     Route::post('/divisi/energi', [EnergiController::class, 'store']);
@@ -74,8 +72,12 @@ Route::middleware(['auth', 'role:user_umum'])->group(function () {
     Route::get('/umum/summary', [EnergiController::class, 'summary']);
 });
 
-// ✅ Route dengan nama 'dashboard'
+// Route dashboard otomatis berdasarkan role
 Route::get('/dashboard', function () {
+    if (!Auth::check()) {
+        return redirect()->route('login');
+    }
+
     $role = Auth::user()->role;
 
     if ($role === 'super_user') {
@@ -83,24 +85,26 @@ Route::get('/dashboard', function () {
     } elseif ($role === 'divisi_user') {
         return view('dashboard.divisi');
     } else {
-        return view('dashboard.umum'); // fallback
+        return view('dashboard.umum');
     }
 })->middleware('auth')->name('dashboard');
 
+// Profil
 Route::middleware('auth')->group(function () {
     Route::get('/profil', [ProfilController::class, 'index'])->name('profil.index');
     Route::post('/profil/upload', [ProfilController::class, 'uploadFoto'])->name('profil.upload');
+    Route::get('/profil/edit', [ProfilController::class, 'edit'])->name('profil.edit');
+    Route::put('/profil/update', [ProfilController::class, 'update'])->name('profil.update');
 });
 
 // Lupa Password
-Route::get('forgot-password', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
-Route::post('forgot-password', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
-Route::get('reset-password/{token}', [ResetPasswordController::class, 'showResetForm'])->name('password.reset');
-Route::post('reset-password', [ResetPasswordController::class, 'reset'])->name('password.update');
+Route::middleware('guest')->group(function () {
+    Route::get('forgot-password', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
+    Route::post('forgot-password', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
+    Route::get('reset-password/{token}', [ResetPasswordController::class, 'showResetForm'])->name('password.reset');
+    Route::post('reset-password', [ResetPasswordController::class, 'reset'])->name('password.update');
+});
 
-// ✅ Pastikan route register hanya ada sekali
+// Pastikan route register hanya ada sekali
 Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
 Route::post('/register', [RegisterController::class, 'register']);
-Route::get('/profil/edit', [ProfilController::class, 'edit'])->name('profil.edit');
-Route::put('/profil/update', [ProfilController::class, 'update'])->name('profil.update');
-
