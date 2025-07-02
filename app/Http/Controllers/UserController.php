@@ -8,12 +8,12 @@ use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
-    // ✅ Tampilkan daftar semua user dengan search & per page
+    // ✅ Tampilkan daftar user dengan fitur search dan pagination dinamis
     public function index(Request $request)
     {
         $query = User::query();
 
-        // Filter berdasarkan keyword pencarian
+        // Filter berdasarkan pencarian
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
@@ -25,20 +25,20 @@ class UserController extends Controller
             });
         }
 
-        // Ambil data dengan pagination (default 10)
-        $perPage = $request->input('per_page', 10);
-        $users = $query->paginate($perPage)->appends($request->only('search', 'per_page'));
+        // Ambil data dengan pagination
+        $perPage = $request->input('per_page', 10); // default 10
+        $users = $query->orderBy('name')->paginate($perPage)->appends($request->only('search', 'per_page'));
 
         return view('users.index', compact('users'));
     }
 
-    // Tampilkan form tambah user
+    // ✅ Form tambah user
     public function create()
     {
         return view('users.create');
     }
 
-    // Simpan user baru
+    // ✅ Simpan user baru
     public function store(Request $request)
     {
         $request->validate([
@@ -61,13 +61,13 @@ class UserController extends Controller
         return redirect()->route('users.index')->with('success', 'User berhasil ditambahkan.');
     }
 
-    // Tampilkan form edit user
+    // ✅ Form edit user
     public function edit(User $user)
     {
         return view('users.edit', compact('user'));
     }
 
-    // Update data user
+    // ✅ Update user
     public function update(Request $request, User $user)
     {
         $request->validate([
@@ -88,7 +88,7 @@ class UserController extends Controller
         return redirect()->route('users.index')->with('success', 'User berhasil diupdate.');
     }
 
-    // Hapus user
+    // ✅ Hapus user
     public function destroy(User $user)
     {
         $user->delete();

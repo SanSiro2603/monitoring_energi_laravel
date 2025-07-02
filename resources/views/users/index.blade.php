@@ -2,21 +2,27 @@
 
 @section('content')
 <div class="container">
-    {{-- ✅ Header dengan Tambah User & Search di satu baris --}}
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h3>Manajemen User</h3>
-        <div class="d-flex align-items-center gap-2">
-            {{-- Form Search --}}
-            <form method="GET" action="{{ route('users.index') }}" class="me-2">
-                <div class="input-group rounded-pill shadow-sm">
-                    <input type="text" name="search" class="form-control border-success rounded-start-pill" placeholder="🔍 Cari user..." value="{{ request('search') }}">
-                    <button class="btn btn-success rounded-end-pill px-4" type="submit">Cari</button>
-                </div>
-            </form>
-            {{-- Tombol Tambah User --}}
-            <a href="{{ route('users.create') }}" class="btn btn-success">Tambah User +</a>
-        </div>
+        <a href="{{ route('users.create') }}" class="btn btn-success">Tambah User +</a>
     </div>
+
+    {{-- ✅ Search dan Per Page --}}
+    <form method="GET" action="{{ route('users.index') }}" class="row g-2 align-items-center mb-3">
+        <div class="col-md-6">
+            <div class="input-group rounded-pill shadow-sm">
+                <input type="text" name="search" class="form-control border-success rounded-start-pill" placeholder="🔍 Cari user..." value="{{ request('search') }}">
+                <button class="btn btn-success rounded-end-pill px-4" type="submit">Cari</button>
+            </div>
+        </div>
+        <div class="col-md-2 ms-auto">
+            <select name="per_page" class="form-select" onchange="this.form.submit()">
+                <option value="5" {{ request('per_page') == 5 ? 'selected' : '' }}>5 </option>
+                <option value="10" {{ request('per_page') == 10 ? 'selected' : '' }}>10 </option>
+                <option value="25" {{ request('per_page') == 25 ? 'selected' : '' }}>25 </option>
+            </select>
+        </div>
+    </form>
 
     {{-- ✅ Notifikasi Sukses --}}
     @if (session('success'))
