@@ -32,13 +32,13 @@ class RegisterController extends Controller
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
             'unit_kerja' => ['nullable', 'string', 'max:255'],
             'unit_bagian' => ['nullable', 'string', 'max:255'],
-            'level_gol' => ['nullable', 'string', 'max:255'],
+            'jabatan' => ['nullable', 'string', 'max:255'],
             'wilayah' => ['nullable', 'string', 'max:255'],
             'foto' => ['nullable', 'image', 'max:2048'],
         ]);
 
         $data = $request->only([
-            'name', 'username', 'email', 'unit_kerja', 'unit_bagian', 'level_gol', 'wilayah'
+            'name', 'username', 'email', 'unit_kerja', 'unit_bagian', 'jabatan', 'wilayah'
         ]);
 
         $data['password'] = Hash::make($request->password);

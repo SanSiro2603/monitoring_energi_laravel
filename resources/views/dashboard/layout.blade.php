@@ -120,6 +120,7 @@
       {{-- Menu User Umum --}}
       @if(Auth::user()->role === 'user_umum')
         <a href="/umum/summary">📄 Lihat Summary</a>
+        <a href="{{ route('profil.index') }}">👤 Profil Saya</a>
       @endif
     </div>
     @endauth

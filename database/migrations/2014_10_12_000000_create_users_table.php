@@ -15,7 +15,7 @@ return new class extends Migration {
     $table->timestamp('email_verified_at')->nullable();
     $table->string('password');
     $table->string('unit_bagian')->nullable();
-    $table->string('level_gol')->nullable();
+    $table->string('jabatan')->nullable();
     $table->string('wilayah')->nullable();
     $table->string('unit_kerja')->nullable();
     $table->string('foto')->nullable();

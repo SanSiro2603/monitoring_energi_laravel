@@ -28,7 +28,7 @@ class ProfilController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'unit_bagian' => 'nullable|string|max:255',
-            'level_gol' => 'nullable|string|max:50',
+            'jabatan' => 'nullable|string|max:50',
             'wilayah' => 'nullable|string|max:100',
             'unit_kerja' => 'nullable|string|max:255',
             'username' => 'required|string|max:100|unique:users,username,' . $user->id,
@@ -38,7 +38,7 @@ class ProfilController extends Controller
         // Update data
         $user->name = $request->name;
         $user->unit_bagian = $request->unit_bagian;
-        $user->level_gol = $request->level_gol;
+        $user->jabatan = $request->jabatan;
         $user->wilayah = $request->wilayah;
         $user->unit_kerja = $request->unit_kerja;
         $user->username = $request->username;

@@ -30,7 +30,7 @@
         <table class="table table-bordered table-striped">
             <tr><th>Nama Lengkap</th><td>{{ $user->name }}</td></tr>
             <tr><th>Unit Bagian</th><td>{{ $user->unit_bagian }}</td></tr>
-            <tr><th>Level / Golongan</th><td>{{ $user->level_gol }}</td></tr>
+            <tr><th>Jabatan</th><td>{{ $user->jabatan }}</td></tr>
             <tr><th>Wilayah</th><td>{{ $user->wilayah }}</td></tr>
             <tr><th>Unit Kerja</th><td>{{ $user->unit_kerja }}</td></tr>
             <tr><th>Username</th><td>{{ $user->username }}</td></tr>

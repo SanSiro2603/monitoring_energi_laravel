@@ -23,13 +23,8 @@
         </div>
 
         <div class="mb-3">
-            <label for="level_gol" class="form-label">Level / Golongan</label>
-            <select name="level_gol" class="form-control" required>
-                <option value="">-- Pilih Level --</option>
-                @for($i = 1; $i <= 4; $i++)
-                    <option value="{{ $i }}" {{ old('level_gol', $user->level_gol) == $i ? 'selected' : '' }}>Level {{ $i }}</option>
-                @endfor
-            </select>
+            <label for="jabatan" class="form-label">Jabatan</label>
+            <input type="text" name="jabatan" value="{{ old('jabatan', $user->jabatan) }}" class="form-control">
         </div>
 
         <div class="mb-3">

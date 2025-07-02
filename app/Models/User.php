@@ -22,7 +22,7 @@ class User extends Authenticatable
         'email',
         'password',
         'unit_bagian',
-        'level_gol',
+        'jabatan',
         'wilayah',
         'unit_kerja',
         'foto',
