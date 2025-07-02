@@ -84,8 +84,33 @@
     <div class="forgot-container">
         <div class="title">🔑 Lupa Password</div>
 
+        {{-- ✅ NOTIFIKASI SUKSES --}}
         @if (session('status'))
-            <div class="alert alert-success">{{ session('status') }}</div>
+            <div class="alert alert-success alert-dismissible fade show text-start" role="alert">
+                ✅ {{ session('status') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Tutup"></button>
+            </div>
+        @endif
+
+        {{-- ✅ NOTIFIKASI CUSTOM (jika ada) --}}
+        @if (session('success'))
+            <div class="alert alert-success alert-dismissible fade show text-start" role="alert">
+                ✅ {{ session('success') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Tutup"></button>
+            </div>
+        @endif
+
+        {{-- ❌ NOTIFIKASI ERROR --}}
+        @if ($errors->any())
+            <div class="alert alert-danger alert-dismissible fade show text-start" role="alert">
+                <strong>Terjadi kesalahan:</strong>
+                <ul class="mb-0">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Tutup"></button>
+            </div>
         @endif
 
         <div class="subtitle">
@@ -110,6 +135,9 @@
         <img src="{{ asset('assets/img/banklpg.png') }}" alt="Bank Lampung"><br>
         ©2025 PT. Bank Lampung - Sistem Monitoring Energi
     </div>
+
+    <!-- Bootstrap JS for close alert -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 </html>

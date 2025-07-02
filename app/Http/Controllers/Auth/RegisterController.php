@@ -55,9 +55,9 @@ class RegisterController extends Controller
         //auth()->login($user);
 
         // ✅ Kirim flash message ke dashboard
-        return redirect('/dashboard')->with('success', 'Registrasi berhasil. Selamat datang!');
+        //return redirect('/dashboard')->with('success', 'Registrasi berhasil. Selamat datang!');
         
         // ⛔️ Jika tidak ingin langsung login, ganti ke ini:
-        // return redirect()->route('login')->with('success', 'Registrasi berhasil. Silakan login.');
+         return redirect()->route('login')->with('success', 'Registrasi berhasil. Silakan login.');
     }
 }

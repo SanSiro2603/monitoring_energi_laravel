@@ -108,3 +108,4 @@ Route::middleware('guest')->group(function () {
 // Pastikan route register hanya ada sekali
 Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
 Route::post('/register', [RegisterController::class, 'register']);
+

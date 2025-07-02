@@ -7,7 +7,7 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
   <style>
     body {
-      background-image: url("<?php echo asset('assets/img/rumpu.png'); ?>");
+      background-image: url("{{ asset('assets/img/rumpu.png') }}");
       background-size: cover;
       background-repeat: no-repeat;
       background-position: center;
@@ -156,8 +156,15 @@
       <button type="submit" class="btn btn-login">Login</button>
     </form>
 
+    <!-- ✅ Link Lupa Password Diperbaiki -->
     <div class="bottom-text">
-      <a href="{{ route('password.request') }}">Lupa password?</a>
+      @if (Route::has('password.request'))
+        <a href="{{ route('password.request') }}" class="text-success text-decoration-none fw-semibold">
+          <i class="bi bi-question-circle me-1"></i> Lupa password?
+        </a>
+      @else
+        <span class="text-muted">Reset password tidak tersedia</span>
+      @endif
     </div>
   </div>
 
