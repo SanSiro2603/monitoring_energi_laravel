@@ -8,10 +8,27 @@ use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
-    // Tampilkan daftar semua user
-    public function index()
+    // ✅ Tampilkan daftar semua user dengan search & per page
+    public function index(Request $request)
     {
-        $users = User::all();
+        $query = User::query();
+
+        // Filter berdasarkan keyword pencarian
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', '%' . $search . '%')
+                  ->orWhere('email', 'like', '%' . $search . '%')
+                  ->orWhere('username', 'like', '%' . $search . '%')
+                  ->orWhere('unit_kerja', 'like', '%' . $search . '%')
+                  ->orWhere('role', 'like', '%' . $search . '%');
+            });
+        }
+
+        // Ambil data dengan pagination (default 10)
+        $perPage = $request->input('per_page', 10);
+        $users = $query->paginate($perPage)->appends($request->only('search', 'per_page'));
+
         return view('users.index', compact('users'));
     }
 
@@ -78,4 +95,3 @@ class UserController extends Controller
         return redirect()->route('users.index')->with('success', 'User berhasil dihapus.');
     }
 }
-

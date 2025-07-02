@@ -35,7 +35,7 @@
                 <th>Daya Listrik (VA)</th>
                 <th>Air</th>
                 <th>BBM</th>
-                <th>Jenis BBM</th> {{-- ✅ Tambahkan kolom Jenis BBM --}}
+                <th>Jenis BBM</th>
                 <th>Kertas</th>
                 <th>Aksi</th>
             </tr>
@@ -51,7 +51,7 @@
                 <td>{{ $row->daya_listrik }}</td>
                 <td>{{ $row->air }}</td>
                 <td>{{ $row->bbm }}</td>
-                <td>{{ $row->jenis_bbm }}</td> {{-- ✅ Tampilkan jenis BBM --}}
+                <td>{{ $row->jenis_bbm }}</td>
                 <td>{{ $row->kertas }}</td>
                 <td>
                     @if(Auth::user()->role === 'super_user')
