@@ -243,7 +243,7 @@
 
     <div class="main-wrapper">
         <div class="header-section">
-            <img src="{{ asset('images/banklpg.png') }}" alt="Bank Lampung Logo">
+            <img src="{{ asset('assets/img/banklpg.png') }}" alt="Bank Lampung">
             <h2>Monitoring Energi</h2>
         </div>
 
@@ -330,9 +330,12 @@
     </div>
 
     <div class="footer">
-        <img src="{{ asset('images/banklpg.png') }}" alt="Bank Lampung"><br>
-        ©2025 PT. Bank Lampung - Sistem Monitoring Energi
+    <div>
+        <img src="{{ asset('assets/img/banklpg.png') }}" alt="Bank Lampung" style="height: 40px; margin-bottom: 5px;">
     </div>
+    <div>©2025 PT. Bank Lampung - Sistem Monitoring Energi</div>
+</div>
+
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
