@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Auth\Events\Registered;
 
 class RegisterController extends Controller
 {
@@ -51,13 +52,10 @@ class RegisterController extends Controller
 
         $user = User::create($data);
 
-        // ✅ Langsung login (jika diinginkan), dan arahkan ke dashboard
-        //auth()->login($user);
+        // Kirim email verifikasi
+        event(new Registered($user));
 
-        // ✅ Kirim flash message ke dashboard
-        //return redirect('/dashboard')->with('success', 'Registrasi berhasil. Selamat datang!');
-        
-        // ⛔️ Jika tidak ingin langsung login, ganti ke ini:
-         return redirect()->route('login')->with('success', 'Registrasi berhasil. Silakan login.');
+        // Redirect ke halaman pemberitahuan verifikasi
+        return redirect()->route('verification.notice')->with('success', 'Registrasi berhasil. Silakan cek email Anda untuk verifikasi.');
     }
 }

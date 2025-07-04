@@ -10,6 +10,8 @@ use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\UserController;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
+use Illuminate\Http\Request;
 
 Route::get('/', function () {
     return view('halamanawal'); // Halaman utama
@@ -22,8 +24,6 @@ Route::get('/tentang', function () {
 // AUTH ROUTES
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
-//Route::get('/register', [AuthController::class, 'showRegister']);
-//Route::post('/register', [AuthController::class, 'register']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 // SUPER USER
@@ -68,7 +68,6 @@ Route::middleware(['auth', 'role:divisi_user'])->prefix('divisi')->group(functio
     Route::post('/users', [UserController::class, 'storeDivisi']); // ← penting!
 });
 
-
 // USER UMUM
 Route::middleware(['auth', 'role:user_umum'])->group(function () {
     Route::get('/umum/dashboard', function () {
@@ -93,7 +92,7 @@ Route::get('/dashboard', function () {
     } else {
         return view('dashboard.umum');
     }
-})->middleware('auth')->name('dashboard');
+})->middleware(['auth', 'verified'])->name('dashboard');
 
 // Profil
 Route::middleware('auth')->group(function () {
@@ -111,7 +110,21 @@ Route::middleware('guest')->group(function () {
     Route::post('reset-password', [ResetPasswordController::class, 'reset'])->name('password.update');
 });
 
-// Pastikan route register hanya ada sekali
+// REGISTER + VERIFIKASI EMAIL
 Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
 Route::post('/register', [RegisterController::class, 'register']);
 
+// ✅ Tambahan route verifikasi email
+Route::get('/email/verify', function () {
+    return view('auth.verify'); // Buat view ini di resources/views/auth/verify.blade.php
+})->middleware('auth')->name('verification.notice');
+
+Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
+    $request->fulfill(); // Menandai email sebagai verified
+    return redirect('/dashboard');
+})->middleware(['auth', 'signed'])->name('verification.verify');
+
+Route::post('/email/verification-notification', function (Request $request) {
+    $request->user()->sendEmailVerificationNotification();
+    return back()->with('resent', true);
+})->middleware(['auth', 'throttle:6,1'])->name('verification.send');
