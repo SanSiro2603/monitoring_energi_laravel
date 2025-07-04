@@ -94,4 +94,51 @@ class UserController extends Controller
         $user->delete();
         return redirect()->route('users.index')->with('success', 'User berhasil dihapus.');
     }
+
+    public function indexDivisi(Request $request)
+{
+    $query = User::where('role', 'user_umum');
+
+    if ($request->filled('search')) {
+        $search = $request->search;
+        $query->where(function ($q) use ($search) {
+            $q->where('name', 'like', '%' . $search . '%')
+              ->orWhere('email', 'like', '%' . $search . '%')
+              ->orWhere('username', 'like', '%' . $search . '%');
+        });
+    }
+
+    $perPage = $request->input('per_page', 10);
+    $users = $query->orderBy('name')->paginate($perPage)->appends($request->only('search', 'per_page'));
+
+    return view('divisi.users.index', compact('users'));
+}
+
+
+    public function createDivisi()
+    {
+        return view('divisi.users.create');
+    }
+
+    public function storeDivisi(Request $request)
+{
+    $request->validate([
+        'name' => 'required|string|max:100',
+        'username' => 'required|unique:users',
+        'email' => 'required|email|unique:users,email',
+        'password' => 'required|string|min:6',
+    ]);
+
+    User::create([
+        'name' => $request->name,
+        'username' => $request->username,
+        'email' => $request->email,
+        'password' => Hash::make($request->password),
+        'unit_kerja' => $request->unit_kerja,
+        'role' => 'user_umum', // dipaksa tetap user_umum
+    ]);
+
+    return redirect('/divisi/users')->with('success', 'User berhasil ditambahkan.');
+}
+
 }

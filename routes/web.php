@@ -62,6 +62,12 @@ Route::middleware(['auth', 'role:divisi_user'])->group(function () {
     Route::post('/divisi/energi', [EnergiController::class, 'store']);
     Route::delete('/divisi/energi/{id}', [EnergiController::class, 'destroy']);
 });
+Route::middleware(['auth', 'role:divisi_user'])->prefix('divisi')->group(function () {
+    Route::get('/users', [UserController::class, 'indexDivisi']);
+    Route::get('/users/create', [UserController::class, 'createDivisi']);
+    Route::post('/users', [UserController::class, 'storeDivisi']); // ← penting!
+});
+
 
 // USER UMUM
 Route::middleware(['auth', 'role:user_umum'])->group(function () {

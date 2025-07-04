@@ -354,6 +354,9 @@
                     <a href="/divisi/energi" class="{{ request()->is('divisi/energi') ? 'active' : '' }}">
                         <i class="fas fa-clipboard-list"></i> Kelola Data
                     </a>
+                    <a href="/divisi/users" class="{{ request()->is('divisi/users') ? 'active' : '' }}">
+                        <i class="fas fa-address-card"></i> Kelola Users
+                    </a>
                     <a href="{{ route('profil.index') }}" class="{{ request()->is('profil*') ? 'active' : '' }}">
                         <i class="fas fa-user-circle"></i> Profil Saya
                     </a>
