@@ -9,11 +9,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary-green: #2e7d32; /* Hijau Primer */
-            --dark-green: #1b5e20;    /* Hijau Gelap */
-            --light-green: #c8e6c9;   /* Hijau Muda */
-            --accent-green: #4caf50;  /* Hijau Aksen */
-            --accent-yellow: #ffc107; /* Kuning Aksen */
+            --primary-green: #2e7d32;
+            --dark-green: #1b5e20;
+            --light-green: #c8e6c9;
+            --accent-green: #4caf50;
+            --accent-yellow: #ffc107;
             --neutral-white: #ffffff;
             --neutral-light: #f5f5f5;
             --neutral-dark: #2c3e50;
@@ -23,7 +23,7 @@
             height: 100%;
             margin: 0;
             padding: 0;
-            overflow-x: hidden; /* Mencegah scroll horizontal */
+            overflow-x: hidden;
         }
 
         body {
@@ -31,56 +31,63 @@
             background: linear-gradient(to bottom, var(--light-green), var(--accent-green));
             display: flex;
             flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
+            min-height: 100vh;
             box-sizing: border-box;
-            position: relative;
         }
 
-        /* Styling baru untuk tombol back yang lebih UI friendly */
+        .main-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex-grow: 1;
+            width: 100%;
+            padding: 20px;
+        }
+
         .btn-back-floating {
             position: absolute;
             left: 20px;
             top: 20px;
             z-index: 10;
-            background-color: rgba(255, 255, 255, 0.9); /* Latar putih sedikit transparan */
-            color: var(--primary-green); /* Warna ikon dan teks hijau */
+            background-color: rgba(255, 255, 255, 0.9);
+            color: var(--primary-green);
             border: none;
-            border-radius: 50%; /* Bentuk lingkaran */
-            width: 45px; /* Ukuran tombol */
+            border-radius: 50%;
+            width: 45px;
             height: 45px;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); /* Bayangan yang lebih kuat */
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
             cursor: pointer;
             transition: all 0.3s ease;
-            font-size: 1.2rem; /* Ukuran ikon lebih besar */
+            font-size: 1.2rem;
         }
 
         .btn-back-floating:hover {
-            background-color: var(--primary-green); /* Latar belakang hijau saat hover */
-            color: var(--neutral-white); /* Ikon putih saat hover */
+            background-color: var(--primary-green);
+            color: var(--neutral-white);
             box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
-            transform: translateY(-2px); /* Efek terangkat */
+            transform: translateY(-2px);
         }
-        /* Jika ingin teks "Halaman Awal" muncul saat hover */
+
         .btn-back-floating span {
-            display: none; /* Sembunyikan teks secara default */
+            display: none;
             margin-left: 8px;
             font-size: 1rem;
-            white-space: nowrap; /* Pastikan teks tidak patah baris */
-        }
-        .btn-back-floating:hover {
-            width: auto; /* Lebarkan tombol saat hover */
-            padding: 0 15px; /* Tambahkan padding agar teks terlihat */
-            border-radius: 25px; /* Ubah ke bentuk pil saat hover */
-        }
-        .btn-back-floating:hover span {
-            display: inline; /* Tampilkan teks saat hover */
+            white-space: nowrap;
         }
 
+        .btn-back-floating:hover {
+            width: auto;
+            padding: 0 15px;
+            border-radius: 25px;
+        }
+
+        .btn-back-floating:hover span {
+            display: inline;
+        }
 
         .header-section {
             text-align: center;
@@ -107,7 +114,6 @@
             border-radius: 20px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.15);
             text-align: center;
-            margin: auto;
             flex-shrink: 0;
         }
 
@@ -181,6 +187,7 @@
             font-weight: 600;
             transition: color 0.3s ease;
         }
+
         .mt-3 a:hover {
             color: var(--accent-green);
             text-decoration: underline;
@@ -195,12 +202,12 @@
             padding-bottom: 20px;
             flex-shrink: 0;
         }
+
         .footer img {
             height: 35px;
             margin-bottom: 8px;
         }
 
-        /* Notifikasi Alert Styling */
         .alert {
             font-size: 0.9rem;
             padding: 0.8rem 1.25rem;
@@ -208,117 +215,22 @@
             margin-bottom: 20px;
             text-align: left;
         }
+
         .alert-success {
             background-color: var(--light-green);
             color: var(--dark-green);
             border-color: var(--accent-green);
         }
+
         .alert-danger {
             background-color: #ffe0b2;
             color: #d32f2f;
             border-color: #ffb74d;
         }
+
         .alert-dismissible .btn-close {
             padding: 0.5rem 0.75rem;
             font-size: 0.85rem;
-        }
-
-        /* Responsive Adjustments */
-        @media (max-width: 768px) {
-            .btn-back-floating {
-                left: 15px;
-                top: 15px;
-                width: 40px;
-                height: 40px;
-                font-size: 1.1rem;
-            }
-            .btn-back-floating:hover {
-                padding: 0 12px;
-                font-size: 0.9rem;
-            }
-            .header-section img {
-                width: 100px;
-            }
-            .header-section h2 {
-                font-size: 1.8rem;
-            }
-            .register-container {
-                padding: 20px;
-                max-width: 380px;
-            }
-            .title {
-                font-size: 24px;
-                margin-bottom: 20px;
-            }
-            .form-control {
-                padding: 10px 12px 10px 40px;
-            }
-            .input-icon i {
-                left: 12px;
-                font-size: 1rem;
-            }
-            .btn-success {
-                padding: 10px;
-                font-size: 1rem;
-            }
-        }
-
-        @media (max-width: 480px) {
-            body {
-                padding: 15px;
-            }
-            .btn-back-floating {
-                left: 10px;
-                top: 10px;
-                width: 35px;
-                height: 35px;
-                font-size: 1rem;
-            }
-            .btn-back-floating:hover {
-                padding: 0 10px;
-                font-size: 0.85rem;
-            }
-            .header-section img {
-                width: 80px;
-            }
-            .header-section h2 {
-                font-size: 1.5rem;
-                margin-bottom: 15px;
-            }
-            .register-container {
-                padding: 15px;
-                max-width: 300px;
-            }
-            .title {
-                font-size: 22px;
-                margin-bottom: 15px;
-            }
-            .form-group {
-                margin-bottom: 12px;
-            }
-            .form-control {
-                padding: 8px 10px 8px 35px;
-                font-size: 0.9rem;
-            }
-            .input-icon i {
-                left: 10px;
-                font-size: 0.9rem;
-            }
-            .btn-success {
-                padding: 8px;
-                font-size: 0.95rem;
-            }
-            .mt-3 {
-                font-size: 0.85rem;
-                margin-top: 15px !important;
-            }
-            .footer {
-                margin-top: 20px;
-                font-size: 0.75rem;
-            }
-            .footer img {
-                height: 30px;
-            }
         }
     </style>
 </head>
@@ -329,91 +241,91 @@
         <span>Back</span>
     </div>
 
-    <div class="header-section">
-        <img src="{{ asset('images/banklpg.png') }}" alt="Bank Lampung Logo">
-        <h2>Monitoring Energi</h2>
-    </div>
+    <div class="main-wrapper">
+        <div class="header-section">
+            <img src="{{ asset('images/banklpg.png') }}" alt="Bank Lampung Logo">
+            <h2>Monitoring Energi</h2>
+        </div>
 
-    <div class="register-container">
-        <div class="title">Registrasi Akun</div>
+        <div class="register-container">
+            <div class="title">Registrasi Akun</div>
 
-        {{-- ✅ NOTIFIKASI BERHASIL --}}
-        @if(session('success'))
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                ✅ {{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Tutup"></button>
-            </div>
-        @endif
-
-        {{-- ❌ NOTIFIKASI GAGAL --}}
-        @if ($errors->any())
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                <strong>Terjadi kesalahan:</strong>
-                <ul class="mb-0 ps-3">
-                    @foreach ($errors->all() as $error)
-                        <li>❌ {{ $error }}</li>
-                    @endforeach
-                </ul>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Tutup"></button>
-            </div>
-        @endif
-
-        <form method="POST" action="{{ route('register') }}">
-            @csrf
-
-            <div class="form-group">
-                <div class="input-icon">
-                    <i class="fas fa-user"></i>
-                    <input type="text" name="name" class="form-control @error('name') is-invalid @enderror" placeholder="Nama Lengkap" value="{{ old('name') }}" required>
+            @if(session('success'))
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    ✅ {{ session('success') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Tutup"></button>
                 </div>
-                @error('name') <small class="text-danger d-block mt-1 text-start">{{ $message }}</small> @enderror
-            </div>
+            @endif
 
-            <div class="form-group">
-                <div class="input-icon">
-                    <i class="fas fa-user-circle"></i>
-                    <input type="text" name="username" class="form-control @error('username') is-invalid @enderror" placeholder="Username" value="{{ old('username') }}" required>
+            @if ($errors->any())
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <strong>Terjadi kesalahan:</strong>
+                    <ul class="mb-0 ps-3">
+                        @foreach ($errors->all() as $error)
+                            <li>❌ {{ $error }}</li>
+                        @endforeach
+                    </ul>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Tutup"></button>
                 </div>
-                @error('username') <small class="text-danger d-block mt-1 text-start">{{ $message }}</small> @enderror
-            </div>
+            @endif
 
-            <div class="form-group">
-                <div class="input-icon">
-                    <i class="fas fa-envelope"></i>
-                    <input type="email" name="email" class="form-control @error('email') is-invalid @enderror" placeholder="Email" value="{{ old('email') }}" required>
+            <form method="POST" action="{{ route('register') }}">
+                @csrf
+
+                <div class="form-group">
+                    <div class="input-icon">
+                        <i class="fas fa-user"></i>
+                        <input type="text" name="name" class="form-control @error('name') is-invalid @enderror" placeholder="Nama Lengkap" value="{{ old('name') }}" required>
+                    </div>
+                    @error('name') <small class="text-danger d-block mt-1 text-start">{{ $message }}</small> @enderror
                 </div>
-                @error('email') <small class="text-danger d-block mt-1 text-start">{{ $message }}</small> @enderror
-            </div>
 
-            <div class="form-group">
-                <div class="input-icon">
-                    <i class="fas fa-building"></i>
-                    <input type="text" name="unit_kerja" class="form-control @error('unit_kerja') is-invalid @enderror" placeholder="Unit Kerja" value="{{ old('unit_kerja') }}" required>
+                <div class="form-group">
+                    <div class="input-icon">
+                        <i class="fas fa-user-circle"></i>
+                        <input type="text" name="username" class="form-control @error('username') is-invalid @enderror" placeholder="Username" value="{{ old('username') }}" required>
+                    </div>
+                    @error('username') <small class="text-danger d-block mt-1 text-start">{{ $message }}</small> @enderror
                 </div>
-                @error('unit_kerja') <small class="text-danger d-block mt-1 text-start">{{ $message }}</small> @enderror
-            </div>
 
-            <div class="form-group">
-                <div class="input-icon">
-                    <i class="fas fa-lock"></i>
-                    <input type="password" name="password" class="form-control @error('password') is-invalid @enderror" placeholder="Password" required>
+                <div class="form-group">
+                    <div class="input-icon">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" name="email" class="form-control @error('email') is-invalid @enderror" placeholder="Email" value="{{ old('email') }}" required>
+                    </div>
+                    @error('email') <small class="text-danger d-block mt-1 text-start">{{ $message }}</small> @enderror
                 </div>
-                @error('password') <small class="text-danger d-block mt-1 text-start">{{ $message }}</small> @enderror
-            </div>
 
-            <div class="form-group">
-                <div class="input-icon">
-                    <i class="fas fa-lock"></i>
-                    <input type="password" name="password_confirmation" class="form-control" placeholder="Konfirmasi Password" required>
+                <div class="form-group">
+                    <div class="input-icon">
+                        <i class="fas fa-building"></i>
+                        <input type="text" name="unit_kerja" class="form-control @error('unit_kerja') is-invalid @enderror" placeholder="Unit Kerja" value="{{ old('unit_kerja') }}" required>
+                    </div>
+                    @error('unit_kerja') <small class="text-danger d-block mt-1 text-start">{{ $message }}</small> @enderror
                 </div>
+
+                <div class="form-group">
+                    <div class="input-icon">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" name="password" class="form-control @error('password') is-invalid @enderror" placeholder="Password" required>
+                    </div>
+                    @error('password') <small class="text-danger d-block mt-1 text-start">{{ $message }}</small> @enderror
+                </div>
+
+                <div class="form-group">
+                    <div class="input-icon">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" name="password_confirmation" class="form-control" placeholder="Konfirmasi Password" required>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-success">Daftar</button>
+            </form>
+
+            <div class="mt-3">
+                <span>Sudah punya akun?</span>
+                <a href="{{ route('login') }}">Masuk di sini</a>
             </div>
-
-            <button type="submit" class="btn btn-success">Daftar</button>
-        </form>
-
-        <div class="mt-3">
-            <span>Sudah punya akun?</span>
-            <a href="{{ route('login') }}">Masuk di sini</a>
         </div>
     </div>
 
