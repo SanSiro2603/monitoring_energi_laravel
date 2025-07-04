@@ -662,40 +662,41 @@
     </section>
 
     <footer class="footer" id="contact">
-        <div class="footer-content-wrapper">
-            <div class="footer-col">
-                 <img src="{{ asset('assets/img/BLPUTIH.png') }}" alt="Bank Lampung">
-                <p class="text-xs leading-5">
-                    Jl. Wolter Monginsidi No.182, Teluk Betung, Kota Bandar Lampung, Lampung 35211, Indonesia<br />
-                    Call Center: 1500575
-                </p>
-            </div>
+    <div class="footer-content-wrapper">
+        <div class="footer-col">
+            <img src="{{ asset('assets/img/BLPUTIH.png') }}" alt="Bank Lampung">
+            <p class="text-xs leading-5">
+                Jl. Wolter Monginsidi No.182, Teluk Betung, Kota Bandar Lampung, Lampung 35211, Indonesia<br />
+                Call Center: 1500575
+            </p>
+        </div>
 
-            <div class="footer-col">
-                <h4>Tentang Kami</h4>
-                <ul>
-                    <li><a href="#">Profil</a></li>
-                    <li><a href="#">Manajemen</a></li>
-                    <li><a href="#">Kontak</a></li>
-                    <li><a href="#">Rekrutmen</a></li>
-                </ul>
-            </div>
+        <div class="footer-col">
+            <h4>Tentang Kami</h4>
+            <ul>
+                <li><a href="https://www.banklampung.co.id/profil" target="_blank" rel="noopener">Profil</a></li>
+                <li><a href="https://www.banklampung.co.id/manajemen-bank-lampung" target="_blank" rel="noopener">Manajemen</a></li>
+                <li><a href="https://www.banklampung.co.id/kontak-kami" target="_blank" rel="noopener">Kontak</a></li>
+                <li><a href="https://rekrutmen.banklampung.co.id/" target="_blank" rel="noopener">Rekrutmen</a></li>
+            </ul>
+        </div>
 
-            <div class="footer-col">
-                <h4>Sosial Media</h4>
-                <div class="social-media-icons">
-                    <a href="#" aria-label="TikTok"><i class="fab fa-tiktok"></i></a>
-                    <a href="#" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
-                    <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-                    <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
-                </div>
+        <div class="footer-col">
+            <h4>Sosial Media</h4>
+            <div class="social-media-icons">
+                <a href="https://www.tiktok.com/@banklampungofficial" target="_blank" rel="noopener" aria-label="TikTok"><i class="fab fa-tiktok"></i></a>
+                <a href="https://www.facebook.com/people/Bank-Lampung/100070309804120/" target="_blank" rel="noopener" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
+                <a href="https://www.instagram.com/bpd_lampung/" target="_blank" rel="noopener" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                <a href="https://www.youtube.com/channel/UCzQzr2QsuE3lE5rLlFpSoxw" target="_blank" rel="noopener" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
             </div>
         </div>
-        <div class="footer-bottom-text">
-            PT Bank Lampung Berizin & diawasi oleh Otoritas Jasa Keuangan serta merupakan peserta penjaminan LPS<br />
-            © 2025 <span class="font-bold">Bank Lampung</span>.
-        </div>
-    </footer>
+    </div>
+    <div class="footer-bottom-text">
+        PT Bank Lampung Berizin & diawasi oleh Otoritas Jasa Keuangan serta merupakan peserta penjaminan LPS<br />
+        © 2025 <span class="font-bold">Bank Lampung</span>.
+    </div>
+</footer>
+
 
     <script>
         // Header scroll effect

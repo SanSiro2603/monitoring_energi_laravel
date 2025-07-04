@@ -330,7 +330,7 @@
     </div>
 
     <div class="header-section">
-        <img src="{{ asset('images/bank-lampung-logo.png') }}" alt="Bank Lampung Logo">
+        <img src="{{ asset('images/banklpg.png') }}" alt="Bank Lampung Logo">
         <h2>Monitoring Energi</h2>
     </div>
 
@@ -418,7 +418,7 @@
     </div>
 
     <div class="footer">
-        <img src="{{ asset('images/bank-lampung-logo.png') }}" alt="Bank Lampung"><br>
+        <img src="{{ asset('images/banklpg.png') }}" alt="Bank Lampung"><br>
         ©2025 PT. Bank Lampung - Sistem Monitoring Energi
     </div>
 
