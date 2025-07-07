@@ -351,8 +351,8 @@
                     <a href="/divisi/energi/create" class="{{ request()->is('divisi/energi/create') ? 'active' : '' }}">
                         <i class="fas fa-plus-circle"></i> Input Data Energi
                     </a>
-                    <a href="/divisi/energi" class="{{ request()->is('divisi/energi') ? 'active' : '' }}">
-                        <i class="fas fa-clipboard-list"></i> Kelola Data
+                    <a href="/divisi/laporan" class="{{ request()->is('divisi/laporan') ? 'active' : '' }}">
+                        <i class="fas fa-chart-bar"></i> Laporan
                     </a>
                     <a href="/divisi/users" class="{{ request()->is('divisi/users') ? 'active' : '' }}">
                         <i class="fas fa-address-card"></i> Kelola Users

@@ -67,6 +67,12 @@ Route::middleware(['auth', 'role:divisi_user'])->prefix('divisi')->group(functio
     Route::get('/users/create', [UserController::class, 'createDivisi']);
     Route::post('/users', [UserController::class, 'storeDivisi']); // ← penting!
 });
+Route::middleware(['auth'])->prefix('divisi')->group(function () {
+    Route::get('/laporan', [EnergiController::class, 'laporan'])->name('divisi.laporan');
+    Route::get('/laporan/export-excel', [EnergiController::class, 'exportExcel'])->name('divisi.export.excel');
+    Route::get('/laporan/export-pdf', [EnergiController::class, 'exportPdf'])->name('divisi.export.pdf');
+    Route::get('/laporan/export-chart-pdf', [EnergiController::class, 'exportChartToPDF'])->name('divisi.export.chart_pdf');
+});
 
 // USER UMUM
 Route::middleware(['auth', 'role:user_umum'])->group(function () {
