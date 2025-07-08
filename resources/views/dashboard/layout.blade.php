@@ -364,6 +364,12 @@
 
                 {{-- Menu User Umum --}}
                 @if(Auth::user()->role === 'user_umum')
+                <a href="/umum/energi/create" class="{{ request()->is('umum/energi/create') ? 'active' : '' }}">
+                <i class="fas fa-plus-circle"></i> Input Data Energi
+                </a>
+                <a href="/umum/laporan" class="{{ request()->is('umum/laporan') ? 'active' : '' }}">
+                    <i class="fas fa-chart-bar"></i> Laporan
+                </a>
                     <a href="/umum/summary" class="{{ request()->is('umum/summary') ? 'active' : '' }}">
                         <i class="fas fa-file-alt"></i> Lihat Summary
                     </a>
