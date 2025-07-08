@@ -11,8 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('energis', function (Blueprint $table) {
-            $table->string('jenis_bbm')->nullable()->after('bbm');
+        Schema::table('users', function (Blueprint $table) {
+            $table->string('otp_code')->nullable()->after('remember_token');
+            $table->timestamp('otp_expires_at')->nullable()->after('otp_code');
         });
     }
 
@@ -21,8 +22,9 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('energis', function (Blueprint $table) {
-            $table->dropColumn('jenis_bbm');
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropColumn('otp_code');
+            $table->dropColumn('otp_expires_at');
         });
     }
 };
