@@ -10,7 +10,6 @@ use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\Auth\OtpController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 
@@ -28,7 +27,7 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 // SUPER USER
-Route::middleware(['auth', 'otp.verified', 'role:super_user', 'no_cache'])->group(function () {
+Route::middleware(['auth', 'verified', 'role:super_user', 'no_cache'])->group(function () {
     Route::get('/admin/dashboard', function () {
         return view('dashboard.admin');
     });
@@ -53,7 +52,7 @@ Route::middleware(['auth', 'otp.verified', 'role:super_user', 'no_cache'])->grou
 });
 
 // DIVISI USER
-Route::middleware(['auth', 'otp.verified', 'role:divisi_user'])->group(function () {
+Route::middleware(['auth', 'verified', 'role:divisi_user'])->group(function () {
     Route::get('/divisi/dashboard', function () {
         return view('dashboard.divisi');
     });
@@ -63,12 +62,14 @@ Route::middleware(['auth', 'otp.verified', 'role:divisi_user'])->group(function 
     Route::post('/divisi/energi', [EnergiController::class, 'store']);
     Route::delete('/divisi/energi/{id}', [EnergiController::class, 'destroy']);
 });
-Route::middleware(['auth', 'otp.verified', 'role:divisi_user'])->prefix('divisi')->group(function () {
+
+Route::middleware(['auth', 'verified', 'role:divisi_user'])->prefix('divisi')->group(function () {
     Route::get('/users', [UserController::class, 'indexDivisi']);
     Route::get('/users/create', [UserController::class, 'createDivisi']);
     Route::post('/users', [UserController::class, 'storeDivisi']);
 });
-Route::middleware(['auth', 'otp.verified'])->prefix('divisi')->group(function () {
+
+Route::middleware(['auth', 'verified'])->prefix('divisi')->group(function () {
     Route::get('/laporan', [EnergiController::class, 'laporan'])->name('divisi.laporan');
     Route::get('/laporan/export-excel', [EnergiController::class, 'exportExcel'])->name('divisi.export.excel');
     Route::get('/laporan/export-pdf', [EnergiController::class, 'exportPdf'])->name('divisi.export.pdf');
@@ -76,7 +77,7 @@ Route::middleware(['auth', 'otp.verified'])->prefix('divisi')->group(function ()
 });
 
 // USER UMUM
-Route::middleware(['auth', 'otp.verified', 'role:user_umum'])->group(function () {
+Route::middleware(['auth', 'verified', 'role:user_umum'])->group(function () {
     Route::get('/umum/dashboard', function () {
         return view('dashboard.umum');
     });
@@ -99,10 +100,10 @@ Route::get('/dashboard', function () {
     } else {
         return view('dashboard.umum');
     }
-})->middleware(['auth', 'otp.verified'])->name('dashboard');
+})->middleware(['auth', 'verified'])->name('dashboard');
 
 // Profil
-Route::middleware(['auth', 'otp.verified'])->group(function () {
+Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/profil', [ProfilController::class, 'index'])->name('profil.index');
     Route::post('/profil/upload', [ProfilController::class, 'uploadFoto'])->name('profil.upload');
     Route::get('/profil/edit', [ProfilController::class, 'edit'])->name('profil.edit');
@@ -117,11 +118,21 @@ Route::middleware('guest')->group(function () {
     Route::post('reset-password', [ResetPasswordController::class, 'reset'])->name('password.update');
 });
 
-// REGISTER + OTP VERIFICATION
+// REGISTER
 Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
 Route::post('/register', [RegisterController::class, 'register']);
 
-// OTP Routes
-Route::get('/verify-otp', [OtpController::class, 'showForm'])->name('otp.form');
-Route::post('/verify-otp', [OtpController::class, 'verify'])->name('otp.verify');
-Route::post('/resend-otp', [OtpController::class, 'resend'])->name('otp.resend');
+// VERIFIKASI EMAIL
+Route::get('/email/verify', function () {
+    return view('auth.verify-email');
+})->middleware('auth')->name('verification.notice');
+
+Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
+    $request->fulfill();
+    return redirect('/dashboard');
+})->middleware(['auth', 'signed'])->name('verification.verify');
+
+Route::post('/email/verification-notification', function (Request $request) {
+    $request->user()->sendEmailVerificationNotification();
+    return back()->with('message', 'Link verifikasi email telah dikirim.');
+})->middleware(['auth', 'throttle:6,1'])->name('verification.send');

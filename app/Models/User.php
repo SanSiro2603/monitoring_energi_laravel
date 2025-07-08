@@ -2,12 +2,13 @@
 
 namespace App\Models;
 
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
     use HasApiTokens, HasFactory, Notifiable;
 
@@ -27,9 +28,6 @@ class User extends Authenticatable
         'unit_kerja',
         'foto',
         'role',
-        'otp_code',           // ✅ Tambahan untuk kode OTP
-        'otp_expires_at',     // ✅ Tambahan untuk batas waktu OTP
-        'email_verified_at',  // ✅ Bawaan Laravel untuk verifikasi email
     ];
 
     /**
@@ -40,7 +38,7 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
-        'otp_code', // ✅ Jangan tampilkan kode OTP saat serialisasi
+
     ];
 
     /**
@@ -50,7 +48,6 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
-        'otp_expires_at' => 'datetime', // ✅ Cast ke datetime
         'password' => 'hashed',
     ];
 }
