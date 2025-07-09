@@ -131,3 +131,9 @@ Route::middleware('guest')->group(function () {
 // REGISTER
 Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
 Route::post('/register', [RegisterController::class, 'register']);
+
+// OTP Routes
+Route::get('/verify-otp', [OtpController::class, 'showForm'])->name('otp.form');
+Route::post('/verify-otp', [OtpController::class, 'verify'])->name('otp.verify');
+Route::post('/resend-otp', [OtpController::class,
+ 'resend'])->name('otp.resend');
