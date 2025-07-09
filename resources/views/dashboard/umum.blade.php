@@ -10,6 +10,6 @@
     </div>
   @endif
 
-  <p class="mt-4">Sebagai user umum, Anda dapat melihat Summary.</p>
+  <p class="mt-4">Sebagai user umum, Anda dapat mencatat data energi serta memantau laporan penggunaannya.</p>
 
 @endsection

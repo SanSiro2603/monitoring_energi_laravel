@@ -370,9 +370,6 @@
                 <a href="/umum/laporan" class="{{ request()->is('umum/laporan') ? 'active' : '' }}">
                     <i class="fas fa-chart-bar"></i> Laporan
                 </a>
-                    <a href="/umum/summary" class="{{ request()->is('umum/summary') ? 'active' : '' }}">
-                        <i class="fas fa-file-alt"></i> Lihat Summary
-                    </a>
                     <a href="{{ route('profil.index') }}" class="{{ request()->is('profil*') ? 'active' : '' }}">
                         <i class="fas fa-user-circle"></i> Profil Saya
                     </a>
