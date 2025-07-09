@@ -16,6 +16,8 @@ use Amenadiel\JpGraph\Plot;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Date;
+use Illuminate\Pagination\LengthAwarePaginator;
+
 
 
 class EnergiController extends Controller
@@ -49,8 +51,6 @@ class EnergiController extends Controller
                 ['path' => request()->url(), 'query' => request()->query()]
             );
         }
-        
-        dd(get_class($data));
 
         return view('energi.index', compact('data'));
     }

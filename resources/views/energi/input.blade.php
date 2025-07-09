@@ -81,12 +81,13 @@
             <!-- Tombol Tambah dan Simpan -->
             <div class="d-flex justify-content-between align-items-center mt-4 mb-3">
                 <button type="submit" class="btn btn-success">💾 Simpan</button>
-                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="tambahBBM()">+ Tambah BBM</button>
-            </div>
-        </form>
-    </div>
+                <button type="button" class="btn btn-outline-primary px-3 py-2" onclick="tambahBBM()">
+                 ➕ Tambah BBM</button> 
+                </div>
+            </form>
+         </div>
 
-    <hr>
+         <hr>
 
     <h5>⬆️ Import Data Energi dari Excel</h5>
     <form method="POST" action="{{ url('/energi/import') }}" enctype="multipart/form-data">

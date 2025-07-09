@@ -28,7 +28,7 @@ class AuthController extends Controller
 } elseif ($user->role === 'divisi_user') {
     return redirect('/divisi/dashboard');
 } else {
-    return redirect('/umum/summary');
+    return redirect('/umum/dashboard');
 } }
 
         return back()->withErrors(['email' => 'Email atau password salah']);
