@@ -558,11 +558,11 @@
             <a href="#home" class="nav-link">
                 <i class="fas fa-home"></i> HOME
             </a>
+                        <a href="#monitoring" class="nav-link">
+                <i class="fas fa-chart-line"></i> MONITORING
+            </a>
             <a href="#about" class="nav-link">
                 <i class="fas fa-info-circle"></i> TENTANG
-            </a>
-            <a href="#monitoring" class="nav-link">
-                <i class="fas fa-chart-line"></i> MONITORING
             </a>
             <a href="#contact" class="nav-link">
                 <i class="fas fa-envelope"></i> KONTAK
