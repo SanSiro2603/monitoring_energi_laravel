@@ -12,6 +12,12 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    
+      rel="stylesheet"
+      integrity="sha512-XxXYbCKWTGyEkVlKQQ5BlVMe6vBQFZ9bUu0sHoP9+ZHzY1kAmSnvcgqRvOQWxlhbU12Gv7ZbyLSAZaCFK1Hw0A=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer" />
 
     <style>
         :root {

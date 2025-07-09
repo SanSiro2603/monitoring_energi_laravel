@@ -71,10 +71,9 @@
                         <input type="number" name="jumlah_bbm[]" class="form-control" placeholder="Liter" required>
                     </div>
                     <div class="col-md-2 d-flex justify-content-end">
-                       <button type="button" class="btn btn-light border shadow-sm rounded-circle d-flex align-items-center justify-content-center p-0" style="width:32px; height:32px;" onclick="hapusBBM(this)">
-                      <i class="fa fa-trash text-danger"></i>
-                    </button>
-
+                        <button type="button" class="btn btn-light border shadow-sm rounded-circle d-flex align-items-center justify-content-center p-0" style="width:32px; height:32px;" onclick="hapusBBM(this)">
+                            <i class="fa fa-trash text-danger"></i>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -122,7 +121,11 @@ function tambahBBM() {
             <input type="number" name="jumlah_bbm[]" class="form-control" placeholder="Liter" required>
         </div>
         <div class="col-md-2 d-flex justify-content-end">
-            <button type="button" class="btn btn-outline-danger btn-sm" onclick="hapusBBM(this)">🗑</button>
+            <button type="button"
+                class="btn btn-light border shadow-sm rounded-circle d-flex align-items-center justify-content-center p-0"
+                style="width:32px; height:32px;" onclick="hapusBBM(this)">
+                <i class="fa fa-trash text-danger"></i>
+            </button>
         </div>
     `;
     container.appendChild(newRow);
