@@ -83,6 +83,14 @@ Route::middleware(['auth', 'verified', 'role:user_umum'])->group(function () {
     });
 
     Route::get('/umum/summary', [EnergiController::class, 'summary']);
+
+    // Tambahan baru:
+    Route::get('/umum/energi/create', [EnergiController::class, 'create'])->name('umum.energi.create');
+    Route::post('/umum/energi', [EnergiController::class, 'store'])->name('umum.energi.store');
+
+    Route::get('/umum/laporan', [EnergiController::class, 'laporan'])->name('umum.laporan');
+    Route::get('/umum/laporan/export-excel', [EnergiController::class, 'exportExcel'])->name('umum.export.excel');
+    Route::get('/umum/laporan/export-pdf', [EnergiController::class, 'exportPdf'])->name('umum.export.pdf');
 });
 
 // Route dashboard otomatis berdasarkan role
@@ -122,17 +130,7 @@ Route::middleware('guest')->group(function () {
 Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
 Route::post('/register', [RegisterController::class, 'register']);
 
-// VERIFIKASI EMAIL
-Route::get('/email/verify', function () {
-    return view('auth.verify-email');
-})->middleware('auth')->name('verification.notice');
-
-Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
-    $request->fulfill();
-    return redirect('/dashboard');
-})->middleware(['auth', 'signed'])->name('verification.verify');
-
-Route::post('/email/verification-notification', function (Request $request) {
-    $request->user()->sendEmailVerificationNotification();
-    return back()->with('message', 'Link verifikasi email telah dikirim.');
-})->middleware(['auth', 'throttle:6,1'])->name('verification.send');
+// OTP Routes
+Route::get('/verify-otp', [OtpController::class, 'showForm'])->name('otp.form');
+Route::post('/verify-otp', [OtpController::class, 'verify'])->name('otp.verify');
+Route::post('/resend-otp', [OtpController::class, 'resend'])->name('otp.resend');
