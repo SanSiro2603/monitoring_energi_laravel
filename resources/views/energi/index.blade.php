@@ -43,7 +43,7 @@
         <tbody>
             @foreach($data as $row)
             <tr>
-                <td>{{ $loop->iteration }}</td>
+                <td>{{ $loop->iteration + ($data->currentPage() - 1) * $data->perPage() }}</td>
                 <td>{{ $row->kantor }}</td>
                 <td>{{ $row->bulan }}</td>
                 <td>{{ $row->tahun }}</td>

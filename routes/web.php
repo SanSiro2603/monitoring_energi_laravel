@@ -77,14 +77,15 @@ Route::middleware(['auth', 'verified'])->prefix('divisi')->group(function () {
 });
 
 // USER UMUM
+// USER UMUM
 Route::middleware(['auth', 'verified', 'role:user_umum'])->group(function () {
     Route::get('/umum/dashboard', function () {
         return view('dashboard.umum');
     });
 
-    Route::get('/umum/summary', [EnergiController::class, 'summary']);
+    // ✅ Tambahan baru: akses ke list energi
+    Route::get('/umum/energi', [EnergiController::class, 'index'])->name('umum.energi.index');
 
-    // Tambahan baru:
     Route::get('/umum/energi/create', [EnergiController::class, 'create'])->name('umum.energi.create');
     Route::post('/umum/energi', [EnergiController::class, 'store'])->name('umum.energi.store');
 
@@ -92,6 +93,7 @@ Route::middleware(['auth', 'verified', 'role:user_umum'])->group(function () {
     Route::get('/umum/laporan/export-excel', [EnergiController::class, 'exportExcel'])->name('umum.export.excel');
     Route::get('/umum/laporan/export-pdf', [EnergiController::class, 'exportPdf'])->name('umum.export.pdf');
 });
+
 
 // Route dashboard otomatis berdasarkan role
 Route::get('/dashboard', function () {
@@ -129,8 +131,3 @@ Route::middleware('guest')->group(function () {
 // REGISTER
 Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
 Route::post('/register', [RegisterController::class, 'register']);
-
-// OTP Routes
-Route::get('/verify-otp', [OtpController::class, 'showForm'])->name('otp.form');
-Route::post('/verify-otp', [OtpController::class, 'verify'])->name('otp.verify');
-Route::post('/resend-otp', [OtpController::class, 'resend'])->name('otp.resend');

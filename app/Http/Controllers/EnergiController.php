@@ -39,6 +39,19 @@ class EnergiController extends Controller
                       ->orderByDesc('bulan')
                       ->paginate(10)
                       ->withQueryString();
+
+            if (!($data instanceof LengthAwarePaginator)) {
+            $data = new LengthAwarePaginator(
+                $data->items(),
+                $data->total(),
+                $data->perPage(),
+                $data->currentPage(),
+                ['path' => request()->url(), 'query' => request()->query()]
+            );
+        }
+        
+        dd(get_class($data));
+
         return view('energi.index', compact('data'));
     }
 
