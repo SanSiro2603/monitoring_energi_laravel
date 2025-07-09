@@ -40,41 +40,44 @@
 
     <div id="laporanPDF">
         <!-- Tabel -->
-        <div class="table-responsive">
-            <table class="table table-bordered table-striped" id="summaryTable">
-                <thead class="table-success">
-                    <tr>
-                        <th>No</th>
-                        <th>Kantor</th>
-                        <th>Bulan</th>
-                        <th>Tahun</th>
-                        <th>Listrik</th>
-                        <th>Air</th>
-                        <th>BBM</th>
-                        <th>Kertas</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse ($data as $i => $row)
-                    <tr>
-                        <td>{{ $i + 1 }}</td>
-                        <td>{{ $row->kantor }}</td>
-                        <td>{{ $row->bulan }}</td>
-                        <td>{{ $row->tahun }}</td>
-                        <td>{{ $row->listrik }}</td>
-                        <td>{{ $row->air }}</td>
-                        <td>{{ $row->bbm }}</td>
-                        <td>{{ $row->kertas }}</td>
-                    </tr>
-                    @empty
-                    <tr>
-                        <td colspan="8" class="text-center">Tidak ada data</td>
-                    </tr>
-                    @endforelse
-                </tbody>
-            </table>
-            <div class="mt-3">
-    {{ $data->links() }}
+<div class="table-responsive">
+    <table class="table table-bordered table-striped" id="summaryTable">
+        <thead class="table-success">
+            <tr>
+                <th>No</th>
+                <th>Kantor</th>
+                <th>Bulan</th>
+                <th>Tahun</th>
+                <th>Listrik</th>
+                <th>Air</th>
+                <th>BBM</th>
+                <th>Kertas</th>
+            </tr>
+        </thead>
+        <tbody>
+            @forelse ($data as $i => $row)
+            <tr>
+                <td>{{ $data->firstItem() + $i }}</td>
+                <td>{{ $row->kantor }}</td>
+                <td>{{ $row->bulan }}</td>
+                <td>{{ $row->tahun }}</td>
+                <td>{{ $row->listrik }}</td>
+                <td>{{ $row->air }}</td>
+                <td>{{ $row->bbm }}</td>
+                <td>{{ $row->kertas }}</td>
+            </tr>
+            @empty
+            <tr>
+                <td colspan="8" class="text-center">Tidak ada data</td>
+            </tr>
+            @endforelse
+        </tbody>
+    </table>
+
+    <!-- Pagination -->
+    <div class="mt-3">
+        {{ $data->links() }}
+    </div>
 </div>
 
         </div>
