@@ -35,7 +35,9 @@
         <a href="{{ route('divisi.export.excel') }}" class="btn btn-success">🗃️Export Excel</a>
         <a href="{{ route('divisi.export.pdf') }}" class="btn btn-danger">📄 Export ke PDF</a>
     @endif
-    <button onclick="downloadChartImage()" class="btn btn-outline-secondary">🖼 Download Gambar Chart</button>
+     <button onclick="downloadChartImage()" class="btn btn-secondary custom-grey-hover">
+    🖼 Download Gambar Chart
+  </button>
 </div>
 
     <div id="laporanPDF">

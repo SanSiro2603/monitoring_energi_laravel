@@ -82,24 +82,24 @@
             opacity: 0.9;
         }
         .header .user-info strong {
-            color: var(--accent-yellow); /* Nama user highlight kuning */
+            color: var(#ffffff); /* Nama user highlight kuning */
             font-weight: 600;
         }
-        .header .btn-logout {
-            background-color: transparent;
-            border: 1px solid rgba(255, 255, 255, 0.6);
-            color: var(--neutral-white);
-            padding: 6px 15px;
-            border-radius: 8px;
-            font-weight: 500;
-            transition: all 0.3s ease;
-        }
-        .header .btn-logout:hover {
-            background-color: rgba(255, 255, 255, 0.15);
-            border-color: var(--neutral-white);
-            color: var(--neutral-white);
-            transform: translateY(-1px);
-        }
+     .header .btn-logout {
+    background-color: var(--accent-yellow); /* Kuning aksen */
+    border: none;
+    color: var(--neutral-dark); /* Teks gelap biar kontras */
+    padding: 6px 15px;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.header .btn-logout:hover {
+    background-color: #e0a800; /* Shade kuning lebih gelap pas hover */
+    color: var(--neutral-white); /* Teks putih pas hover biar kontras */
+    transform: translateY(-1px);
+}
 
         /* CONTAINER UNTUK SIDEBAR DAN MAIN CONTENT */
         .content-area {
@@ -329,9 +329,14 @@
         <div class="content-area">
             @auth
             <div class="sidebar">
-                <a href="{{ url('/dashboard') }}" class="{{ request()->is('dashboard') ? 'active' : '' }}">
-                    <i class="fas fa-home"></i> Dashboard
-                </a>
+               <a href="
+    @if(Auth::user()->role === 'super_user') {{ url('/admin/dashboard') }}
+    @elseif(Auth::user()->role === 'divisi_user') {{ url('/divisi/dashboard') }}
+    @else {{ url('/umum/dashboard') }}
+    @endif
+" class="{{ request()->is('*dashboard*') ? 'active' : '' }}">
+    <i class="fas fa-home"></i> Dashboard
+</a>
 
                 {{-- Menu Super User --}}
                 @if(Auth::user()->role === 'super_user')
