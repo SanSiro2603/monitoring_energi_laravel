@@ -1,342 +1,262 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registrasi - Bank Lampung</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --primary-green: #2e7d32;
-            --dark-green: #1b5e20;
-            --light-green: #c8e6c9;
-            --accent-green: #4caf50;
-            --accent-yellow: #ffc107;
-            --neutral-white: #ffffff;
-            --neutral-light: #f5f5f5;
-            --neutral-dark: #2c3e50;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Registrasi - Bank Lampung</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --primary-green: #2e7d32;
+      --dark-green: #1b5e20;
+      --light-green: #c8e6c9;
+      --accent-green: #4caf50;
+      --accent-yellow: #ffc107;
+      --neutral-white: #ffffff;
+      --neutral-dark: #2c3e50;
+      --box-shadow-strong: 0 15px 40px rgba(0, 0, 0, 0.3);
+    }
 
-        html, body {
-            height: 100%;
-            margin: 0;
-            padding: 0;
-            overflow-x: hidden;
-        }
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: 'Montserrat', sans-serif;
+      background: url('https://images.unsplash.com/photo-1558346490-a72e53ae2d4f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80') no-repeat center center;
+      background-size: cover;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
 
-        body {
-            font-family: 'Montserrat', sans-serif;
-            background: linear-gradient(to bottom, var(--light-green), var(--accent-green));
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-            box-sizing: border-box;
-        }
+    body::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: rgba(46, 125, 50, 0.85);
+      z-index: 0;
+    }
 
-        .main-wrapper {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            flex-grow: 1;
-            width: 100%;
-            padding: 20px;
-        }
+    .btn-back-floating {
+      position: absolute;
+      left: 20px;
+      top: 20px;
+      z-index: 10;
+      background: rgba(255, 255, 255, 0.9);
+      color: var(--primary-green);
+      border: none;
+      border-radius: 50%;
+      width: 45px;
+      height: 45px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 1.2rem;
+    }
 
-        .btn-back-floating {
-            position: absolute;
-            left: 20px;
-            top: 20px;
-            z-index: 10;
-            background-color: rgba(255, 255, 255, 0.9);
-            color: var(--primary-green);
-            border: none;
-            border-radius: 50%;
-            width: 45px;
-            height: 45px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 1.2rem;
-        }
+    .btn-back-floating:hover {
+      background: var(--primary-green);
+      color: var(--neutral-white);
+      transform: translateY(-2px);
+    }
 
-        .btn-back-floating:hover {
-            background-color: var(--primary-green);
-            color: var(--neutral-white);
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
-            transform: translateY(-2px);
-        }
+    .main-content-wrapper {
+      position: relative;
+      z-index: 1;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      text-align: center;
+    }
 
-        .btn-back-floating span {
-            display: none;
-            margin-left: 8px;
-            font-size: 1rem;
-            white-space: nowrap;
-        }
+    .top-logo {
+      color: var(--neutral-white);
+      margin-bottom: 20px;
+    }
 
-        .btn-back-floating:hover {
-            width: auto;
-            padding: 0 15px;
-            border-radius: 25px;
-        }
+    .top-logo img {
+      width: 120px;
+      margin-bottom: 10px;
+    }
 
-        .btn-back-floating:hover span {
-            display: inline;
-        }
+    .top-logo h3 {
+      font-size: 2rem;
+      font-weight: 700;
+    }
 
-        .header-section {
-            text-align: center;
-            margin-bottom: 20px;
-        }
+    .register-box {
+      background: rgba(0, 0, 0, 0.2);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 20px;
+      box-shadow: var(--box-shadow-strong);
+      max-width: 420px;
+      width: 100%;
+  
+    }
 
-        .header-section img {
-            width: 120px;
-            height: auto;
-            margin-bottom: 10px;
-        }
+    .register-box h4 {
+      color: var(--neutral-white);
+      margin-bottom: 20px;
+      font-size: 1.8rem;
+      font-weight: 700;
+    }
 
-        .header-section h2 {
-            font-size: 2.2rem;
-            font-weight: 700;
-            color: var(--dark-green);
-        }
+    .form-group {
+      position: relative;
+      margin-bottom: 15px;
+    }
 
-        .register-container {
-            max-width: 450px;
-            width: 100%;
-            padding: 30px;
-            background: var(--neutral-white);
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-            text-align: center;
-            flex-shrink: 0;
-        }
+    .form-control {
+      border-radius: 12px;
+      padding: 12px 15px 12px 45px;
+      border: 2px solid var(--light-green);
+      font-size: 1rem;
+    }
 
-        .title {
-            font-size: 28px;
-            font-weight: 700;
-            color: var(--primary-green);
-            margin-bottom: 25px;
-        }
+    .form-control:focus {
+      border-color: var(--accent-green);
+      box-shadow: 0 0 0 0.25rem rgba(76, 175, 80, 0.35);
+      outline: none;
+    }
 
-        .form-group {
-            margin-bottom: 15px;
-        }
+    .form-group i {
+      position: absolute;
+      top: 50%;
+      left: 15px;
+      transform: translateY(-50%);
+      color: var(--primary-green);
+      font-size: 1.1rem;
+    }
 
-        .input-icon {
-            position: relative;
-            width: 100%;
-        }
+    .btn-register {
+      background: var(--accent-yellow);
+      color: var(--dark-green);
+      border-radius: 12px;
+      width: 100%;
+      padding: 12px;
+      font-weight: 700;
+      font-size: 1.1rem;
+      border: none;
+      transition: all 0.3s ease;
+    }
 
-        .input-icon i {
-            position: absolute;
-            top: 50%;
-            left: 15px;
-            transform: translateY(-50%);
-            color: var(--primary-green);
-            font-size: 1.1rem;
-            z-index: 5;
-        }
+    .btn-register:hover {
+      background: var(--accent-green);
+      color: white;
+    }
 
-        .form-control {
-            border: 2px solid var(--light-green);
-            border-radius: 12px;
-            padding: 12px 15px 12px 45px;
-            width: 100%;
-            font-size: 1rem;
-            transition: border-color 0.3s ease, box-shadow 0.3s ease;
-        }
+    .bottom-text {
+      margin-top: 15px;
+      font-size: 0.95rem;
+      color: #FFCC00;
+    }
 
-        .form-control:focus {
-            border-color: var(--accent-green);
-            box-shadow: 0 0 0 0.25rem rgba(76, 175, 80, 0.25);
-            outline: none;
-        }
+    .bottom-text a {
+      color: #ffffff;
+      font-weight: 600;
+      text-decoration: none;
+    }
 
-        .btn-success {
-            background-color: var(--primary-green);
-            border: none;
-            width: 100%;
-            border-radius: 12px;
-            padding: 12px;
-            font-weight: 600;
-            font-size: 1.1rem;
-            margin-top: 10px;
-            transition: background-color 0.3s ease, transform 0.3s ease;
-        }
+    .bottom-text a:hover {
+      text-decoration: underline;
+    }
 
-        .btn-success:hover {
-            background-color: var(--dark-green);
-            transform: translateY(-2px);
-        }
+    .footer-bank {
+      background: var(--dark-green);
+      width: 100%;
+      padding: 15px 0;
+      text-align: center;
+      z-index: 1;
+      color: var(--neutral-white);
+      font-size: 0.85rem;
+    }
 
-        .mt-3 {
-            margin-top: 20px !important;
-            font-size: 0.95rem;
-            color: var(--neutral-dark);
-        }
+    @media (max-width: 480px) {
+      .top-logo img {
+        width: 100px;
+      }
 
-        .mt-3 a {
-            color: var(--primary-green);
-            text-decoration: none;
-            font-weight: 600;
-            transition: color 0.3s ease;
-        }
+      .top-logo h3 {
+        font-size: 1.7rem;
+      }
 
-        .mt-3 a:hover {
-            color: var(--accent-green);
-            text-decoration: underline;
-        }
+      .register-box {
+        padding: 20px;
+        max-width: 90%;
+      }
 
-        .footer {
-            text-align: center;
-            font-size: 0.85rem;
-            margin-top: 30px;
-            color: var(--dark-green);
-            width: 100%;
-            padding-bottom: 20px;
-            flex-shrink: 0;
-        }
-
-        .footer img {
-            height: 35px;
-            margin-bottom: 8px;
-        }
-
-        .alert {
-            font-size: 0.9rem;
-            padding: 0.8rem 1.25rem;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            text-align: left;
-        }
-
-        .alert-success {
-            background-color: var(--light-green);
-            color: var(--dark-green);
-            border-color: var(--accent-green);
-        }
-
-        .alert-danger {
-            background-color: #ffe0b2;
-            color: #d32f2f;
-            border-color: #ffb74d;
-        }
-
-        .alert-dismissible .btn-close {
-            padding: 0.5rem 0.75rem;
-            font-size: 0.85rem;
-        }
-    </style>
+      .register-box h4 {
+        font-size: 1.5rem;
+      }
+    }
+  </style>
 </head>
 <body>
+  <div class="btn-back-floating" onclick="window.location.href='{{ url('/') }}'">
+    <i class="fas fa-arrow-left"></i>
+  </div>
 
-    <div class="btn-back-floating" onclick="window.location.href='{{ url('/') }}'">
-        <i class="fas fa-arrow-left"></i>
-        <span>Back</span>
+  <div class="main-content-wrapper">
+    <div class="top-logo">
+      <img src="{{ asset('assets/img/BLPUTIH.png') }}" alt="Bank Lampung" />
+ 
     </div>
 
-    <div class="main-wrapper">
-        <div class="header-section">
-            <img src="{{ asset('assets/img/banklpg.png') }}" alt="Bank Lampung">
-            <h2>Monitoring Energi</h2>
+    <div class="register-box">
+      <h4>Registrasi Akun</h4>
+
+      <form method="POST" action="{{ route('register') }}">
+        @csrf
+        <div class="form-group">
+          <i class="fas fa-user"></i>
+          <input type="text" name="name" class="form-control" placeholder="Nama Lengkap" required>
         </div>
 
-        <div class="register-container">
-            <div class="title">Registrasi Akun</div>
-
-            @if(session('success'))
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    ✅ {{ session('success') }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Tutup"></button>
-                </div>
-            @endif
-
-            @if ($errors->any())
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    <strong>Terjadi kesalahan:</strong>
-                    <ul class="mb-0 ps-3">
-                        @foreach ($errors->all() as $error)
-                            <li>❌ {{ $error }}</li>
-                        @endforeach
-                    </ul>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Tutup"></button>
-                </div>
-            @endif
-
-            <form method="POST" action="{{ route('register') }}">
-                @csrf
-
-                <div class="form-group">
-                    <div class="input-icon">
-                        <i class="fas fa-user"></i>
-                        <input type="text" name="name" class="form-control @error('name') is-invalid @enderror" placeholder="Nama Lengkap" value="{{ old('name') }}" required>
-                    </div>
-                    @error('name') <small class="text-danger d-block mt-1 text-start">{{ $message }}</small> @enderror
-                </div>
-
-                <div class="form-group">
-                    <div class="input-icon">
-                        <i class="fas fa-user-circle"></i>
-                        <input type="text" name="username" class="form-control @error('username') is-invalid @enderror" placeholder="Username" value="{{ old('username') }}" required>
-                    </div>
-                    @error('username') <small class="text-danger d-block mt-1 text-start">{{ $message }}</small> @enderror
-                </div>
-
-                <div class="form-group">
-                    <div class="input-icon">
-                        <i class="fas fa-envelope"></i>
-                        <input type="email" name="email" class="form-control @error('email') is-invalid @enderror" placeholder="Email" value="{{ old('email') }}" required>
-                    </div>
-                    @error('email') <small class="text-danger d-block mt-1 text-start">{{ $message }}</small> @enderror
-                </div>
-
-                <div class="form-group">
-                    <div class="input-icon">
-                        <i class="fas fa-building"></i>
-                        <input type="text" name="unit_kerja" class="form-control @error('unit_kerja') is-invalid @enderror" placeholder="Unit Kerja" value="{{ old('unit_kerja') }}" required>
-                    </div>
-                    @error('unit_kerja') <small class="text-danger d-block mt-1 text-start">{{ $message }}</small> @enderror
-                </div>
-
-                <div class="form-group">
-                    <div class="input-icon">
-                        <i class="fas fa-lock"></i>
-                        <input type="password" name="password" class="form-control @error('password') is-invalid @enderror" placeholder="Password" required>
-                    </div>
-                    @error('password') <small class="text-danger d-block mt-1 text-start">{{ $message }}</small> @enderror
-                </div>
-
-                <div class="form-group">
-                    <div class="input-icon">
-                        <i class="fas fa-lock"></i>
-                        <input type="password" name="password_confirmation" class="form-control" placeholder="Konfirmasi Password" required>
-                    </div>
-                </div>
-
-                <button type="submit" class="btn btn-success">Daftar</button>
-            </form>
-
-            <div class="mt-3">
-                <span>Sudah punya akun?</span>
-                <a href="{{ route('login') }}">Masuk di sini</a>
-            </div>
+        <div class="form-group">
+          <i class="fas fa-user-circle"></i>
+          <input type="text" name="username" class="form-control" placeholder="Username" required>
         </div>
+
+        <div class="form-group">
+          <i class="fas fa-envelope"></i>
+          <input type="email" name="email" class="form-control" placeholder="Email" required>
+        </div>
+
+        <div class="form-group">
+          <i class="fas fa-building"></i>
+          <input type="text" name="unit_kerja" class="form-control" placeholder="Unit Kerja" required>
+        </div>
+
+        <div class="form-group">
+          <i class="fas fa-lock"></i>
+          <input type="password" name="password" class="form-control" placeholder="Password" required>
+        </div>
+
+        <div class="form-group">
+          <i class="fas fa-lock"></i>
+          <input type="password" name="password_confirmation" class="form-control" placeholder="Konfirmasi Password" required>
+        </div>
+
+        <button type="submit" class="btn btn-register">Daftar</button>
+      </form>
+
+      <div class="bottom-text">
+        Sudah punya akun? <a href="{{ route('login') }}">Masuk di sini</a>
+      </div>
     </div>
+  </div>
 
-    <div class="footer">
-    <div>
-        <img src="{{ asset('assets/img/banklpg.png') }}" alt="Bank Lampung" style="height: 40px; margin-bottom: 5px;">
-    </div>
-    <div>©2025 PT. Bank Lampung - Sistem Monitoring Energi</div>
-</div>
-
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <div class="footer-bank">
+    ©2025 PT. Bank Lampung - Sistem Monitoring Energi
+  </div>
 </body>
 </html>

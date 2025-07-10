@@ -18,7 +18,7 @@
       --neutral-white: #ffffff;
       --neutral-light: #f5f5f5;
       --neutral-dark: #2c3e50;
-      --footer-bg: rgba(255, 255, 255, 0.85);
+      --footer-bg: rgba(255, 255, 255, 0.2);
       --box-shadow-medium: 0 10px 30px rgba(0, 0, 0, 0.2);
       --box-shadow-strong: 0 15px 40px rgba(0, 0, 0, 0.3);
     }
@@ -28,7 +28,7 @@
       padding: 0;
       height: 100%;
       font-family: 'Montserrat', sans-serif;
-      background: url("{{ asset('assets/img/rumpu.png') }}") center center / cover no-repeat fixed;
+      background: url('https://images.unsplash.com/photo-1558346490-a72e53ae2d4f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80') no-repeat center center;
       display: flex;
       flex-direction: column;
       overflow-x: hidden;
@@ -40,7 +40,7 @@
       content: "";
       position: absolute;
       inset: 0;
-      background: rgba(0, 0, 0, 0.6);
+      background: rgba(46, 125, 50, 0.85);
       z-index: 0;
     }
 
@@ -98,6 +98,7 @@
       justify-content: center;
       padding: 20px;
       text-align: center;
+      
     }
 
     .top-logo {
@@ -117,7 +118,9 @@
     }
 
     .login-box {
-      background: var(--neutral-white);
+      background: rgba(0, 0, 0, 0.2);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
       border-radius: 20px;
       padding: 40px;
       box-shadow: var(--box-shadow-strong);
@@ -127,7 +130,7 @@
     }
 
     .login-box h4 {
-      color: var(--primary-green);
+      color: var(--neutral-white);
       margin-bottom: 30px;
       font-size: 2rem;
       font-weight: 700;
@@ -163,8 +166,8 @@
     }
 
     .btn-login {
-      background: var(--primary-green);
-      color: var(--neutral-white);
+      background: var(--accent-yellow);
+      color: var(--dark-green);
       border-radius: 12px;
       width: 100%;
       padding: 15px;
@@ -175,7 +178,7 @@
     }
 
     .btn-login:hover {
-      background: var(--dark-green);
+      background: var(--accent-green);
       color: white;
       box-shadow: var(--box-shadow-medium);
     }
@@ -183,17 +186,17 @@
     .bottom-text {
       margin-top: 25px;
       font-size: 1rem;
-      color: var(--dark-green);
+      color: #FFCC00;
     }
 
     .bottom-text a {
-      color: var(--accent-green);
+      color:rgb(255, 255, 255);
       font-weight: 600;
       text-decoration: none;
     }
 
     .bottom-text a:hover {
-      color: var(--primary-green);
+      color: var(--neutral-white);
       text-decoration: underline;
     }
 
@@ -216,7 +219,7 @@
     }
 
     .footer-bank {
-      background: var(--footer-bg);
+      background: var(--dark-green);
       backdrop-filter: blur(5px);
       -webkit-backdrop-filter: blur(5px);
       width: 100%;
@@ -234,7 +237,7 @@
       display: block;
       margin-top: 5px;
       font-size: 0.85rem;
-      color: var(--dark-green);
+      color: var(--neutral-white);
     }
 
     @media (max-width: 768px) {
@@ -346,12 +349,10 @@
         <span>Reset password tidak tersedia</span>
         @endif
       </div>
-      
     </div>
   </div>
 
   <div class="footer-bank">
-    <img src="{{ asset('assets/img/banklpg.png') }}" alt="Bank Lampung" />
     <span>&copy;2025 PT. Bank Lampung - Sistem Monitoring Energi</span>
   </div>
 </body>
