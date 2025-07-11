@@ -86,7 +86,7 @@ class UserController extends Controller
         return redirect()->route('users.index')->with('success', 'User berhasil diupdate.');
     }
 
-    // ✅ Hapus user
+    // Hapus user
     public function destroy(User $user)
     {
         $user->delete();

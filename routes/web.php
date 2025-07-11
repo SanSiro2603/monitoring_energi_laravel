@@ -5,12 +5,12 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\EnergiController;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\ProfilController;
-// use App\Http\Controllers\ChartController; // Tidak terlihat digunakan, bisa dihapus jika tidak dipakai
+// use App\Http\Controllers\ChartController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\OtpController; // Pastikan ini di-import jika digunakan
+use App\Http\Controllers\OtpController; 
 
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
@@ -51,11 +51,6 @@ Route::middleware('guest')->group(function () {
 Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
 Route::post('/register', [RegisterController::class, 'register']);
 
-// OTP Routes (Pastikan OtpController ada dan method-methodnya benar)
-Route::get('/verify-otp', [OtpController::class, 'showForm'])->name('otp.form');
-Route::post('/verify-otp', [OtpController::class, 'verify'])->name('otp.verify');
-Route::post('/resend-otp', [OtpController::class, 'resend'])->name('otp.resend');
-
 // Route dashboard otomatis berdasarkan role
 Route::get('/dashboard', function () {
     if (!Auth::check()) {
@@ -81,18 +76,24 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::put('/profil/update', [ProfilController::class, 'update'])->name('profil.update');
 });
 
-// =====================================================================================
-// GROUP RUTES BERDASARKAN ROLE DAN PREFIX UNTUK KONSISTENSI
-// =====================================================================================
-
 // SUPER USER ROUTES
 Route::middleware(['auth', 'verified', 'role:super_user', 'no_cache'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', function () {
         return view('dashboard.admin');
     })->name('dashboard');
 
+
+    
     // Manajemen Pengguna (Users)
-    Route::resource('users', UserController::class);
+   Route::resource('users', UserController::class)->names([
+    'index'   => 'users.index',
+    'create'  => 'users.create',
+    'store'   => 'users.store',
+    'edit'    => 'users.edit',
+    'update'  => 'users.update',
+    'destroy' => 'users.destroy',
+]);
+
 
     // Manajemen Energi (CRUD)
     // Menggunakan Route::resource untuk CRUD yang lebih ringkas
@@ -116,10 +117,7 @@ Route::middleware(['auth', 'verified', 'role:divisi_user'])->prefix('divisi')->n
     })->name('dashboard');
 
     // Manajemen Energi (CRUD) untuk Divisi
-    Route::resource('energi', EnergiController::class)->except(['show', 'edit', 'update']); // Divisi tidak bisa edit/update data orang lain
-    // Jika divisi bisa edit/update data mereka sendiri, Anda mungkin perlu logika di controller
-    // Route::get('/energi/{id}/edit', [EnergiController::class, 'edit'])->name('energi.edit');
-    // Route::put('/energi/{id}', [EnergiController::class, 'update'])->name('energi.update');
+    Route::resource('energi', EnergiController::class)->except(['show', 'edit', 'update']);
 
 
     // Manajemen Pengguna (Divisi hanya melihat atau membuat?)

@@ -8,17 +8,17 @@ use Illuminate\Support\Facades\Password;
 
 class ForgotPasswordController extends Controller
 {
-    /**
-     * Tampilkan form lupa password
-     */
+    
+     //Tampilkan form lupa password
+    
     public function showLinkRequestForm()
     {
         return view('auth.forgot-password');
     }
 
-    /**
-     * Kirim link reset ke email
-     */
+   
+     //Kirim link reset ke email
+     
     public function sendResetLinkEmail(Request $request)
     {
         $request->validate(['email' => 'required|email']);
