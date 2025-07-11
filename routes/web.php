@@ -152,3 +152,6 @@ Route::middleware(['auth', 'verified', 'role:user_umum'])->prefix('umum')->name(
     Route::get('/laporan/export-excel', [EnergiController::class, 'exportExcel'])->name('laporan.export-excel');
     Route::get('/laporan/export-pdf', [EnergiController::class, 'exportPdf'])->name('laporan.export-pdf');
 });
+// REGISTER
+Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
+Route::post('/register', [RegisterController::class, 'register']);

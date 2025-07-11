@@ -325,7 +325,8 @@
       <div class="alert alert-danger">{{ $errors->first() }}</div>
       @endif
 
-      <form method="POST" action="/login">
+      <form method="POST" action="{{ route('login') }}">
+
         @csrf
         <div class="form-group">
           <i class="bi bi-person-fill"></i>

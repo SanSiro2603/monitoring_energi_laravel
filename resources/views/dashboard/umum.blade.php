@@ -10,6 +10,15 @@
     </div>
   @endif
 
-  <p class="mt-4">Sebagai user umum, Anda dapat mencatat data energi serta memantau laporan penggunaannya.</p>
+  {{-- ✅ Kotak Selamat Datang --}}
+  <div class="card mt-6 shadow-sm">
+    <div class="bg-white shadow-sm rounded p-4" style="max-width: 900px; width: 100%;">
+      <h4 class="mb-2">👋 Selamat Datang, {{ Auth::user()->name }}</h4>
+      <p class="mb-0">Sebagai user umum, Anda dapat menginput data energi dan Laporan.</p>
+    </div>
+  </div>
+
+
+  <p class="mt-6"> Sebagai user umum, Anda dapat mencatat data energi serta memantau laporan penggunaannya.</p>
 
 @endsection

@@ -8,7 +8,6 @@ use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
-    // ✅ Tampilkan daftar user dengan fitur search dan pagination dinamis
     public function index(Request $request)
     {
         $query = User::query();
@@ -31,8 +30,7 @@ class UserController extends Controller
 
         return view('users.index', compact('users'));
     }
-
-    // ✅ Form tambah user
+    
     public function create()
     {
         return view('users.create');
