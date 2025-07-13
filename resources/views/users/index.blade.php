@@ -4,11 +4,11 @@
 <div class="container">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h3>Manajemen User</h3>
-        <a href="{{ route('users.create') }}" class="btn btn-success">Tambah User +</a>
+        <a href="{{ route('admin.users.create') }}" class="btn btn-success">Tambah User +</a>
     </div>
 
     {{-- ✅ Search dan Per Page --}}
-    <form method="GET" action="{{ route('users.index') }}" class="row g-2 align-items-center mb-3">
+    <form method="GET" action="{{ route('admin.users.index') }}" class="row g-2 align-items-center mb-3">
         <div class="col-md-6">
             <div class="input-group rounded-pill shadow-sm">
                 <input type="text" name="search" class="form-control border-success rounded-start-pill" placeholder="🔍 Cari user..." value="{{ request('search') }}">
@@ -49,8 +49,8 @@
                             <td>{{ $user->unit_kerja }}</td>
                             <td>{{ $user->role }}</td>
                             <td>
-                                <a href="{{ route('users.edit', $user->id) }}" class="btn btn-sm btn-primary">Edit</a>
-                                <form action="{{ route('users.destroy', $user->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus user ini?')">
+                                <a href="{{ route('admin.users.edit', $user->id) }}" class="btn btn-sm btn-primary">Edit</a>
+                                <form action="{{ route('admin.users.destroy', $user->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus user ini?')">
                                     @csrf
                                     @method('DELETE')
                                     <button class="btn btn-sm btn-danger">Delete</button>
