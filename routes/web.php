@@ -5,13 +5,11 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\EnergiController;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\ProfilController;
-// use App\Http\Controllers\ChartController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\OtpController; 
-
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 
@@ -19,11 +17,6 @@ use Illuminate\Http\Request;
 |--------------------------------------------------------------------------
 | Web Routes
 |--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| contains the "web" middleware group. Now create something great!
-|
 */
 
 Route::get('/', function () {
@@ -82,14 +75,11 @@ Route::middleware(['auth', 'verified', 'role:super_user', 'no_cache'])->prefix('
         return view('dashboard.admin');
     })->name('dashboard');
 
-
-    
     // Manajemen Pengguna (Users)
     Route::resource('users', UserController::class);
 
     // Manajemen Energi (CRUD)
-    // Menggunakan Route::resource untuk CRUD yang lebih ringkas
-    Route::resource('energi', EnergiController::class)->except(['show']); // show tidak ada di controller Anda
+    Route::resource('energi', EnergiController::class)->except(['show']);
     Route::post('/energi/import', [EnergiController::class, 'import'])->name('energi.import');
     Route::get('/energi/template', [EnergiController::class, 'downloadTemplate'])->name('energi.template');
 
@@ -99,9 +89,7 @@ Route::middleware(['auth', 'verified', 'role:super_user', 'no_cache'])->prefix('
     Route::get('/laporan/export-pdf', [EnergiController::class, 'exportPdf'])->name('laporan.export-pdf');
     Route::get('/laporan/export-excel', [EnergiController::class, 'exportExcel'])->name('laporan.export-excel');
     Route::get('/laporan/export-chart-pdf', [EnergiController::class, 'exportChartToPDF'])->name('laporan.export-chart-pdf');
-    // Rute '/export-energi' yang asli sekarang menjadi bagian dari '/admin/laporan/export-excel'
 });
-
 
 // Route global tanpa prefix, bisa diakses semua role
 Route::middleware(['auth'])->group(function () {
@@ -109,23 +97,18 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/energi/export', [EnergiController::class, 'exportExcel'])->name('energi.export');
 });
 
-
 // DIVISI USER ROUTES
 Route::middleware(['auth', 'verified', 'role:divisi_user'])->prefix('divisi')->name('divisi.')->group(function () {
     Route::get('/dashboard', function () {
         return view('dashboard.divisi');
     })->name('dashboard');
 
-    // Manajemen Energi (CRUD) untuk Divisi
     Route::resource('energi', EnergiController::class)->except(['show', 'edit', 'update']);
 
-
-    // Manajemen Pengguna (Divisi hanya melihat atau membuat?)
     Route::get('/users', [UserController::class, 'indexDivisi'])->name('users.index');
     Route::get('/users/create', [UserController::class, 'createDivisi'])->name('users.create');
     Route::post('/users', [UserController::class, 'storeDivisi'])->name('users.store');
 
-    // Laporan Energi untuk Divisi User
     Route::get('/laporan', [EnergiController::class, 'laporan'])->name('laporan');
     Route::get('/laporan/export-excel', [EnergiController::class, 'exportExcel'])->name('laporan.export-excel');
     Route::get('/laporan/export-pdf', [EnergiController::class, 'exportPdf'])->name('laporan.export-pdf');
@@ -138,18 +121,26 @@ Route::middleware(['auth', 'verified', 'role:user_umum'])->prefix('umum')->name(
         return view('dashboard.umum');
     })->name('dashboard');
 
-    // List Energi untuk User Umum (hanya melihat)
     Route::get('/energi', [EnergiController::class, 'index'])->name('energi.index');
-    // Jika umum bisa membuat data energi:
     Route::get('/energi/create', [EnergiController::class, 'create'])->name('energi.create');
     Route::post('/energi', [EnergiController::class, 'store'])->name('energi.store');
 
-
-    // Laporan Energi untuk User Umum (hanya melihat/export)
     Route::get('/laporan', [EnergiController::class, 'laporan'])->name('laporan');
     Route::get('/laporan/export-excel', [EnergiController::class, 'exportExcel'])->name('laporan.export-excel');
     Route::get('/laporan/export-pdf', [EnergiController::class, 'exportPdf'])->name('laporan.export-pdf');
 });
-// REGISTER
-Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
-Route::post('/register', [RegisterController::class, 'register']);
+
+// EMAIL VERIFICATION ROUTES
+Route::get('/email/verify', function () {
+    return view('auth.verify-email');
+})->middleware('auth')->name('verification.notice');
+
+Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
+    $request->fulfill();
+    return redirect('/dashboard');
+})->middleware(['auth', 'signed'])->name('verification.verify');
+
+Route::post('/email/verification-notification', function (Request $request) {
+    $request->user()->sendEmailVerificationNotification();
+    return back()->with('message', 'Link verifikasi telah dikirim!');
+})->middleware(['auth', 'throttle:6,1'])->name('verification.send');
