@@ -21,17 +21,19 @@ class EnergiExport implements FromArray, WithStyles, WithDrawings, WithColumnWid
 
         // Baris kosong untuk logo (1-7)
         for ($i = 1; $i <= 7; $i++) {
-            $data[] = ['', '', '', '', '', '', '', '', ''];
+            $data[] = ['', '', '', '', '', '', '', '', '', '', ''];
         }
 
         // Header (baris ke-8)
-        $data[] = ['Kantor', 'Bulan', 'Tahun', 'Listrik', 'Daya Listrik', 'Air', 'BBM', 'Jenis BBM', 'Kertas'];
+        $data[] = [
+            'Kantor', 'Bulan', 'Tahun', 'Listrik', 'Daya Listrik',
+            'Air', 'BBM', 'Jenis BBM', 'Kertas', 'Tanggal Input', 'Penginput'
+        ];
 
-        // Data dari database
-        $energiData = Energi::select(
-            'kantor', 'bulan', 'tahun',
-            'listrik', 'daya_listrik', 'air',
-            'bbm', 'jenis_bbm', 'kertas'
+        // Ambil data
+        $energiData = Energi::with('user')->select(
+            'kantor', 'bulan', 'tahun', 'listrik', 'daya_listrik', 'air',
+            'bbm', 'jenis_bbm', 'kertas', 'created_at', 'user_id'
         )->get();
 
         foreach ($energiData as $energi) {
@@ -45,6 +47,8 @@ class EnergiExport implements FromArray, WithStyles, WithDrawings, WithColumnWid
                 $energi->bbm,
                 $energi->jenis_bbm,
                 $energi->kertas,
+                $energi->created_at->format('d-m-Y H:i:s'),
+                optional($energi->user)->name ?? '-',
             ];
         }
 
@@ -54,15 +58,10 @@ class EnergiExport implements FromArray, WithStyles, WithDrawings, WithColumnWid
     public function columnWidths(): array
     {
         return [
-            'A' => 20, // Kantor
-            'B' => 10, // Bulan
-            'C' => 10, // Tahun
-            'D' => 12, // Listrik
-            'E' => 14, // Daya Listrik
-            'F' => 10, // Air
-            'G' => 10, // BBM
-            'H' => 14, // Jenis BBM
-            'I' => 10, // Kertas
+            'A' => 20, 'B' => 10, 'C' => 10,
+            'D' => 12, 'E' => 14, 'F' => 10,
+            'G' => 10, 'H' => 14, 'I' => 10,
+            'J' => 20, 'K' => 20,
         ];
     }
 
@@ -73,14 +72,13 @@ class EnergiExport implements FromArray, WithStyles, WithDrawings, WithColumnWid
         $dataStartRow = 9;
         $lastDataRow = $dataStartRow + $dataCount - 1;
 
-        // Tinggi baris
         for ($i = 1; $i <= 7; $i++) {
             $sheet->getRowDimension($i)->setRowHeight(30);
         }
         $sheet->getRowDimension($headerRow)->setRowHeight(25);
 
         // Header style
-        $sheet->getStyle("A{$headerRow}:I{$headerRow}")->applyFromArray([
+        $sheet->getStyle("A{$headerRow}:K{$headerRow}")->applyFromArray([
             'font' => [
                 'bold' => true,
                 'size' => 11,
@@ -103,9 +101,8 @@ class EnergiExport implements FromArray, WithStyles, WithDrawings, WithColumnWid
             ]
         ]);
 
-        // Style data jika ada
         if ($dataCount > 0) {
-            $sheet->getStyle("A{$dataStartRow}:I{$lastDataRow}")->applyFromArray([
+            $sheet->getStyle("A{$dataStartRow}:K{$lastDataRow}")->applyFromArray([
                 'borders' => [
                     'allBorders' => [
                         'borderStyle' => Border::BORDER_THIN,
@@ -121,17 +118,18 @@ class EnergiExport implements FromArray, WithStyles, WithDrawings, WithColumnWid
                 ]
             ]);
 
-            // Alignment per kolom
             $alignments = [
-                'A' => Alignment::HORIZONTAL_LEFT,   // Kantor
-                'B' => Alignment::HORIZONTAL_LEFT,   // Bulan
-                'C' => Alignment::HORIZONTAL_CENTER, // Tahun
-                'D' => Alignment::HORIZONTAL_RIGHT,  // Listrik
-                'E' => Alignment::HORIZONTAL_RIGHT,  // Daya Listrik
-                'F' => Alignment::HORIZONTAL_RIGHT,  // Air
-                'G' => Alignment::HORIZONTAL_RIGHT,  // BBM
-                'H' => Alignment::HORIZONTAL_CENTER, // Jenis BBM
-                'I' => Alignment::HORIZONTAL_RIGHT,  // Kertas
+                'A' => Alignment::HORIZONTAL_LEFT,
+                'B' => Alignment::HORIZONTAL_LEFT,
+                'C' => Alignment::HORIZONTAL_CENTER,
+                'D' => Alignment::HORIZONTAL_RIGHT,
+                'E' => Alignment::HORIZONTAL_RIGHT,
+                'F' => Alignment::HORIZONTAL_RIGHT,
+                'G' => Alignment::HORIZONTAL_RIGHT,
+                'H' => Alignment::HORIZONTAL_CENTER,
+                'I' => Alignment::HORIZONTAL_RIGHT,
+                'J' => Alignment::HORIZONTAL_CENTER,
+                'K' => Alignment::HORIZONTAL_LEFT,
             ];
 
             foreach ($alignments as $col => $align) {
@@ -139,15 +137,12 @@ class EnergiExport implements FromArray, WithStyles, WithDrawings, WithColumnWid
                       ->getAlignment()->setHorizontal($align);
             }
 
-            // Putihkan background data
-            $sheet->getStyle("A{$dataStartRow}:I{$lastDataRow}")->getFill()
+            $sheet->getStyle("A{$dataStartRow}:K{$lastDataRow}")->getFill()
                   ->setFillType(Fill::FILL_SOLID)
                   ->getStartColor()->setRGB('FFFFFF');
         }
 
-        // Freeze header
         $sheet->freezePane("A{$dataStartRow}");
-
         return $sheet;
     }
 
