@@ -85,15 +85,7 @@ Route::middleware(['auth', 'verified', 'role:super_user', 'no_cache'])->prefix('
 
     
     // Manajemen Pengguna (Users)
-   Route::resource('users', UserController::class)->names([
-    'index'   => 'users.index',
-    'create'  => 'users.create',
-    'store'   => 'users.store',
-    'edit'    => 'users.edit',
-    'update'  => 'users.update',
-    'destroy' => 'users.destroy',
-]);
-
+    Route::resource('users', UserController::class);
 
     // Manajemen Energi (CRUD)
     // Menggunakan Route::resource untuk CRUD yang lebih ringkas
@@ -109,6 +101,14 @@ Route::middleware(['auth', 'verified', 'role:super_user', 'no_cache'])->prefix('
     Route::get('/laporan/export-chart-pdf', [EnergiController::class, 'exportChartToPDF'])->name('laporan.export-chart-pdf');
     // Rute '/export-energi' yang asli sekarang menjadi bagian dari '/admin/laporan/export-excel'
 });
+
+
+// Route global tanpa prefix, bisa diakses semua role
+Route::middleware(['auth'])->group(function () {
+    Route::post('/energi/import', [EnergiController::class, 'import'])->name('energi.import');
+    Route::get('/energi/export', [EnergiController::class, 'exportExcel'])->name('energi.export');
+});
+
 
 // DIVISI USER ROUTES
 Route::middleware(['auth', 'verified', 'role:divisi_user'])->prefix('divisi')->name('divisi.')->group(function () {
