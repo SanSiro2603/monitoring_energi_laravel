@@ -68,42 +68,52 @@ class EnergiController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'kantor' => 'required|string|max:255',
-            'bulan' => 'required|string|max:50',
-            'tahun' => 'required|numeric|integer|min:1900|max:' . (date('Y') + 5), // Example year range
-            'listrik' => 'required|numeric|min:0',
-            'daya_listrik' => 'nullable|numeric|min:0',
-            'air' => 'required|numeric|min:0',
-            'bbm' => 'required|numeric|min:0',
-            'jenis_bbm' => 'required|string|max:100',
-            'kertas' => 'required|numeric|min:0',
+   public function store(Request $request)
+{
+    $validated = $request->validate([
+        'kantor' => 'required|string|max:255',
+        'bulan' => 'required|string|max:50',
+        'tahun' => 'required|numeric|integer|min:1900|max:' . (date('Y') + 5),
+        'listrik' => 'required|numeric|min:0',
+        'daya_listrik' => 'nullable|numeric|min:0',
+        'air' => 'required|numeric|min:0',
+        'kertas' => 'required|numeric|min:0',
+        'jenis_bbm' => 'required|array|min:1',
+        'jenis_bbm.*' => 'required|string|max:100',
+        'jumlah_bbm' => 'required|array|min:1',
+        'jumlah_bbm.*' => 'required|numeric|min:0',
+    ]);
+
+    try {
+        $totalBBM = array_sum($request->jumlah_bbm);
+
+        Energi::create([
+            'kantor' => $request->kantor,
+            'bulan' => $request->bulan,
+            'tahun' => $request->tahun,
+            'listrik' => $request->listrik,
+            'daya_listrik' => $request->daya_listrik,
+            'air' => $request->air,
+            'bbm' => $totalBBM,
+            'jenis_bbm' => json_encode($request->jenis_bbm),
+            'kertas' => $request->kertas,
+            'user_id' => auth()->id(),
         ]);
 
-        try {
-            Energi::create($validated);
+        $user = Auth::user();
+        $redirectRoute = match($user->role) {
+            'super_user' => 'admin.energi.index',
+            'divisi_user' => 'divisi.energi.index',
+            'user_umum' => 'umum.energi.index',
+            default => 'dashboard',
+        };
 
-            // Redirect based on user role
-            $user = Auth::user();
-            $redirectRoute = 'dashboard'; // Default redirect to dashboard
-            if ($user) {
-                if ($user->role === 'super_user') {
-                    $redirectRoute = 'admin.energi.index';
-                } elseif ($user->role === 'divisi_user') {
-                    $redirectRoute = 'divisi.energi.index';
-                } elseif ($user->role === 'user_umum') {
-                    $redirectRoute = 'umum.energi.index';
-                }
-            }
-
-
-            return redirect()->route($redirectRoute)->with('success', '✅ Data energi berhasil ditambahkan!');
-        } catch (\Exception $e) {
-            return back()->with('error', '❌ Gagal menambahkan data: ' . $e->getMessage());
-        }
+        return redirect()->route($redirectRoute)->with('success', '✅ Data energi berhasil ditambahkan!');
+    } catch (\Exception $e) {
+        return back()->with('error', '❌ Gagal menambahkan data: ' . $e->getMessage());
     }
+}
+
 
     /**
      * Menampilkan form untuk mengedit data energi.
