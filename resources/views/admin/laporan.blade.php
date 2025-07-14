@@ -40,11 +40,30 @@
 
     @php
     $userRole = Auth::check() ? Auth::user()->role : 'guest';
+    $exportRoute = match ($userRole) {
+        'super_user' => route('admin.laporan.export-excel'),
+        'divisi_user' => route('divisi.laporan.export-excel'),
+        'user_umum' => route('umum.laporan.export-excel'),
+        default => '#',
+    };
+    $query = http_build_query([
+        'kantor' => request('kantor'),
+        'bulan' => request('bulan'),
+        'tahun' => request('tahun'),
+    ]);
     @endphp
 
     <div class="mb-3 d-flex gap-2">
         {{-- Tombol Export Excel --}}
-        <a href="#" id="exportExcelBtn" class="btn btn-success">🗃️ Export Excel</a>
+        {{-- Tombol Export Excel --}}
+    <a href="{{ 
+    route(
+        Auth::user()->role === 'super_user' ? 'admin.laporan.export-excel' : 
+        (Auth::user()->role === 'divisi_user' ? 'divisi.laporan.export-excel' : 'umum.laporan.export-excel'), 
+        ['kantor' => request('kantor'), 'bulan' => request('bulan'), 'tahun' => request('tahun')] 
+    ) 
+    }}" class="btn btn-success">🗃️ Export Excel</a>
+
 
         {{-- Tombol Export PDF (untuk tabel) --}}
         <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#exportPdfModal" data-export-type="table">📄 Export Tabel ke PDF</button>
