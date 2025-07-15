@@ -62,7 +62,7 @@
         (Auth::user()->role === 'divisi_user' ? 'divisi.laporan.export-excel' : 'umum.laporan.export-excel'), 
         ['kantor' => request('kantor'), 'bulan' => request('bulan'), 'tahun' => request('tahun')] 
     ) 
-    }}" class="btn btn-success">🗃 Export Excel</a>
+    }}" class="btn btn-success">🗃️ Export Excel</a>
 
 
         {{-- Tombol Export PDF (untuk tabel) --}}
@@ -87,10 +87,10 @@
                         <th>Bulan</th>
                         <th>Tahun</th>
                         <th>Listrik (kWh)</th>
-                        <th>Daya Listrik (VA)</th> 
+                        <th>Daya Listrik (VA)</th> {{-- Ditambahkan --}}
                         <th>Air (m³)</th>
                         <th>BBM (liter)</th>
-                        <th>Jenis BBM</th> 
+                        <th>Jenis BBM</th> {{-- Ditambahkan --}}
                         <th>Kertas (rim)</th>
                     </tr>
                 </thead>
@@ -345,12 +345,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
             uniqueKantorForChartModal.forEach(kantor => {
                 const selectedAttr = (kantor == chartKantorVal) ? 'selected' : '';
-                chartPdfKantorSelect.innerHTML += <option value="${kantor}" ${selectedAttr}>${kantor}</option>;
+                chartPdfKantorSelect.innerHTML += `<option value="${kantor}" ${selectedAttr}>${kantor}</option>`;
             });
 
             uniqueTahunForChartModal.forEach(tahun => {
                 const selectedAttr = (tahun == chartTahunVal) ? 'selected' : '';
-                chartPdfTahunSelect.innerHTML += <option value="${tahun}" ${selectedAttr}>${tahun}</option>;
+                chartPdfTahunSelect.innerHTML += `<option value="${tahun}" ${selectedAttr}>${tahun}</option>`;
             });
 
             // Set nilai hidden input untuk bulan dari filter utama
@@ -392,11 +392,11 @@ function populateChartFilters() {
     const uniqueTahun = [...new Set(allData.map(item => item.tahun))].filter(Boolean).sort((a, b) => b - a);
     
     uniqueKantor.forEach(kantor => {
-        kantorSelect.innerHTML += <option value="${kantor}">${kantor}</option>;
+        kantorSelect.innerHTML += `<option value="${kantor}">${kantor}</option>`;
     });
     
     uniqueTahun.forEach(tahun => {
-        tahunSelect.innerHTML += <option value="${tahun}">${tahun}</option>;
+        tahunSelect.innerHTML += `<option value="${tahun}">${tahun}</option>`;
     });
 }
 
@@ -548,7 +548,7 @@ function generateMonthlyChart(data, energyType) {
     
     chartEnergi.data.labels = labels;
     chartEnergi.data.datasets = datasets;
-    chartEnergi.options.plugins.title.text = Konsumsi Energi Per Bulan;
+    chartEnergi.options.plugins.title.text = `Konsumsi Energi Per Bulan`;
     chartEnergi.options.scales.x.title.text = 'Bulan';
     chartEnergi.options.scales.y.title.text = 'Jumlah Penggunaan';
     chartEnergi.update();
@@ -610,7 +610,7 @@ function generateYearlyChart(data, energyType) {
     
     chartEnergi.data.labels = labels;
     chartEnergi.data.datasets = datasets;
-    chartEnergi.options.plugins.title.text = Konsumsi Energi Per Tahun;
+    chartEnergi.options.plugins.title.text = `Konsumsi Energi Per Tahun`;
     chartEnergi.options.scales.x.title.text = 'Tahun';
     chartEnergi.options.scales.y.title.text = 'Jumlah Penggunaan';
     chartEnergi.update();
@@ -633,7 +633,7 @@ function generateComparisonChart(data) {
         borderWidth: 1
     }];
     
-    chartEnergi.options.plugins.title.text = Perbandingan Total Konsumsi Energi;
+    chartEnergi.options.plugins.title.text = `Perbandingan Total Konsumsi Energi`;
     chartEnergi.options.scales.x.title.text = 'Jenis Energi';
     chartEnergi.options.scales.y.title.text = 'Jumlah Penggunaan';
     chartEnergi.update();

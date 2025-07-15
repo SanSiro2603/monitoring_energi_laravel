@@ -20,11 +20,11 @@ use Illuminate\Http\Request;
 */
 
 Route::get('/', function () {
-    return view('halamanawal'); // Halaman utama
+    return view('halamanawal');
 })->name('home');
 
 Route::get('/tentang', function () {
-    return view('welcome'); // Halaman tentang
+    return view('welcome');
 })->name('tentang');
 
 // AUTH ROUTES
@@ -44,14 +44,12 @@ Route::middleware('guest')->group(function () {
 Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
 Route::post('/register', [RegisterController::class, 'register']);
 
-// Route dashboard otomatis berdasarkan role
+// Dashboard berdasarkan role
 Route::get('/dashboard', function () {
     if (!Auth::check()) {
         return redirect()->route('login');
     }
-
     $role = Auth::user()->role;
-
     if ($role === 'super_user') {
         return view('dashboard.admin');
     } elseif ($role === 'divisi_user') {
@@ -69,21 +67,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::put('/profil/update', [ProfilController::class, 'update'])->name('profil.update');
 });
 
-// SUPER USER ROUTES
+// SUPER USER
 Route::middleware(['auth', 'verified', 'role:super_user', 'no_cache'])->prefix('admin')->name('admin.')->group(function () {
-    Route::get('/dashboard', function () {
-        return view('dashboard.admin');
-    })->name('dashboard');
-
-    // Manajemen Pengguna (Users)
+    Route::get('/dashboard', fn() => view('dashboard.admin'))->name('dashboard');
     Route::resource('users', UserController::class);
-
-    // Manajemen Energi (CRUD)
     Route::resource('energi', EnergiController::class)->except(['show']);
     Route::post('/energi/import', [EnergiController::class, 'import'])->name('energi.import');
     Route::get('/energi/template', [EnergiController::class, 'downloadTemplate'])->name('energi.template');
 
-    // Laporan Energi untuk Super User
     Route::get('/laporan', [EnergiController::class, 'laporan'])->name('laporan');
     Route::get('/laporan/json', [EnergiController::class, 'laporanJson'])->name('laporan.json');
     Route::get('/laporan/export-pdf', [EnergiController::class, 'exportPdf'])->name('laporan.export-pdf');
@@ -91,20 +82,10 @@ Route::middleware(['auth', 'verified', 'role:super_user', 'no_cache'])->prefix('
     Route::get('/laporan/export-chart-pdf', [EnergiController::class, 'exportChartToPDF'])->name('laporan.export-chart-pdf');
 });
 
-// Route global tanpa prefix, bisa diakses semua role
-Route::middleware(['auth'])->group(function () {
-    Route::post('/energi/import', [EnergiController::class, 'import'])->name('energi.import');
-    Route::get('/energi/export', [EnergiController::class, 'exportExcel'])->name('energi.export');
-});
-
-// DIVISI USER ROUTES
+// DIVISI USER
 Route::middleware(['auth', 'verified', 'role:divisi_user'])->prefix('divisi')->name('divisi.')->group(function () {
-    Route::get('/dashboard', function () {
-        return view('dashboard.divisi');
-    })->name('dashboard');
-
+    Route::get('/dashboard', fn() => view('dashboard.divisi'))->name('dashboard');
     Route::resource('energi', EnergiController::class)->except(['show', 'edit', 'update']);
-
     Route::get('/users', [UserController::class, 'indexDivisi'])->name('users.index');
     Route::get('/users/create', [UserController::class, 'createDivisi'])->name('users.create');
     Route::post('/users', [UserController::class, 'storeDivisi'])->name('users.store');
@@ -115,12 +96,9 @@ Route::middleware(['auth', 'verified', 'role:divisi_user'])->prefix('divisi')->n
     Route::get('/laporan/export-chart-pdf', [EnergiController::class, 'exportChartToPDF'])->name('laporan.export-chart-pdf');
 });
 
-// USER UMUM ROUTES
+// USER UMUM
 Route::middleware(['auth', 'verified', 'role:user_umum'])->prefix('umum')->name('umum.')->group(function () {
-    Route::get('/dashboard', function () {
-        return view('dashboard.umum');
-    })->name('dashboard');
-
+    Route::get('/dashboard', fn() => view('dashboard.umum'))->name('dashboard');
     Route::get('/energi', [EnergiController::class, 'index'])->name('energi.index');
     Route::get('/energi/create', [EnergiController::class, 'create'])->name('energi.create');
     Route::post('/energi', [EnergiController::class, 'store'])->name('energi.store');
@@ -130,11 +108,17 @@ Route::middleware(['auth', 'verified', 'role:user_umum'])->prefix('umum')->name(
     Route::get('/laporan/export-pdf', [EnergiController::class, 'exportPdf'])->name('laporan.export-pdf');
 });
 
-// EMAIL VERIFICATION ROUTES
-Route::get('/email/verify', function () {
-    return view('auth.verify-email');
-})->middleware('auth')->name('verification.notice');
+// GLOBAL route tanpa prefix untuk semua role
+Route::middleware(['auth'])->group(function () {
+    Route::post('/energi/import', [EnergiController::class, 'import'])->name('energi.import');
+    Route::get('/energi/export', [EnergiController::class, 'exportExcel'])->name('energi.export');
 
+    // ✅ Tambahan route global chart PDF di sini:
+    Route::get('/laporan/export-chart-pdf', [EnergiController::class, 'exportChartToPDF'])->name('laporan.export-chart-pdf-global');
+});
+
+// EMAIL VERIFICATION
+Route::get('/email/verify', fn() => view('auth.verify-email'))->middleware('auth')->name('verification.notice');
 Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
     $request->fulfill();
     return redirect('/dashboard');
