@@ -33,12 +33,22 @@ class UserController extends Controller
     
     public function create()
     {
+        // Cek apakah sudah mencapai limit 50 user
+        if (User::count() >= 50) {
+            return redirect()->route('users.index')->with('error', 'Maksimal 50 user sudah tercapai. Tidak dapat menambah user baru.');
+        }
+        
         return view('users.create');
     }
 
     // ✅ Simpan user baru
     public function store(Request $request)
     {
+        // Cek limit sebelum validasi
+        if (User::count() >= 50) {
+            return redirect()->back()->with('error', 'Maksimal 50 user sudah tercapai. Tidak dapat menambah user baru.');
+        }
+
         $request->validate([
             'name' => 'required',
             'username' => 'required|unique:users',
@@ -46,6 +56,11 @@ class UserController extends Controller
             'password' => 'required|min:6',
             'role' => 'required',
         ]);
+
+        // Double check limit setelah validasi untuk mencegah race condition
+        if (User::count() >= 50) {
+            return redirect()->back()->with('error', 'Maksimal 50 user sudah tercapai. Tidak dapat menambah user baru.');
+        }
 
         User::create([
             'name' => $request->name,
@@ -94,49 +109,74 @@ class UserController extends Controller
     }
 
     public function indexDivisi(Request $request)
-{
-    $query = User::where('role', 'user_umum');
+    {
+        $query = User::where('role', 'user_umum');
 
-    if ($request->filled('search')) {
-        $search = $request->search;
-        $query->where(function ($q) use ($search) {
-            $q->where('name', 'like', '%' . $search . '%')
-              ->orWhere('email', 'like', '%' . $search . '%')
-              ->orWhere('username', 'like', '%' . $search . '%');
-        });
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', '%' . $search . '%')
+                  ->orWhere('email', 'like', '%' . $search . '%')
+                  ->orWhere('username', 'like', '%' . $search . '%');
+            });
+        }
+
+        $perPage = $request->input('per_page', 10);
+        $users = $query->orderBy('name')->paginate($perPage)->appends($request->only('search', 'per_page'));
+
+        return view('divisi.users.index', compact('users'));
     }
-
-    $perPage = $request->input('per_page', 10);
-    $users = $query->orderBy('name')->paginate($perPage)->appends($request->only('search', 'per_page'));
-
-    return view('divisi.users.index', compact('users'));
-}
-
 
     public function createDivisi()
     {
+        // Cek apakah sudah mencapai limit 50 user
+        if (User::count() >= 50) {
+            return redirect('/divisi/users')->with('error', 'Maksimal 50 user sudah tercapai. Tidak dapat menambah user baru.');
+        }
+        
         return view('divisi.users.create');
     }
 
     public function storeDivisi(Request $request)
-{
-    $request->validate([
-        'name' => 'required|string|max:100',
-        'username' => 'required|unique:users',
-        'email' => 'required|email|unique:users,email',
-        'password' => 'required|string|min:6',
-    ]);
+    {
+        // Cek limit sebelum validasi
+        if (User::count() >= 50) {
+            return redirect()->back()->with('error', 'Maksimal 50 user sudah tercapai. Tidak dapat menambah user baru.');
+        }
 
-    User::create([
-        'name' => $request->name,
-        'username' => $request->username,
-        'email' => $request->email,
-        'password' => Hash::make($request->password),
-        'unit_kerja' => $request->unit_kerja,
-        'role' => 'user_umum', // dipaksa tetap user_umum
-    ]);
+        $request->validate([
+            'name' => 'required|string|max:100',
+            'username' => 'required|unique:users',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|string|min:6',
+        ]);
 
-    return redirect('/divisi/users')->with('success', 'User berhasil ditambahkan.');
-}
+        // Double check limit setelah validasi untuk mencegah race condition
+        if (User::count() >= 50) {
+            return redirect()->back()->with('error', 'Maksimal 50 user sudah tercapai. Tidak dapat menambah user baru.');
+        }
 
+        User::create([
+            'name' => $request->name,
+            'username' => $request->username,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+            'unit_kerja' => $request->unit_kerja,
+            'role' => 'user_umum', // dipaksa tetap user_umum
+        ]);
+
+        return redirect('/divisi/users')->with('success', 'User berhasil ditambahkan.');
+    }
+
+    // Helper method untuk mengecek apakah masih bisa menambah user
+    public function canAddUser()
+    {
+        return User::count() < 50;
+    }
+
+    // Helper method untuk mendapatkan sisa slot user
+    public function getRemainingUserSlots()
+    {
+        return 50 - User::count();
+    }
 }

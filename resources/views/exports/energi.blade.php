@@ -6,7 +6,7 @@
             <th>Bulan</th>
             <th>Tahun</th>
             <th>Listrik</th>
-            <th>Daya Listrik</th> {{-- ✅ Tambahkan ini --}}
+            <th>Daya Listrik</th> 
             <th>Air</th>
             <th>BBM</th>
             <th>Jenis BBM</th> 

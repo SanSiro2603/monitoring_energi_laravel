@@ -542,7 +542,7 @@ class EnergiController extends Controller
             $uniqueTahun = Energi::distinct()->pluck('tahun')->filter()->sortDesc()->values()->all();
 
             // Render the view that contains the chart.js canvas.
-            // It's crucial that this view (`admin.laporan`) is capable of rendering the chart
+            // It's crucial that this view (admin.laporan) is capable of rendering the chart
             // dynamically based on the passed data. Browsershot will take a screenshot of this rendered HTML.
             $html = view('admin.laporan', compact(
                 'data', 'kantor', 'bulan', 'tahun', 'total',
