@@ -68,7 +68,7 @@
             padding: 0; /* Hapus padding jika sudah proporsional */
             border-radius: 8px; /* Lebih halus */
             margin-right: 20px;
-            /* background-color: rgba(255, 255, 255, 0.1); */ /* Latar belakang transparan dihapus */
+            /* background-color: rgba(255, 255, 255, 0.1); / / Latar belakang transparan dihapus */
             /* Jika masih ada putih, kemungkinan dari gambar itu sendiri */
             filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.4)); /* Biarkan shadow tetap ada */
         }
@@ -382,7 +382,7 @@
     @elseif(Auth::user()->role === 'divisi_user') {{ url('/divisi/dashboard') }}
     @else {{ url('/umum/dashboard') }}
     @endif
-" class="{{ request()->is('*dashboard*') ? 'active' : '' }}">
+" class="{{ request()->is('dashboard') ? 'active' : '' }}">
     <i class="fas fa-home"></i> Dashboard
 </a>
 
