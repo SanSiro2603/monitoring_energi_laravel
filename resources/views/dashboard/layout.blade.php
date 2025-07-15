@@ -85,21 +85,39 @@
             color: var(#ffffff); /* Nama user highlight kuning */
             font-weight: 600;
         }
-     .header .btn-logout {
-    background-color: var(--accent-yellow); /* Kuning aksen */
-    border: none;
-    color: var(--neutral-dark); /* Teks gelap biar kontras */
-    padding: 6px 15px;
-    border-radius: 8px;
-    font-weight: 600;
-    transition: all 0.3s ease;
-}
+        .header .btn-logout {
+            background-color: var(--accent-yellow); /* Kuning aksen */
+            border: none;
+            color: var(--neutral-dark); /* Teks gelap biar kontras */
+            padding: 6px 15px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
 
-.header .btn-logout:hover {
-    background-color: #e0a800; /* Shade kuning lebih gelap pas hover */
-    color: var(--neutral-white); /* Teks putih pas hover biar kontras */
-    transform: translateY(-1px);
-}
+        .header .btn-logout:hover {
+            background-color: #e0a800; /* Shade kuning lebih gelap pas hover */
+            color: var(--neutral-white); /* Teks putih pas hover biar kontras */
+            transform: translateY(-1px);
+        }
+
+        /* TOGGLE SIDEBAR BUTTON */
+        .btn-toggle-sidebar {
+            background-color: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: var(--neutral-white);
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            margin-right: 15px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .btn-toggle-sidebar:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+            transform: translateY(-1px);
+        }
 
         /* CONTAINER UNTUK SIDEBAR DAN MAIN CONTENT */
         .content-area {
@@ -120,7 +138,18 @@
             position: sticky; /* Sticky position agar sidebar tetap terlihat saat scroll di main-content */
             top: 0; /* Penting untuk sticky */
             align-self: flex-start; /* Penting untuk sticky dalam flex container */
+            transition: all 0.3s ease;
+            transform: translateX(0);
         }
+
+        .sidebar.hidden {
+            transform: translateX(-100%);
+            width: 0;
+            padding: 0;
+            border-right: none;
+            overflow: hidden;
+        }
+
         .sidebar a {
             display: flex; /* Untuk ikon dan teks sejajar */
             align-items: center;
@@ -160,7 +189,13 @@
             padding: 30px; /* Padding lebih seragam */
             overflow-y: auto; /* Memungkinkan scroll di konten utama jika terlalu panjang */
             height: calc(100vh - 90px); /* Tinggi konten menyesuaikan sisa layar */
+            transition: all 0.3s ease;
         }
+
+        .sidebar.hidden + .main-content {
+            margin-left: 0;
+        }
+
         .main-content .card {
             border-radius: 15px; /* Sudut kartu lebih halus */
             border: none;
@@ -272,6 +307,9 @@
             .header {
                 position: relative; /* Header tidak fixed di mobile */
             }
+            .btn-toggle-sidebar {
+                display: none; /* Sembunyikan toggle button di mobile */
+            }
             .content-area {
                 flex-direction: column; /* Sidebar dan konten utama bertumpuk */
                 overflow: visible; /* Izinkan scroll pada content-area di mobile */
@@ -285,6 +323,13 @@
                 padding-bottom: 10px;
                 margin-bottom: 15px; /* Jarak dari main content */
                 overflow-y: visible; /* Matikan scroll internal sidebar */
+                transform: translateX(0) !important; /* Reset transform di mobile */
+            }
+            .sidebar.hidden {
+                transform: translateX(0) !important;
+                width: 100% !important;
+                padding-top: 15px !important;
+                border-bottom: 1px solid var(--light-green) !important;
             }
             .sidebar a {
                 border-radius: 10px; /* Radius untuk tombol penuh */
@@ -307,6 +352,9 @@
     <div class="wrapper">
         <div class="header d-flex justify-content-between align-items-center">
             <div class="d-flex align-items-center">
+                <button class="btn-toggle-sidebar d-none d-md-block" onclick="toggleSidebar()">
+                    <i class="fas fa-bars" id="toggleIcon"></i>
+                </button>
                 <img src="{{ asset('assets/img/BLPUTIH.png') }}" alt="Bank Lampung">
                 <div>
                     <h4 class="mb-0">Hemat Energi</h4>
@@ -328,7 +376,7 @@
 
         <div class="content-area">
             @auth
-            <div class="sidebar">
+            <div class="sidebar" id="sidebar">
                <a href="
     @if(Auth::user()->role === 'super_user') {{ url('/admin/dashboard') }}
     @elseif(Auth::user()->role === 'divisi_user') {{ url('/divisi/dashboard') }}
@@ -427,6 +475,24 @@
             </div>
         </div>
     </div>
+
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const toggleIcon = document.getElementById('toggleIcon');
+            
+            sidebar.classList.toggle('hidden');
+            
+            // Ubah ikon berdasarkan status sidebar
+            if (sidebar.classList.contains('hidden')) {
+                toggleIcon.classList.remove('fa-bars');
+                toggleIcon.classList.add('fa-angles-right');
+            } else {
+                toggleIcon.classList.remove('fa-angles-right');
+                toggleIcon.classList.add('fa-bars');
+            }
+        }
+    </script>
 
     @stack('scripts')
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
