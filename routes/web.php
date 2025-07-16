@@ -117,6 +117,11 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/laporan/export-chart-pdf', [EnergiController::class, 'exportChartToPDF'])->name('laporan.export-chart-pdf-global');
 });
 
+// ✅ TAMBAHAN: Route untuk users.store yang hilang
+Route::middleware(['auth', 'verified', 'role:super_user', 'no_cache'])->group(function () {
+    Route::post('/users', [UserController::class, 'store'])->name('users.store');
+});
+
 // EMAIL VERIFICATION
 Route::get('/email/verify', fn() => view('auth.verify-email'))->middleware('auth')->name('verification.notice');
 Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {

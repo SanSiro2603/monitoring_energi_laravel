@@ -18,9 +18,6 @@ class RegisterController extends Controller
         return view('auth.register');
     }
 
-    /**
-     * Tangani proses registrasi.
-     */
     public function register(Request $request)
     {
         $request->validate([
