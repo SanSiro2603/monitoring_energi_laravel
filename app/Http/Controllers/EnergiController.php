@@ -501,8 +501,8 @@ class EnergiController extends Controller
         $user = Auth::user();
         $viewName = match($user->role) {
             'super_user' => 'admin.laporan',
-            'divisi_user' => 'divisi.laporan',
-            'user_umum' => 'umum.laporan',
+            'divisi_user' => 'admin.laporan',
+            'user_umum' => 'admin.laporan',
             default => 'laporan',
         };
 
@@ -615,8 +615,8 @@ class EnergiController extends Controller
         $user = Auth::user();
         $pdfView = match($user->role) {
             'super_user' => 'admin.export_pdf',
-            'divisi_user' => 'divisi.export_pdf',
-            'user_umum' => 'umum.export_pdf',
+            'divisi_user' => 'admin.export_pdf',
+            'user_umum' => 'admin.export_pdf',
             default => 'export_pdf',
         };
 
@@ -683,8 +683,8 @@ class EnergiController extends Controller
             $user = Auth::user();
             $viewName = match($user->role) {
                 'super_user' => 'admin.laporan',
-                'divisi_user' => 'divisi.laporan',
-                'user_umum' => 'umum.laporan',
+                'divisi_user' => 'admin.laporan',
+                'user_umum' => 'admin.laporan',
                 default => 'laporan',
             };
 
