@@ -112,13 +112,15 @@ Route::middleware(['auth', 'verified', 'role:user_umum'])->prefix('umum')->name(
 Route::middleware(['auth'])->group(function () {
     Route::post('/energi/import', [EnergiController::class, 'import'])->name('energi.import');
     Route::get('/energi/export', [EnergiController::class, 'exportExcel'])->name('energi.export');
+    Route::get('/energi/template', [EnergiController::class, 'downloadTemplate'])->name('energi.template');
 
     // ✅ Tambahan route global chart PDF di sini:
     Route::get('/laporan/export-chart-pdf', [EnergiController::class, 'exportChartToPDF'])->name('laporan.export-chart-pdf-global');
 });
 
-// ✅ TAMBAHAN: Route untuk users.store yang hilang
+// ✅ TAMBAHAN: Route untuk users yang hilang
 Route::middleware(['auth', 'verified', 'role:super_user', 'no_cache'])->group(function () {
+    Route::get('/users', [UserController::class, 'index'])->name('users.index');
     Route::post('/users', [UserController::class, 'store'])->name('users.store');
 });
 
