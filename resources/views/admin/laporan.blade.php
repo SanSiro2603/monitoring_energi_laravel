@@ -568,10 +568,10 @@ function downloadExcel() {
     // Build URL with parameters
    <?php
 $baseRoute = match($userRole) {
-    'super_user'  => 'admin.laporan.export-excel',
-    'divisi_user' => 'admin.laporan.export-excel',
-    'user_umum'   => 'admin.laporan.export-excel',
-    default       => '',
+    'super_user' => 'admin.laporan.export-excel',
+    'divisi_user' => 'divisi.laporan.export-excel', 
+    'user_umum' => 'umum.laporan.export-excel',
+    default => '',
 };
 ?>
 
