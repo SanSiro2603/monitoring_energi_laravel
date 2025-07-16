@@ -1,4 +1,4 @@
-@extends('dashboard.layout') {{-- Pastikan ini sesuai dengan layout utama Anda --}}
+@extends('dashboard.layout')
 
 @section('content')
 <div class="container mt-4">
@@ -46,24 +46,17 @@
         'user_umum' => route('umum.laporan.export-excel'),
         default => '#',
     };
-    $query = http_build_query([
-        'kantor' => request('kantor'),
-        'bulan' => request('bulan'),
-        'tahun' => request('tahun'),
-    ]);
     @endphp
 
     <div class="mb-3 d-flex gap-2">
         {{-- Tombol Export Excel --}}
-        {{-- Tombol Export Excel --}}
-    <a href="{{ 
-    route(
-        Auth::user()->role === 'super_user' ? 'admin.laporan.export-excel' : 
-        (Auth::user()->role === 'divisi_user' ? 'divisi.laporan.export-excel' : 'umum.laporan.export-excel'), 
-        ['kantor' => request('kantor'), 'bulan' => request('bulan'), 'tahun' => request('tahun')] 
-    ) 
-    }}" class="btn btn-success">🗃️ Export Excel</a>
-
+        <a href="{{ 
+        route(
+            Auth::user()->role === 'super_user' ? 'admin.laporan.export-excel' : 
+            (Auth::user()->role === 'divisi_user' ? 'divisi.laporan.export-excel' : 'umum.laporan.export-excel'), 
+            ['kantor' => request('kantor'), 'bulan' => request('bulan'), 'tahun' => request('tahun')] 
+        ) 
+        }}" class="btn btn-success">🗃️ Export Excel</a>
 
         {{-- Tombol Export PDF (untuk tabel) --}}
         <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#exportPdfModal" data-export-type="table">📄 Export Tabel ke PDF</button>
@@ -86,11 +79,14 @@
                         <th>Kantor</th>
                         <th>Bulan</th>
                         <th>Tahun</th>
+                        <th>PERTALITE (L)</th>
+                        <th>PERTAMAX (L)</th>
+                        <th>SOLAR (L)</th>
+                        <th>DEXLITE (L)</th>
+                        <th>PERTAMINA DEX (L)</th>
                         <th>Listrik (kWh)</th>
-                        <th>Daya Listrik (VA)</th> {{-- Ditambahkan --}}
+                        <th>Daya Listrik (VA)</th>
                         <th>Air (m³)</th>
-                        <th>BBM (liter)</th>
-                        <th>Jenis BBM</th> {{-- Ditambahkan --}}
                         <th>Kertas (rim)</th>
                     </tr>
                 </thead>
@@ -101,16 +97,19 @@
                         <td>{{ $row->kantor }}</td>
                         <td>{{ $row->bulan }}</td>
                         <td>{{ $row->tahun }}</td>
+                        <td>{{ $row->pertalite ?? '0' }}</td>
+                        <td>{{ $row->pertamax ?? '0' }}</td>
+                        <td>{{ $row->solar ?? '0' }}</td>
+                        <td>{{ $row->dexlite ?? '0' }}</td>
+                        <td>{{ $row->pertamina_dex ?? '0' }}</td>
                         <td>{{ $row->listrik }}</td>
-                        <td>{{ $row->daya_listrik }}</td> {{-- Ditambahkan --}}
+                        <td>{{ $row->daya_listrik ?? '-' }}</td>
                         <td>{{ $row->air }}</td>
-                        <td>{{ $row->bbm }}</td>
-                        <td>{{ $row->jenis_bbm ?: '-' }}</td> {{-- Ditambahkan --}}
                         <td>{{ $row->kertas }}</td>
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="10" class="text-center">Tidak ada data</td> {{-- colspan diubah menjadi 10 --}}
+                        <td colspan="13" class="text-center">Tidak ada data</td>
                     </tr>
                     @endforelse
                 </tbody>
@@ -149,6 +148,7 @@
                                 <option value="monthly">Per Bulan</option>
                                 <option value="yearly">Per Tahun</option>
                                 <option value="comparison">Perbandingan Energi</option>
+                                <option value="bbm_comparison">Perbandingan Jenis BBM</option>
                             </select>
                         </div>
                         <div class="col-md-3">
@@ -157,7 +157,7 @@
                                 <option value="all">Semua</option>
                                 <option value="listrik">Listrik</option>
                                 <option value="air">Air</option>
-                                <option value="bbm">BBM</option>
+                                <option value="bbm">Total BBM</option>
                                 <option value="kertas">Kertas</option>
                             </select>
                         </div>
@@ -178,6 +178,42 @@
         </div>
     </div>
 
+    {{-- Summary Cards --}}
+    <div class="row mt-4">
+        <div class="col-md-3">
+            <div class="card text-white bg-primary mb-3">
+                <div class="card-header">Total Listrik</div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ number_format($totalListrik, 2) }} kWh</h5>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-info mb-3">
+                <div class="card-header">Total Air</div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ number_format($totalAir, 2) }} m³</h5>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-warning mb-3">
+                <div class="card-header">Total BBM</div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ number_format($totalBBM, 2) }} L</h5>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-success mb-3">
+                <div class="card-header">Total Kertas</div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ number_format($totalKertas, 2) }} rim</h5>
+                </div>
+            </div>
+        </div>
+    </div>
+
     {{-- Menyimpan dataAll sebagai JSON tersembunyi untuk ChartJS --}}
     <div id="energiData" style="display: none;">{!! json_encode($dataAll) !!}</div>
 
@@ -191,8 +227,7 @@
                 <h5 class="modal-title" id="exportPdfModalLabel">Filter Export Tabel ke PDF</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-       {{-- Menggunakan route() akan secara otomatis menambahkan prefix 'admin', 'divisi', atau 'umum' --}}
-<form id="exportPdfForm" method="GET" action="{{ route(Auth::user()->role === 'super_user' ? 'admin.laporan.export-pdf' : (Auth::user()->role === 'divisi_user' ? 'divisi.laporan.export-pdf' : 'umum.laporan.export-pdf')) }}">
+            <form id="exportPdfForm" method="GET" action="{{ route(Auth::user()->role === 'super_user' ? 'admin.laporan.export-pdf' : (Auth::user()->role === 'divisi_user' ? 'divisi.laporan.export-pdf' : 'umum.laporan.export-pdf')) }}">
                 <div class="modal-body">
                     <div class="mb-3">
                         <label for="pdfKantor" class="form-label">Kantor</label>
@@ -239,24 +274,21 @@
                 <h5 class="modal-title" id="exportChartPdfModalLabel">Filter Export Chart ke PDF</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form id="exportChartPdfForm" method="GET" action="{{ url('/laporan/export-chart-pdf') }}"> {{-- Sesuaikan action route --}}
+            <form id="exportChartPdfForm" method="GET" action="{{ url('/laporan/export-chart-pdf') }}">
                 <div class="modal-body">
                     <p class="alert alert-info">Ekspor ini akan menyertakan chart dengan filter yang dipilih saat ini.</p>
                     <div class="mb-3">
                         <label for="chartPdfKantor" class="form-label">Kantor (dari Chart)</label>
                         <select class="form-select" id="chartPdfKantor" name="kantor">
                             <option value="">-- Semua Kantor --</option>
-                            {{-- Opsi ini akan diisi JavaScript saat modal dibuka, dari chartKantor --}}
                         </select>
                     </div>
                     <div class="mb-3">
                         <label for="chartPdfTahun" class="form-label">Tahun (dari Chart)</label>
                         <select class="form-select" id="chartPdfTahun" name="tahun">
                             <option value="">-- Semua Tahun --</option>
-                            {{-- Opsi ini akan diisi JavaScript saat modal dibuka, dari chartTahun --}}
                         </select>
                     </div>
-                    {{-- Hidden input untuk mengirimkan filter bulan dari form utama ke controller Browsershot --}}
                     <input type="hidden" name="bulan" id="chartPdfBulanHidden">
                 </div>
                 <div class="modal-footer">
@@ -268,7 +300,27 @@
     </div>
 </div>
 
+<style>
+.table-responsive {
+    overflow-x: auto;
+}
 
+.table th, .table td {
+    white-space: nowrap;
+    vertical-align: middle;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .table-responsive {
+        font-size: 12px;
+    }
+    
+    .btn {
+        font-size: 0.875rem;
+    }
+}
+</style>
 @endsection
 
 @push('scripts')
@@ -277,7 +329,7 @@
 
 <script>
 let chartEnergi;
-let allData = []; // Data mentah dari database untuk ChartJS
+let allData = [];
 
 document.addEventListener('DOMContentLoaded', function() {
     const dataElement = document.getElementById('energiData');
@@ -288,34 +340,13 @@ document.addEventListener('DOMContentLoaded', function() {
         allData = [];
     }
     
-    populateChartFilters(); // Mengisi dropdown filter untuk CHART
+    populateChartFilters();
     initChart();
-
-    // Event Listener untuk tombol Export Excel
-    const exportExcelBtn = document.getElementById('exportExcelBtn');
-    exportExcelBtn.addEventListener('click', function(e) {
-        e.preventDefault(); // Mencegah default link behavior
-        const kantor = document.getElementById('filterKantor').value;
-        const bulan = document.getElementById('filterBulan').value;
-        const tahun = document.getElementById('filterTahun').value;
-        
-        let url = "{{ url('/laporan/export-excel') }}"; // Sesuaikan route di web.php
-        const params = new URLSearchParams();
-        if (kantor) params.append('kantor', kantor);
-        if (bulan) params.append('bulan', bulan);
-        if (tahun) params.append('tahun', tahun);
-        
-        if (params.toString()) {
-            url += '?' + params.toString();
-        }
-        window.location.href = url;
-    });
 
     // Event Listener untuk Modal Export PDF (Tabel)
     const exportPdfModal = document.getElementById('exportPdfModal');
     if (exportPdfModal) {
         exportPdfModal.addEventListener('show.bs.modal', function (event) {
-            // Isi otomatis form modal dengan nilai filter yang sedang aktif dari laporan utama
             document.getElementById('pdfKantor').value = document.getElementById('filterKantor').value;
             document.getElementById('pdfBulan').value = document.getElementById('filterBulan').value;
             document.getElementById('pdfTahun').value = document.getElementById('filterTahun').value;
@@ -326,20 +357,17 @@ document.addEventListener('DOMContentLoaded', function() {
     const exportChartPdfModal = document.getElementById('exportChartPdfModal');
     if (exportChartPdfModal) {
         exportChartPdfModal.addEventListener('show.bs.modal', function (event) {
-            // Isi dropdown di modal dengan pilihan yang sedang aktif di chart filter
             const chartKantorVal = document.getElementById('chartKantor').value;
             const chartTahunVal = document.getElementById('chartTahun').value;
-            const filterBulanVal = document.getElementById('filterBulan').value; // Ambil nilai bulan dari filter utama
+            const filterBulanVal = document.getElementById('filterBulan').value;
 
             const chartPdfKantorSelect = document.getElementById('chartPdfKantor');
             const chartPdfTahunSelect = document.getElementById('chartPdfTahun');
             const chartPdfBulanHiddenInput = document.getElementById('chartPdfBulanHidden');
 
-            // Kosongkan dan isi ulang dropdown chartPdfKantor dan chartPdfTahun
             chartPdfKantorSelect.innerHTML = '<option value="">-- Semua Kantor --</option>';
             chartPdfTahunSelect.innerHTML = '<option value="">-- Semua Tahun --</option>';
 
-            // Gunakan allData untuk mengisi opsi di modal chart PDF
             const uniqueKantorForChartModal = [...new Set(allData.map(item => item.kantor))].filter(Boolean);
             const uniqueTahunForChartModal = [...new Set(allData.map(item => item.tahun))].filter(Boolean).sort((a, b) => b - a);
 
@@ -353,20 +381,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 chartPdfTahunSelect.innerHTML += `<option value="${tahun}" ${selectedAttr}>${tahun}</option>`;
             });
 
-            // Set nilai hidden input untuk bulan dari filter utama
             chartPdfBulanHiddenInput.value = filterBulanVal;
 
-            // Set action form modal agar mengirim filter chart yang aktif
             const form = document.getElementById('exportChartPdfForm');
             let actionUrl = "{{ url('/laporan/export-chart-pdf') }}";
             const params = new URLSearchParams();
 
-            // Penting: Kirim nilai yang dipilih di modal chart untuk Kantor dan Tahun
             if (chartPdfKantorSelect.value) params.append('kantor', chartPdfKantorSelect.value);
             if (chartPdfTahunSelect.value) params.append('tahun', chartPdfTahunSelect.value);
-            
-            // Penting: Kirim nilai filter Bulan dari form utama ke Browsershot
-            // karena chart juga difilter bulan secara keseluruhan di controller
             params.append('bulan', filterBulanVal); 
 
             if (params.toString()) {
@@ -377,12 +399,10 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-// Fungsi untuk mengisi dropdown filter ChartJS (Kantor dan Tahun)
 function populateChartFilters() {
     const kantorSelect = document.getElementById('chartKantor');
     const tahunSelect = document.getElementById('chartTahun');
     
-    // Pastikan dropdown kosong sebelum diisi
     kantorSelect.innerHTML = '<option value="">Semua Kantor</option>';
     tahunSelect.innerHTML = '<option value="">Semua Tahun</option>';
     
@@ -399,7 +419,6 @@ function populateChartFilters() {
         tahunSelect.innerHTML += `<option value="${tahun}">${tahun}</option>`;
     });
 }
-
 
 function initChart() {
     const ctx = document.getElementById('chartEnergi').getContext('2d');
@@ -442,7 +461,7 @@ function initChart() {
         }
     });
     
-    updateChart(); // Panggil updateChart() pertama kali untuk menampilkan grafik awal
+    updateChart();
 }
 
 function updateChart() {
@@ -451,7 +470,7 @@ function updateChart() {
     const chartType = document.getElementById('chartType').value;
     const energyType = document.getElementById('energyType').value;
     
-    let filteredData = [...allData]; // Mulai dengan salinan data mentah
+    let filteredData = [...allData];
     
     if (kantor) {
         filteredData = filteredData.filter(item => item.kantor === kantor);
@@ -461,7 +480,6 @@ function updateChart() {
         filteredData = filteredData.filter(item => item.tahun == tahun);
     }
     
-    // Bulan juga harus difilter dari filter utama jika ada
     const filterBulanUtama = document.getElementById('filterBulan').value;
     if (filterBulanUtama) {
         filteredData = filteredData.filter(item => item.bulan === filterBulanUtama);
@@ -477,6 +495,9 @@ function updateChart() {
         case 'comparison':
             generateComparisonChart(filteredData);
             break;
+        case 'bbm_comparison':
+            generateBBMComparisonChart(filteredData);
+            break;
     }
 }
 
@@ -487,9 +508,9 @@ function generateMonthlyChart(data, energyType) {
     const monthlyData = {};
     data.forEach(item => {
         const monthIndex = monthNames.indexOf(item.bulan);
-        if (monthIndex === -1) return; // Lewati bulan yang tidak valid
+        if (monthIndex === -1) return;
         
-        const monthKey = monthIndex.toString().padStart(2, '0') + '-' + item.bulan; // Key untuk pengurutan
+        const monthKey = monthIndex.toString().padStart(2, '0') + '-' + item.bulan;
         if (!monthlyData[monthKey]) {
             monthlyData[monthKey] = {
                 listrik: 0,
@@ -500,17 +521,19 @@ function generateMonthlyChart(data, energyType) {
         }
         monthlyData[monthKey].listrik += parseFloat(item.listrik || 0);
         monthlyData[monthKey].air += parseFloat(item.air || 0);
-        monthlyData[monthKey].bbm += parseFloat(item.bbm || 0);
+        monthlyData[monthKey].bbm += parseFloat(item.pertalite || 0) + parseFloat(item.pertamax || 0) + 
+                                    parseFloat(item.solar || 0) + parseFloat(item.dexlite || 0) + 
+                                    parseFloat(item.pertamina_dex || 0);
         monthlyData[monthKey].kertas += parseFloat(item.kertas || 0);
     });
     
-    const labels = Object.keys(monthlyData).sort().map(key => key.substring(3)); // Ambil nama bulan setelah pengurutan
+    const labels = Object.keys(monthlyData).sort().map(key => key.substring(3));
     let datasets = [];
     
     const energyLabels = {
         'listrik': 'Listrik (kWh)',
         'air': 'Air (m³)',
-        'bbm': 'BBM (L)',
+        'bbm': 'Total BBM (L)',
         'kertas': 'Kertas (Rim)'
     };
     const colors = {
@@ -568,7 +591,9 @@ function generateYearlyChart(data, energyType) {
         }
         yearlyData[year].listrik += parseFloat(item.listrik || 0);
         yearlyData[year].air += parseFloat(item.air || 0);
-        yearlyData[year].bbm += parseFloat(item.bbm || 0);
+        yearlyData[year].bbm += parseFloat(item.pertalite || 0) + parseFloat(item.pertamax || 0) + 
+                                parseFloat(item.solar || 0) + parseFloat(item.dexlite || 0) + 
+                                parseFloat(item.pertamina_dex || 0);
         yearlyData[year].kertas += parseFloat(item.kertas || 0);
     });
     
@@ -578,7 +603,7 @@ function generateYearlyChart(data, energyType) {
     const energyLabels = {
         'listrik': 'Listrik (kWh)',
         'air': 'Air (m³)',
-        'bbm': 'BBM (L)',
+        'bbm': 'Total BBM (L)',
         'kertas': 'Kertas (Rim)'
     };
     const colors = {
@@ -620,11 +645,13 @@ function generateComparisonChart(data) {
     const totals = {
         listrik: data.reduce((sum, item) => sum + parseFloat(item.listrik || 0), 0),
         air: data.reduce((sum, item) => sum + parseFloat(item.air || 0), 0),
-        bbm: data.reduce((sum, item) => sum + parseFloat(item.bbm || 0), 0),
+        bbm: data.reduce((sum, item) => sum + parseFloat(item.pertalite || 0) + parseFloat(item.pertamax || 0) + 
+                                       parseFloat(item.solar || 0) + parseFloat(item.dexlite || 0) + 
+                                       parseFloat(item.pertamina_dex || 0), 0),
         kertas: data.reduce((sum, item) => sum + parseFloat(item.kertas || 0), 0)
     };
     
-    chartEnergi.data.labels = ['Listrik (kWh)', 'Air (m³)', 'BBM (L)', 'Kertas (Rim)'];
+    chartEnergi.data.labels = ['Listrik (kWh)', 'Air (m³)', 'Total BBM (L)', 'Kertas (Rim)'];
     chartEnergi.data.datasets = [{
         label: 'Total Konsumsi',
         data: [totals.listrik, totals.air, totals.bbm, totals.kertas],
@@ -636,6 +663,30 @@ function generateComparisonChart(data) {
     chartEnergi.options.plugins.title.text = `Perbandingan Total Konsumsi Energi`;
     chartEnergi.options.scales.x.title.text = 'Jenis Energi';
     chartEnergi.options.scales.y.title.text = 'Jumlah Penggunaan';
+    chartEnergi.update();
+}
+
+function generateBBMComparisonChart(data) {
+    const bbmTotals = {
+        pertalite: data.reduce((sum, item) => sum + parseFloat(item.pertalite || 0), 0),
+        pertamax: data.reduce((sum, item) => sum + parseFloat(item.pertamax || 0), 0),
+        solar: data.reduce((sum, item) => sum + parseFloat(item.solar || 0), 0),
+        dexlite: data.reduce((sum, item) => sum + parseFloat(item.dexlite || 0), 0),
+        pertamina_dex: data.reduce((sum, item) => sum + parseFloat(item.pertamina_dex || 0), 0)
+    };
+    
+    chartEnergi.data.labels = ['PERTALITE', 'PERTAMAX', 'SOLAR', 'DEXLITE', 'PERTAMINA DEX'];
+    chartEnergi.data.datasets = [{
+        label: 'Konsumsi BBM (Liter)',
+        data: [bbmTotals.pertalite, bbmTotals.pertamax, bbmTotals.solar, bbmTotals.dexlite, bbmTotals.pertamina_dex],
+        backgroundColor: ['#e74c3c', '#e67e22', '#f39c12', '#f1c40f', '#2ecc71'],
+        borderColor: ['#c0392b', '#d35400', '#e67e22', '#f39c12', '#27ae60'],
+        borderWidth: 1
+    }];
+    
+    chartEnergi.options.plugins.title.text = `Perbandingan Konsumsi Per Jenis BBM`;
+    chartEnergi.options.scales.x.title.text = 'Jenis BBM';
+    chartEnergi.options.scales.y.title.text = 'Jumlah (Liter)';
     chartEnergi.update();
 }
 

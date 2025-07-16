@@ -20,81 +20,116 @@
     <div id="formManual" style="display: none;">
         <form method="POST" action="{{ url("$prefix/energi") }}">
             @csrf
-            <div class="row mb-3">
-                <div class="col">
-                    <label>Kantor</label>
-                    <input name="kantor" class="form-control" required>
-                </div>
-                <div class="col">
-                    <label>Bulan</label>
-                    <input name="bulan" class="form-control" required>
-                </div>
-                <div class="col">
-                    <label>Tahun</label>
-                    <input name="tahun" type="number" class="form-control" required>
-                </div>
-            </div>
-            <div class="row mb-3">
-                <div class="col">
-                    <label>Listrik (kWh)</label>
-                    <input name="listrik" type="number" class="form-control" required>
-                </div>
-                <div class="col">
-                    <label>Daya Listrik (VA)</label>
-                    <input name="daya_listrik" type="number" class="form-control" placeholder="Contoh: 1300">
-                </div>
-                <div class="col">
-                    <label>Air (m³)</label>
-                    <input name="air" type="number" class="form-control" required>
-                </div>
-                <div class="col">
-                    <label>Kertas (rim)</label>
-                    <input name="kertas" type="number" class="form-control" required>
-                </div>
-            </div>
-
-            <!-- Jenis BBM Dinamis -->
-            <label class="mb-2 fw-semibold">Jenis BBM & Jumlah (liter)</label>
-            <div id="bbm-container" class="mb-3">
-                <div class="row bbm-row align-items-center g-2 mb-2">
-                    <div class="col-md-5">
-                        <select name="jenis_bbm[]" class="form-select" required>
-                            <option value="">-- Pilih Jenis BBM --</option>
-                            <option value="Pertalite">Pertalite</option>
-                            <option value="Pertamax">Pertamax</option>
-                            <option value="Solar">Solar</option>
-                            <option value="Dexlite">Dexlite</option>
-                            <option value="Pertamina Dex">Pertamina Dex</option>
-                        </select>
-                    </div>
-                    <div class="col-md-5">
-                        <input type="number" name="jumlah_bbm[]" class="form-control" placeholder="Liter" required>
-                    </div>
-                    <div class="col-md-2 d-flex justify-content-end">
-                        <button type="button" class="btn btn-light border shadow-sm rounded-circle d-flex align-items-center justify-content-center p-0" style="width:32px; height:32px;" onclick="hapusBBM(this)">
-                            <i class="fa fa-trash text-danger"></i>
-                        </button>
-                    </div>
-                </div>
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Kantor</th>
+                            <th>Bulan</th>
+                            <th>Tahun</th>
+                            <th>PERTALITE (L)</th>
+                            <th>PERTAMAX (L)</th>
+                            <th>SOLAR (L)</th>
+                            <th>DEXLITE (L)</th>
+                            <th>PERTAMINA DEX (L)</th>
+                            <th>Listrik (kWh)</th>
+                            <th>Daya Listrik (VA)</th>
+                            <th>Air (m³)</th>
+                            <th>Kertas (rim)</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="data-table-body">
+                        <tr>
+                            <td>
+                                <input name="kantor[]" class="form-control form-control-sm" required>
+                            </td>
+                            <td>
+                                <select name="bulan[]" class="form-select form-select-sm" required>
+                                    <option value="">-- Pilih --</option>
+                                    <option value="Januari">Januari</option>
+                                    <option value="Februari">Februari</option>
+                                    <option value="Maret">Maret</option>
+                                    <option value="April">April</option>
+                                    <option value="Mei">Mei</option>
+                                    <option value="Juni">Juni</option>
+                                    <option value="Juli">Juli</option>
+                                    <option value="Agustus">Agustus</option>
+                                    <option value="September">September</option>
+                                    <option value="Oktober">Oktober</option>
+                                    <option value="November">November</option>
+                                    <option value="Desember">Desember</option>
+                                </select>
+                            </td>
+                            <td>
+                                <input name="tahun[]" type="number" class="form-control form-control-sm" required min="2020" max="2030">
+                            </td>
+                            <td>
+                                <input name="pertalite[]" type="number" class="form-control form-control-sm" step="0.01" min="0" placeholder="0">
+                            </td>
+                            <td>
+                                <input name="pertamax[]" type="number" class="form-control form-control-sm" step="0.01" min="0" placeholder="0">
+                            </td>
+                            <td>
+                                <input name="solar[]" type="number" class="form-control form-control-sm" step="0.01" min="0" placeholder="0">
+                            </td>
+                            <td>
+                                <input name="dexlite[]" type="number" class="form-control form-control-sm" step="0.01" min="0" placeholder="0">
+                            </td>
+                            <td>
+                                <input name="pertamina_dex[]" type="number" class="form-control form-control-sm" step="0.01" min="0" placeholder="0">
+                            </td>
+                            <td>
+                                <input name="listrik[]" type="number" class="form-control form-control-sm" step="0.01" min="0" required>
+                            </td>
+                            <td>
+                                <input name="daya_listrik[]" type="number" class="form-control form-control-sm" step="0.01" min="0" placeholder="1300">
+                            </td>
+                            <td>
+                                <input name="air[]" type="number" class="form-control form-control-sm" step="0.01" min="0" required>
+                            </td>
+                            <td>
+                                <input name="kertas[]" type="number" class="form-control form-control-sm" step="0.01" min="0" required>
+                            </td>
+                            <td>
+                                <button type="button" class="btn btn-danger btn-sm" onclick="hapusRow(this)">
+                                    <i class="fa fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
 
             <!-- Tombol Tambah dan Simpan -->
-            <div class="d-flex justify-content-between align-items-center mt-4 mb-3">
-                <button type="submit" class="btn btn-success">💾 Simpan</button>
-                <button type="button" class="btn btn-outline-primary px-3 py-2" onclick="tambahBBM()">
-                 ➕ Tambah BBM</button> 
-                </div>
-            </form>
-         </div>
+            <div class="d-flex justify-content-between align-items-center mt-3 mb-3">
+                <button type="submit" class="btn btn-success">💾 Simpan Data</button>
+                <button type="button" class="btn btn-outline-primary" onclick="tambahRow()">
+                    ➕ Tambah Baris
+                </button>
+            </div>
+        </form>
+    </div>
 
-         <hr>
+    <hr>
 
     <h5>⬆️ Import Data Energi dari Excel</h5>
+    <div class="alert alert-info">
+        <strong>Format Excel yang diharapkan:</strong><br>
+        Kolom: Kantor | Bulan | Tahun | PERTALITE | PERTAMAX | SOLAR | DEXLITE | PERTAMINA DEX | Listrik (kWh) | Daya Listrik (VA) | Air (m³) | Kertas (rim)
+    </div>
     <form method="POST" action="{{ url('/energi/import') }}" enctype="multipart/form-data">
         @csrf
         <input type="file" name="fileexcel" accept=".xlsx, .xls" class="form-control mb-3" required>
-        <button type="submit" class="btn btn-primary">Import Excel</button>
+        <button type="submit" class="btn btn-primary">📥 Import Excel</button>
     </form>
+
+    <!-- Template Excel Download -->
+    <div class="mt-3">
+        <a href="{{ url('/energi/template') }}" class="btn btn-outline-secondary">
+            📄 Download Template Excel
+        </a>
+    </div>
 </div>
 
 <script>
@@ -103,38 +138,119 @@ function toggleForm() {
     formDiv.style.display = (formDiv.style.display === "none") ? "block" : "none";
 }
 
-function tambahBBM() {
-    const container = document.getElementById('bbm-container');
-    const newRow = document.createElement('div');
-    newRow.classList.add('row', 'bbm-row', 'align-items-center', 'g-2', 'mb-2');
+function tambahRow() {
+    const tbody = document.getElementById('data-table-body');
+    const newRow = document.createElement('tr');
     newRow.innerHTML = `
-        <div class="col-md-5">
-            <select name="jenis_bbm[]" class="form-select" required>
-                <option value="">-- Pilih Jenis BBM --</option>
-                <option value="Pertalite">Pertalite</option>
-                <option value="Pertamax">Pertamax</option>
-                <option value="Solar">Solar</option>
-                <option value="Dexlite">Dexlite</option>
-                <option value="Pertamina Dex">Pertamina Dex</option>
+        <td>
+            <input name="kantor[]" class="form-control form-control-sm" required>
+        </td>
+        <td>
+            <select name="bulan[]" class="form-select form-select-sm" required>
+                <option value="">-- Pilih --</option>
+                <option value="Januari">Januari</option>
+                <option value="Februari">Februari</option>
+                <option value="Maret">Maret</option>
+                <option value="April">April</option>
+                <option value="Mei">Mei</option>
+                <option value="Juni">Juni</option>
+                <option value="Juli">Juli</option>
+                <option value="Agustus">Agustus</option>
+                <option value="September">September</option>
+                <option value="Oktober">Oktober</option>
+                <option value="November">November</option>
+                <option value="Desember">Desember</option>
             </select>
-        </div>
-        <div class="col-md-5">
-            <input type="number" name="jumlah_bbm[]" class="form-control" placeholder="Liter" required>
-        </div>
-        <div class="col-md-2 d-flex justify-content-end">
-            <button type="button"
-                class="btn btn-light border shadow-sm rounded-circle d-flex align-items-center justify-content-center p-0"
-                style="width:32px; height:32px;" onclick="hapusBBM(this)">
-                <i class="fa fa-trash text-danger"></i>
+        </td>
+        <td>
+            <input name="tahun[]" type="number" class="form-control form-control-sm" required min="2020" max="2030">
+        </td>
+        <td>
+            <input name="pertalite[]" type="number" class="form-control form-control-sm" step="0.01" min="0" placeholder="0">
+        </td>
+        <td>
+            <input name="pertamax[]" type="number" class="form-control form-control-sm" step="0.01" min="0" placeholder="0">
+        </td>
+        <td>
+            <input name="solar[]" type="number" class="form-control form-control-sm" step="0.01" min="0" placeholder="0">
+        </td>
+        <td>
+            <input name="dexlite[]" type="number" class="form-control form-control-sm" step="0.01" min="0" placeholder="0">
+        </td>
+        <td>
+            <input name="pertamina_dex[]" type="number" class="form-control form-control-sm" step="0.01" min="0" placeholder="0">
+        </td>
+        <td>
+            <input name="listrik[]" type="number" class="form-control form-control-sm" step="0.01" min="0" required>
+        </td>
+        <td>
+            <input name="daya_listrik[]" type="number" class="form-control form-control-sm" step="0.01" min="0" placeholder="1300">
+        </td>
+        <td>
+            <input name="air[]" type="number" class="form-control form-control-sm" step="0.01" min="0" required>
+        </td>
+        <td>
+            <input name="kertas[]" type="number" class="form-control form-control-sm" step="0.01" min="0" required>
+        </td>
+        <td>
+            <button type="button" class="btn btn-danger btn-sm" onclick="hapusRow(this)">
+                <i class="fa fa-trash"></i>
             </button>
-        </div>
+        </td>
     `;
-    container.appendChild(newRow);
+    tbody.appendChild(newRow);
 }
 
-function hapusBBM(button) {
-    const row = button.closest('.bbm-row');
-    row.remove();
+function hapusRow(button) {
+    const row = button.closest('tr');
+    const tbody = document.getElementById('data-table-body');
+    
+    // Pastikan minimal ada 1 baris
+    if (tbody.children.length > 1) {
+        row.remove();
+    } else {
+        alert('Minimal harus ada 1 baris data!');
+    }
 }
+
+// Auto-resize table pada window resize
+window.addEventListener('resize', function() {
+    const table = document.querySelector('.table-responsive');
+    if (table) {
+        table.style.overflowX = 'auto';
+    }
+});
 </script>
+
+<style>
+.table-responsive {
+    overflow-x: auto;
+}
+
+.table th, .table td {
+    white-space: nowrap;
+    vertical-align: middle;
+}
+
+.form-control-sm, .form-select-sm {
+    min-width: 100px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .table-responsive {
+        font-size: 12px;
+    }
+    
+    .form-control-sm, .form-select-sm {
+        min-width: 80px;
+        font-size: 11px;
+    }
+    
+    .btn-sm {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.75rem;
+    }
+}
+</style>
 @endsection
