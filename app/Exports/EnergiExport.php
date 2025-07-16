@@ -7,29 +7,33 @@ use Maatwebsite\Excel\Concerns\FromArray;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use Maatwebsite\Excel\Concerns\WithDrawings;
 use Maatwebsite\Excel\Concerns\WithColumnWidths;
-use Maatwebsite\Excel\Concerns\WithTitle; // Ditambahkan: Untuk nama sheet
+use Maatwebsite\Excel\Concerns\WithTitle;
+use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use Maatwebsite\Excel\Concerns\WithEvents;
+use Maatwebsite\Excel\Events\AfterSheet;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
-use Illuminate\Support\Facades\Auth; // Ditambahkan: Untuk otorisasi filter
+use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
+use Illuminate\Support\Facades\Auth;
 
-class EnergiExport implements FromArray, WithStyles, WithDrawings, WithColumnWidths, WithTitle
+class EnergiExport implements FromArray, WithStyles, WithDrawings, WithColumnWidths, WithTitle, WithEvents
 {
     protected $kantor;
     protected $bulan;
     protected $tahun;
-    protected $filteredData; // Akan menyimpan hasil query yang difilter
+    protected $filteredData;
+    protected $totalData;
 
     public function __construct($kantor = null, $bulan = null, $tahun = null)
     {
         $this->kantor = $kantor;
         $this->bulan = $bulan;
         $this->tahun = $tahun;
-
-        // Lakukan query data di sini atau di method array()
         $this->filteredData = $this->queryEnergiData();
+        $this->calculateTotals();
     }
 
     protected function queryEnergiData()
@@ -47,69 +51,143 @@ class EnergiExport implements FromArray, WithStyles, WithDrawings, WithColumnWid
             $query->where('tahun', $this->tahun);
         }
 
-        // Tambahan: Filter berdasarkan user_id atau kantor jika role bukan super_user
-        // Pastikan Anda memanggil Auth::user() di sini jika diperlukan,
-        // atau jika data user tidak selalu tersedia di constructor export class,
-        // Anda bisa meneruskannya dari controller.
-        $user = Auth::user(); // Asumsi user selalu ada saat ekspor
-        if ($user && $user->role === 'divisi_user') {
-            // Contoh: Jika divisi user hanya boleh melihat data kantornya
-            // Anda perlu memastikan kolom 'kantor' ada di tabel users
-            // $query->where('kantor', $user->kantor);
+        // Role-based filtering
+        $user = Auth::user();
+        if ($user) {
+            switch ($user->role) {
+                case 'divisi_user':
+                    // Filter berdasarkan kantor user jika ada
+                    if (isset($user->kantor)) {
+                        $query->where('kantor', $user->kantor);
+                    }
+                    break;
+                case 'user_umum':
+                    // Filter khusus untuk user_umum jika diperlukan
+                    break;
+                // super_user dapat melihat semua data
+            }
         }
-        // ... untuk user_umum jika perlu
 
-        return $query->orderByDesc('tahun')
-                     ->orderByDesc('bulan')
+        return $query->orderBy('tahun', 'desc')
+                     ->orderBy('bulan', 'asc')
                      ->get();
+    }
+
+    protected function calculateTotals()
+    {
+        $this->totalData = [
+            'listrik' => $this->filteredData->sum('listrik'),
+            'air' => $this->filteredData->sum('air'),
+            'pertalite' => $this->filteredData->sum('pertalite'),
+            'pertamax' => $this->filteredData->sum('pertamax'),
+            'solar' => $this->filteredData->sum('solar'),
+            'dexlite' => $this->filteredData->sum('dexlite'),
+            'pertamina_dex' => $this->filteredData->sum('pertamina_dex'),
+            'kertas' => $this->filteredData->sum('kertas'),
+            'total_bbm' => $this->filteredData->sum('pertalite') + 
+                          $this->filteredData->sum('pertamax') + 
+                          $this->filteredData->sum('solar') + 
+                          $this->filteredData->sum('dexlite') + 
+                          $this->filteredData->sum('pertamina_dex'),
+        ];
     }
 
     public function array(): array
     {
         $data = [];
 
-        // Informasi umum di bagian atas
-        $data[] = ['Laporan Konsumsi Energi Bank Lampung']; // Judul Utama
-        $data[] = ['']; // Baris kosong
-        $data[] = ['Tanggal Cetak:', date('d-m-Y H:i:s')]; // Tanggal Cetak
-        $data[] = ['']; // Baris kosong
+        // Header Information
+        $data[] = ['LAPORAN KONSUMSI ENERGI'];
+        $data[] = ['BANK LAMPUNG'];
+        $data[] = [''];
+        
+        // Export Information
+        $data[] = ['Tanggal Export:', date('d F Y H:i:s')];
+        $data[] = ['Diexport oleh:', Auth::user()->name ?? 'System'];
+        $data[] = [''];
 
-        // Informasi Filter
-        $data[] = ['Filter Aktif:'];
+        // Filter Information
+        $data[] = ['FILTER YANG DITERAPKAN:'];
         $data[] = ['Kantor:', $this->kantor ?: 'Semua Kantor'];
         $data[] = ['Bulan:', $this->bulan ?: 'Semua Bulan'];
         $data[] = ['Tahun:', $this->tahun ?: 'Semua Tahun'];
-        $data[] = ['']; // Baris kosong
-        $data[] = ['']; // Baris kosong
+        $data[] = [''];
 
-        // Jika tidak ada data ditemukan
+        // Summary Information
+        $data[] = ['RINGKASAN DATA:'];
+        $data[] = ['Total Data:', $this->filteredData->count() . ' record'];
+        $data[] = ['Total Listrik:', number_format($this->totalData['listrik'], 2, ',', '.') . ' kWh'];
+        $data[] = ['Total Air:', number_format($this->totalData['air'], 2, ',', '.') . ' m³'];
+        $data[] = ['Total BBM:', number_format($this->totalData['total_bbm'], 2, ',', '.') . ' Liter'];
+        $data[] = ['Total Kertas:', number_format($this->totalData['kertas'], 2, ',', '.') . ' Rim'];
+        $data[] = [''];
+        $data[] = [''];
+
+        // Check if data exists
         if ($this->filteredData->isEmpty()) {
             $data[] = ['Tidak ada data konsumsi energi yang ditemukan untuk filter yang dipilih.'];
-            return $data; // Hentikan di sini, jangan tambahkan header tabel atau data
+            return $data;
         }
 
-        // Header Tabel (Setelah baris-baris info)
+        // Table Headers
         $data[] = [
-            'No', 'Kantor', 'Bulan', 'Tahun', 'Listrik (kWh)', 'Daya Listrik (VA)',
-            'Air (m³)', 'BBM (liter)', 'Jenis BBM', 'Tanggal Input', 'Penginput'
+            'No', 
+            'Kantor', 
+            'Bulan', 
+            'Tahun', 
+            'PERTALITE (L)', 
+            'PERTAMAX (L)', 
+            'SOLAR (L)', 
+            'DEXLITE (L)', 
+            'PERTAMINA DEX (L)',
+            'Listrik (kWh)', 
+            'Daya Listrik (VA)',
+            'Air (m³)', 
+            'Kertas (Rim)',
+            'Tanggal Input',
+            'Penginput'
         ];
 
-        // Data dari database
+        // Data Rows
         foreach ($this->filteredData as $index => $energi) {
             $data[] = [
-                $index + 1, // Nomor urut
+                $index + 1,
                 $energi->kantor,
                 $energi->bulan,
                 $energi->tahun,
+                $energi->pertalite ?? 0,
+                $energi->pertamax ?? 0,
+                $energi->solar ?? 0,
+                $energi->dexlite ?? 0,
+                $energi->pertamina_dex ?? 0,
                 $energi->listrik,
-                $energi->daya_listrik,
+                $energi->daya_listrik ?? '-',
                 $energi->air,
-                $energi->bbm,
-                $energi->jenis_bbm,
+                $energi->kertas,
                 $energi->created_at->format('d-m-Y H:i:s'),
                 optional($energi->user)->name ?? '-',
             ];
         }
+
+        // Footer Total
+        $data[] = [''];
+        $data[] = [
+            '', 
+            'TOTAL', 
+            '', 
+            '', 
+            number_format($this->totalData['pertalite'], 2, ',', '.'),
+            number_format($this->totalData['pertamax'], 2, ',', '.'),
+            number_format($this->totalData['solar'], 2, ',', '.'),
+            number_format($this->totalData['dexlite'], 2, ',', '.'),
+            number_format($this->totalData['pertamina_dex'], 2, ',', '.'),
+            number_format($this->totalData['listrik'], 2, ',', '.'),
+            '',
+            number_format($this->totalData['air'], 2, ',', '.'),
+            number_format($this->totalData['kertas'], 2, ',', '.'),
+            '',
+            ''
+        ];
 
         return $data;
     }
@@ -117,222 +195,240 @@ class EnergiExport implements FromArray, WithStyles, WithDrawings, WithColumnWid
     public function columnWidths(): array
     {
         return [
-            'A' => 6,  // No
-            'B' => 20, // Kantor
-            'C' => 12, // Bulan
-            'D' => 8,  // Tahun
-            'E' => 15, // Listrik (kWh)
-            'F' => 18, // Daya Listrik (VA)
-            'G' => 12, // Air (m³)
-            'H' => 12, // BBM (liter)
-            'I' => 18, // Jenis BBM
-            'J' => 20, // Tanggal Input
-            'K' => 25, // Penginput
+            'A' => 5,   // No
+            'B' => 25,  // Kantor
+            'C' => 12,  // Bulan
+            'D' => 8,   // Tahun
+            'E' => 12,  // PERTALITE
+            'F' => 12,  // PERTAMAX
+            'G' => 12,  // SOLAR
+            'H' => 12,  // DEXLITE
+            'I' => 15,  // PERTAMINA DEX
+            'J' => 12,  // Listrik
+            'K' => 15,  // Daya Listrik
+            'L' => 10,  // Air
+            'M' => 10,  // Kertas
+            'N' => 18,  // Tanggal Input
+            'O' => 20,  // Penginput
         ];
     }
 
     public function styles(Worksheet $sheet)
     {
-        $startRowHeaderTable = 1;
-        $endRowHeaderTable = 8; // Karena ada 8 baris sebelum header tabel data
+        $highestRow = $sheet->getHighestRow();
+        $highestColumn = $sheet->getHighestColumn();
 
-        // Style untuk Judul Utama "Laporan Konsumsi Energi Bank Lampung"
-        $sheet->mergeCells('A1:K1'); // Merge cell untuk judul utama
-        $sheet->getStyle('A1')->applyFromArray([
+        // Main Title Styling
+        $sheet->mergeCells('A1:O1');
+        $sheet->mergeCells('A2:O2');
+        $sheet->getStyle('A1:A2')->applyFromArray([
             'font' => [
                 'bold' => true,
                 'size' => 16,
                 'name' => 'Arial',
-                'color' => ['rgb' => '2E7D32'], // Hijau gelap
-            ],
-            'alignment' => [
-                'horizontal' => Alignment::HORIZONTAL_CENTER,
-                'vertical' => Alignment::VERTICAL_CENTER,
-            ],
-        ]);
-        $sheet->getRowDimension(1)->setRowHeight(30);
-
-        // Style untuk Tanggal Cetak
-        $sheet->getStyle('A3')->getFont()->setBold(true);
-        $sheet->mergeCells('A3:B3'); // Merge cell untuk label Tanggal Cetak
-        $sheet->getStyle('C3')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT); // Sesuaikan alignment jika perlu
-        $sheet->getStyle('C3')->getFont()->setBold(true);
-
-
-        // Style untuk informasi Filter Aktif
-        $sheet->mergeCells('A5:K5'); // Merge cell "Filter Aktif:"
-        $sheet->getStyle('A5')->applyFromArray([
-            'font' => ['bold' => true, 'size' => 11, 'color' => ['rgb' => '1B5E20']],
-            'alignment' => ['horizontal' => Alignment::HORIZONTAL_LEFT],
-            'fill' => [
-                'fillType' => Fill::FILL_SOLID,
-                'startColor' => ['rgb' => 'E8F5E9'] // Latar belakang hijau muda
-            ],
-            'borders' => [
-                'allBorders' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => 'C8E6C9']]
-            ]
-        ]);
-
-        // Style untuk setiap baris filter
-        for ($i = 6; $i <= 8; $i++) {
-            $sheet->getStyle("A{$i}")->getFont()->setBold(true);
-            $sheet->getStyle("A{$i}:K{$i}")->applyFromArray([
-                'fill' => [
-                    'fillType' => Fill::FILL_SOLID,
-                    'startColor' => ['rgb' => 'E8F5E9'] // Latar belakang hijau muda
-                ],
-                'borders' => [
-                    'allBorders' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => 'C8E6C9']]
-                ]
-            ]);
-        }
-        $sheet->getStyle('B6:B8')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
-
-        // Header kolom data
-        $headerRow = 10; // Baris ke-10 adalah header tabel data
-        $sheet->getStyle("A{$headerRow}:K{$headerRow}")->applyFromArray([
-            'font' => [
-                'bold' => true,
-                'size' => 11,
-                'name' => 'Arial',
-                'color' => ['rgb' => 'FFFFFF'] // Teks putih
+                'color' => ['rgb' => '1B5E20']
             ],
             'alignment' => [
                 'horizontal' => Alignment::HORIZONTAL_CENTER,
                 'vertical' => Alignment::VERTICAL_CENTER
+            ]
+        ]);
+        $sheet->getRowDimension(1)->setRowHeight(25);
+        $sheet->getRowDimension(2)->setRowHeight(25);
+
+        // Export Info Styling
+        $sheet->getStyle('A4:A5')->getFont()->setBold(true);
+        $sheet->getStyle('B4:B5')->getFont()->setItalic(true);
+
+        // Filter Section Styling
+        $sheet->mergeCells('A7:O7');
+        $sheet->getStyle('A7')->applyFromArray([
+            'font' => ['bold' => true, 'size' => 12],
+            'fill' => [
+                'fillType' => Fill::FILL_SOLID,
+                'startColor' => ['rgb' => 'E8F5E9']
+            ],
+            'borders' => [
+                'bottom' => ['borderStyle' => Border::BORDER_THIN]
+            ]
+        ]);
+
+        // Filter rows styling
+        for ($i = 8; $i <= 10; $i++) {
+            $sheet->getStyle("A{$i}")->getFont()->setBold(true);
+            $sheet->getStyle("A{$i}:B{$i}")->getFill()
+                  ->setFillType(Fill::FILL_SOLID)
+                  ->getStartColor()->setRGB('F5F5F5');
+        }
+
+        // Summary Section Styling
+        $sheet->mergeCells('A12:O12');
+        $sheet->getStyle('A12')->applyFromArray([
+            'font' => ['bold' => true, 'size' => 12],
+            'fill' => [
+                'fillType' => Fill::FILL_SOLID,
+                'startColor' => ['rgb' => 'E3F2FD']
+            ],
+            'borders' => [
+                'bottom' => ['borderStyle' => Border::BORDER_THIN]
+            ]
+        ]);
+
+        // Summary rows styling
+        for ($i = 13; $i <= 17; $i++) {
+            $sheet->getStyle("A{$i}")->getFont()->setBold(true);
+            $sheet->getStyle("B{$i}")->applyFromArray([
+                'font' => [
+                    'color' => ['rgb' => '1976D2']
+                ]
+            ]);
+        }
+
+        // Find header row (should be row 20 based on the structure)
+        $headerRow = 20;
+        
+        // Header Table Styling
+        $sheet->getStyle("A{$headerRow}:O{$headerRow}")->applyFromArray([
+            'font' => [
+                'bold' => true,
+                'size' => 11,
+                'color' => ['rgb' => 'FFFFFF']
+            ],
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_CENTER,
+                'vertical' => Alignment::VERTICAL_CENTER,
+                'wrapText' => true
             ],
             'fill' => [
                 'fillType' => Fill::FILL_SOLID,
-                'startColor' => ['rgb' => '2E7D32'] // Hijau tua
+                'startColor' => ['rgb' => '2E7D32']
             ],
             'borders' => [
                 'allBorders' => [
                     'borderStyle' => Border::BORDER_THIN,
-                    'color' => ['rgb' => '1B5E20'] // Border sedikit lebih gelap
+                    'color' => ['rgb' => '1B5E20']
                 ]
             ]
         ]);
-        $sheet->getRowDimension($headerRow)->setRowHeight(25);
+        $sheet->getRowDimension($headerRow)->setRowHeight(30);
 
+        // Data Rows Styling
+        $dataStartRow = $headerRow + 1;
+        $lastDataRow = $highestRow - 2; // Minus 2 for empty row and total row
 
-        $dataStartRow = 11; // Data dimulai dari baris ke-11
-        $dataCount = $this->filteredData->count();
-        $lastDataRow = $dataStartRow + $dataCount - 1;
-
-        if ($dataCount > 0) {
-            // Gaya untuk sel data
-            $sheet->getStyle("A{$dataStartRow}:K{$lastDataRow}")->applyFromArray([
+        if ($this->filteredData->count() > 0) {
+            // Apply borders to all data cells
+            $sheet->getStyle("A{$dataStartRow}:O{$lastDataRow}")->applyFromArray([
                 'borders' => [
                     'allBorders' => [
                         'borderStyle' => Border::BORDER_THIN,
-                        'color' => ['rgb' => 'DDDDDD'] // Border abu-abu muda
+                        'color' => ['rgb' => 'E0E0E0']
                     ]
                 ],
                 'font' => [
-                    'name' => 'Arial',
                     'size' => 10
-                ],
-                'alignment' => [
-                    'vertical' => Alignment::VERTICAL_TOP
                 ]
             ]);
 
-            // Alignment spesifik untuk kolom data
-            $alignments = [
-                'A' => Alignment::HORIZONTAL_CENTER, // No
-                'B' => Alignment::HORIZONTAL_LEFT,    // Kantor
-                'C' => Alignment::HORIZONTAL_LEFT,    // Bulan
-                'D' => Alignment::HORIZONTAL_CENTER,  // Tahun
-                'E' => Alignment::HORIZONTAL_RIGHT,   // Listrik (kWh)
-                'F' => Alignment::HORIZONTAL_RIGHT,   // Daya Listrik (VA)
-                'G' => Alignment::HORIZONTAL_RIGHT,   // Air (m³)
-                'H' => Alignment::HORIZONTAL_RIGHT,   // BBM (liter)
-                'I' => Alignment::HORIZONTAL_LEFT,    // Jenis BBM
-                'J' => Alignment::HORIZONTAL_CENTER,  // Tanggal Input
-                'K' => Alignment::HORIZONTAL_LEFT,    // Penginput
-            ];
-
-            foreach ($alignments as $col => $align) {
-                $sheet->getStyle("{$col}{$dataStartRow}:{$col}{$lastDataRow}")
-                      ->getAlignment()->setHorizontal($align);
-            }
-
-            // Atur format angka untuk kolom Listrik, Daya Listrik, Air, BBM, Kertas
-            $numberColumns = ['E', 'F', 'G', 'H']; // Listrik, Daya Listrik, Air, BBM
-            foreach ($numberColumns as $col) {
+            // Number formatting for numeric columns
+            $numericColumns = ['E', 'F', 'G', 'H', 'I', 'J', 'L', 'M'];
+            foreach ($numericColumns as $col) {
                 $sheet->getStyle("{$col}{$dataStartRow}:{$col}{$lastDataRow}")
                       ->getNumberFormat()
-                      ->setFormatCode(\PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1); // Format angka dengan pemisah ribuan
+                      ->setFormatCode('#,##0.00');
             }
-            // Untuk Kertas (I) jika juga angka dan ingin format sama
-            $sheet->getStyle("I{$dataStartRow}:I{$lastDataRow}")
-                  ->getNumberFormat()
-                  ->setFormatCode(\PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
 
+            // Alignment for specific columns
+            $sheet->getStyle("A{$dataStartRow}:A{$lastDataRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+            $sheet->getStyle("C{$dataStartRow}:D{$lastDataRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+            $sheet->getStyle("E{$dataStartRow}:M{$lastDataRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
+            $sheet->getStyle("N{$dataStartRow}:N{$lastDataRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
-            // Warna latar belakang baris bergantian (opsional)
-            // for ($row = $dataStartRow; $row <= $lastDataRow; $row++) {
-            //     if ($row % 2 == 0) {
-            //         $sheet->getStyle("A{$row}:K{$row}")->getFill()
-            //               ->setFillType(Fill::FILL_SOLID)
-            //               ->getStartColor()->setRGB('F5F5F5'); // Abu-abu sangat muda
-            //     }
-            // }
-
-        } else {
-            // Style jika tidak ada data
-            $sheet->mergeCells('A' . $dataStartRow . ':K' . $dataStartRow);
-            $sheet->getStyle('A' . $dataStartRow)->applyFromArray([
-                'font' => [
-                    'italic' => true,
-                    'color' => ['rgb' => '888888'],
-                    'size' => 11
-                ],
-                'alignment' => [
-                    'horizontal' => Alignment::HORIZONTAL_CENTER,
-                    'vertical' => Alignment::VERTICAL_CENTER,
-                ],
-                'fill' => [
-                    'fillType' => Fill::FILL_SOLID,
-                    'startColor' => ['rgb' => 'F9F9F9']
-                ],
-                'borders' => [
-                    'allBorders' => [
-                        'borderStyle' => Border::BORDER_THIN,
-                        'color' => ['rgb' => 'DDDDDD']
-                    ]
-                ]
-            ]);
-            $sheet->getRowDimension($dataStartRow)->setRowHeight(30);
+            // Zebra striping
+            for ($row = $dataStartRow; $row <= $lastDataRow; $row++) {
+                if (($row - $dataStartRow) % 2 == 1) {
+                    $sheet->getStyle("A{$row}:O{$row}")->getFill()
+                          ->setFillType(Fill::FILL_SOLID)
+                          ->getStartColor()->setRGB('FAFAFA');
+                }
+            }
         }
 
-        $sheet->freezePane("A{$headerRow}"); // Membekukan baris header
+        // Total Row Styling
+        $totalRow = $highestRow;
+        $sheet->getStyle("A{$totalRow}:O{$totalRow}")->applyFromArray([
+            'font' => [
+                'bold' => true,
+                'size' => 11
+            ],
+            'fill' => [
+                'fillType' => Fill::FILL_SOLID,
+                'startColor' => ['rgb' => 'FFF9C4']
+            ],
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => Border::BORDER_MEDIUM
+                ]
+            ]
+        ]);
+
+        // Freeze panes at header row
+        $sheet->freezePane("A" . ($headerRow + 1));
 
         return $sheet;
     }
 
     public function drawings()
     {
+        $drawings = [];
         $logoPath = public_path('assets/img/banklpg.png');
 
-        if (!file_exists($logoPath)) {
-            return [];
+        if (file_exists($logoPath)) {
+            $drawing = new Drawing();
+            $drawing->setName('Logo Bank Lampung');
+            $drawing->setDescription('Logo Bank Lampung');
+            $drawing->setPath($logoPath);
+            $drawing->setHeight(60);
+            $drawing->setCoordinates('N1');
+            $drawing->setOffsetX(10);
+            $drawing->setOffsetY(5);
+            $drawings[] = $drawing;
         }
 
-        $drawing = new Drawing();
-        $drawing->setName('Logo Bank Lampung');
-        $drawing->setDescription('Logo Bank Lampung');
-        $drawing->setPath($logoPath);
-        $drawing->setHeight(70); // Ukuran logo disesuaikan (lebih kecil dari PDF)
-        $drawing->setCoordinates('B2'); // Koordinat ditempatkan di dekat judul
-        $drawing->setOffsetX(0);
-        $drawing->setOffsetY(0);
-
-        return [$drawing];
+        return $drawings;
     }
 
     public function title(): string
     {
-        return 'Laporan Energi';
+        $title = 'Laporan Energi';
+        if ($this->tahun) {
+            $title .= ' ' . $this->tahun;
+        }
+        if ($this->bulan) {
+            $title .= ' ' . $this->bulan;
+        }
+        return $title;
+    }
+
+    public function registerEvents(): array
+    {
+        return [
+            AfterSheet::class => function(AfterSheet $event) {
+                $sheet = $event->sheet->getDelegate();
+                
+                // Set print settings
+                $sheet->getPageSetup()
+                      ->setOrientation(\PhpOffice\PhpSpreadsheet\Worksheet\PageSetup::ORIENTATION_LANDSCAPE)
+                      ->setFitToWidth(1)
+                      ->setFitToHeight(0);
+                
+                // Set margins
+                $sheet->getPageMargins()
+                      ->setTop(0.75)
+                      ->setRight(0.25)
+                      ->setBottom(0.75)
+                      ->setLeft(0.25);
+            },
+        ];
     }
 }

@@ -49,14 +49,10 @@
     @endphp
 
     <div class="mb-3 d-flex gap-2">
-        {{-- Tombol Export Excel --}}
-        <a href="{{ 
-        route(
-            Auth::user()->role === 'super_user' ? 'admin.laporan.export-excel' : 
-            (Auth::user()->role === 'divisi_user' ? 'divisi.laporan.export-excel' : 'umum.laporan.export-excel'), 
-            ['kantor' => request('kantor'), 'bulan' => request('bulan'), 'tahun' => request('tahun')] 
-        ) 
-        }}" class="btn btn-success">🗃️ Export Excel</a>
+        {{-- Tombol Export Excel dengan Preview --}}
+        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#previewExcelModal">
+            🗃️ Export Excel
+        </button>
 
         {{-- Tombol Export PDF (untuk tabel) --}}
         <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#exportPdfModal" data-export-type="table">📄 Export Tabel ke PDF</button>
@@ -219,6 +215,95 @@
 
 </div>
 
+{{-- Modal Preview Excel --}}
+<div class="modal fade" id="previewExcelModal" tabindex="-1" aria-labelledby="previewExcelModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="previewExcelModalLabel">Preview & Filter Export Excel</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                {{-- Filter Section --}}
+                <div class="row mb-3">
+                    <div class="col-md-3">
+                        <label for="excelKantor" class="form-label">Kantor</label>
+                        <select class="form-select" id="excelKantor">
+                            <option value="">-- Semua Kantor --</option>
+                            @foreach($uniqueKantor as $k)
+                                <option value="{{ $k }}">{{ $k }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="excelBulan" class="form-label">Bulan</label>
+                        <select class="form-select" id="excelBulan">
+                            <option value="">-- Semua Bulan --</option>
+                            @foreach($uniqueBulan as $b)
+                                <option value="{{ $b }}">{{ $b }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="excelTahun" class="form-label">Tahun</label>
+                        <select class="form-select" id="excelTahun">
+                            <option value="">-- Semua Tahun --</option>
+                            @foreach($uniqueTahun as $t)
+                                <option value="{{ $t }}">{{ $t }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">&nbsp;</label>
+                        <button type="button" class="btn btn-primary w-100" onclick="updateExcelPreview()">
+                            <i class="bi bi-funnel"></i> Apply Filter
+                        </button>
+                    </div>
+                </div>
+
+                {{-- Preview Table --}}
+                <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                    <table class="table table-bordered table-sm" id="excelPreviewTable">
+                        <thead class="table-dark sticky-top">
+                            <tr>
+                                <th>No</th>
+                                <th>Kantor</th>
+                                <th>Bulan</th>
+                                <th>Tahun</th>
+                                <th>PERTALITE</th>
+                                <th>PERTAMAX</th>
+                                <th>SOLAR</th>
+                                <th>DEXLITE</th>
+                                <th>PERTAMINA DEX</th>
+                                <th>Listrik</th>
+                                <th>Daya Listrik</th>
+                                <th>Air</th>
+                                <th>Kertas</th>
+                            </tr>
+                        </thead>
+                        <tbody id="excelPreviewBody">
+                            {{-- Data akan diisi oleh JavaScript --}}
+                        </tbody>
+                    </table>
+                </div>
+
+                {{-- Summary Info --}}
+                <div class="mt-3">
+                    <div class="alert alert-info">
+                        <strong>Total Data: </strong><span id="totalDataCount">0</span> baris
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                <button type="button" class="btn btn-success" onclick="downloadExcel()">
+                    <i class="bi bi-download"></i> Download Excel
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 {{-- Modal Export PDF (untuk Tabel) --}}
 <div class="modal fade" id="exportPdfModal" tabindex="-1" aria-labelledby="exportPdfModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -227,7 +312,7 @@
                 <h5 class="modal-title" id="exportPdfModalLabel">Filter Export Tabel ke PDF</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form id="exportPdfForm" method="GET" action="{{ route(Auth::user()->role === 'super_user' ? 'admin.laporan.export-pdf' : (Auth::user()->role === 'divisi_user' ? 'divisi.laporan.export-pdf' : 'umum.laporan.export-pdf')) }}">
+            <form id="exportPdfForm" method="GET" action="{{ route(Auth::user()->role === 'super_user' ? 'admin.laporan.export-excel' : (Auth::user()->role === 'divisi_user' ? 'divisi.laporan.export-excel' : 'umum.laporan.export-excel')) }}">
                 <div class="modal-body">
                     <div class="mb-3">
                         <label for="pdfKantor" class="form-label">Kantor</label>
@@ -310,6 +395,19 @@
     vertical-align: middle;
 }
 
+/* Modal preview table styles */
+#excelPreviewTable {
+    font-size: 0.875rem;
+}
+
+#excelPreviewTable th {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background-color: #212529;
+    color: white;
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
     .table-responsive {
@@ -330,6 +428,7 @@
 <script>
 let chartEnergi;
 let allData = [];
+let filteredExcelData = [];
 
 document.addEventListener('DOMContentLoaded', function() {
     const dataElement = document.getElementById('energiData');
@@ -342,6 +441,20 @@ document.addEventListener('DOMContentLoaded', function() {
     
     populateChartFilters();
     initChart();
+
+    // Event Listener untuk Modal Preview Excel
+    const previewExcelModal = document.getElementById('previewExcelModal');
+    if (previewExcelModal) {
+        previewExcelModal.addEventListener('show.bs.modal', function (event) {
+            // Set initial filter values from main filter
+            document.getElementById('excelKantor').value = document.getElementById('filterKantor').value;
+            document.getElementById('excelBulan').value = document.getElementById('filterBulan').value;
+            document.getElementById('excelTahun').value = document.getElementById('filterTahun').value;
+            
+            // Update preview
+            updateExcelPreview();
+        });
+    }
 
     // Event Listener untuk Modal Export PDF (Tabel)
     const exportPdfModal = document.getElementById('exportPdfModal');
@@ -398,6 +511,89 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+// Function to update Excel preview
+function updateExcelPreview() {
+    const kantor = document.getElementById('excelKantor').value;
+    const bulan = document.getElementById('excelBulan').value;
+    const tahun = document.getElementById('excelTahun').value;
+    
+    // Filter data
+    filteredExcelData = allData.filter(item => {
+        let match = true;
+        if (kantor && item.kantor !== kantor) match = false;
+        if (bulan && item.bulan !== bulan) match = false;
+        if (tahun && item.tahun != tahun) match = false;
+        return match;
+    });
+    
+    // Update preview table
+    const tbody = document.getElementById('excelPreviewBody');
+    tbody.innerHTML = '';
+    
+    if (filteredExcelData.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="13" class="text-center">Tidak ada data dengan filter yang dipilih</td></tr>';
+    } else {
+        filteredExcelData.forEach((row, index) => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${index + 1}</td>
+                <td>${row.kantor}</td>
+                <td>${row.bulan}</td>
+                <td>${row.tahun}</td>
+                <td>${row.pertalite || '0'}</td>
+                <td>${row.pertamax || '0'}</td>
+                <td>${row.solar || '0'}</td>
+                <td>${row.dexlite || '0'}</td>
+                <td>${row.pertamina_dex || '0'}</td>
+                <td>${row.listrik}</td>
+                <td>${row.daya_listrik || '-'}</td>
+                <td>${row.air}</td>
+                <td>${row.kertas}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+    
+    // Update count
+    document.getElementById('totalDataCount').textContent = filteredExcelData.length;
+}
+
+// Function to download Excel with selected filters
+function downloadExcel() {
+    const kantor = document.getElementById('excelKantor').value;
+    const bulan = document.getElementById('excelBulan').value;
+    const tahun = document.getElementById('excelTahun').value;
+    
+    // Build URL with parameters
+   <?php
+$baseRoute = match($userRole) {
+    'super_user'  => 'admin.laporan.export-excel',
+    'divisi_user' => 'admin.laporan.export-excel',
+    'user_umum'   => 'admin.laporan.export-excel',
+    default       => '',
+};
+?>
+
+    
+    let url = "{{ route($baseRoute) }}";
+    const params = new URLSearchParams();
+    
+    if (kantor) params.append('kantor', kantor);
+    if (bulan) params.append('bulan', bulan);
+    if (tahun) params.append('tahun', tahun);
+    
+    if (params.toString()) {
+        url += '?' + params.toString();
+    }
+    
+    // Close modal and download
+    const modal = bootstrap.Modal.getInstance(document.getElementById('previewExcelModal'));
+    modal.hide();
+    
+    // Download file
+    window.location.href = url;
+}
 
 function populateChartFilters() {
     const kantorSelect = document.getElementById('chartKantor');
