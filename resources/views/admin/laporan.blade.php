@@ -312,7 +312,7 @@
                 <h5 class="modal-title" id="exportPdfModalLabel">Filter Export Tabel ke PDF</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form id="exportPdfForm" method="GET" action="{{ route(Auth::user()->role === 'super_user' ? 'admin.laporan.export-excel' : (Auth::user()->role === 'divisi_user' ? 'divisi.laporan.export-excel' : 'umum.laporan.export-excel')) }}">
+            <form id="exportPdfForm" method="GET" action="{{ route(Auth::user()->role === 'super_user' ? 'admin.laporan.export-pdf' : (Auth::user()->role === 'divisi_user' ? 'divisi.laporan.export-pdf' : 'umum.laporan.export-pdf')) }}">
                 <div class="modal-body">
                     <div class="mb-3">
                         <label for="pdfKantor" class="form-label">Kantor</label>
