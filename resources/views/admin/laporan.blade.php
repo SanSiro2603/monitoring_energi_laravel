@@ -176,8 +176,20 @@
 
     {{-- Summary Cards --}}
 <div class="row mt-4">
+    <style>
+        .card-hover {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+        }
+
+        .card-hover:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+    </style>
+
     <div class="col-md-3">
-        <div class="card text-white bg-primary mb-3">
+        <div class="card text-white bg-primary mb-3 card-hover">
             <div class="card-header">Total Listrik</div>
             <div class="card-body">
                 <h5 class="card-title" id="totalListrikCard">{{ number_format($totalListrik, 2) }} kWh</h5>
@@ -185,7 +197,7 @@
         </div>
     </div>
     <div class="col-md-3">
-        <div class="card text-white bg-info mb-3">
+        <div class="card text-white bg-info mb-3 card-hover">
             <div class="card-header">Total Air</div>
             <div class="card-body">
                 <h5 class="card-title" id="totalAirCard">{{ number_format($totalAir, 2) }} m³</h5>
@@ -193,7 +205,7 @@
         </div>
     </div>
     <div class="col-md-3">
-        <div class="card text-white bg-warning mb-3">
+        <div class="card text-white bg-warning mb-3 card-hover">
             <div class="card-header">Total BBM</div>
             <div class="card-body">
                 <h5 class="card-title" id="totalBBMCard">{{ number_format($totalBBM, 2) }} L</h5>
@@ -201,7 +213,7 @@
         </div>
     </div>
     <div class="col-md-3">
-        <div class="card text-white bg-success mb-3">
+        <div class="card text-white bg-success mb-3 card-hover">
             <div class="card-header">Total Kertas</div>
             <div class="card-body">
                 <h5 class="card-title" id="totalKertasCard">{{ number_format($totalKertas, 2) }} rim</h5>
@@ -209,6 +221,7 @@
         </div>
     </div>
 </div>
+
 
     {{-- Menyimpan dataAll sebagai JSON tersembunyi untuk ChartJS --}}
     <div id="energiData" style="display: none;">{!! json_encode($dataAll) !!}</div>
