@@ -55,7 +55,9 @@
         </button>
 
         {{-- Tombol Export PDF (untuk tabel) --}}
-        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#exportPdfModal" data-export-type="table">📄 Export Tabel ke PDF</button>
+        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#previewPdfModal">
+            📄 Export PDF
+        </button>
 
         {{-- Tombol Export Chart to PDF (Menggunakan Browsershot) --}}
         <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#exportChartPdfModal">📊 Export Chart ke PDF</button>
@@ -317,49 +319,91 @@
     </div>
 </div>
 
-{{-- Modal Export PDF (untuk Tabel) --}}
-<div class="modal fade" id="exportPdfModal" tabindex="-1" aria-labelledby="exportPdfModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+{{-- Modal Preview PDF --}}
+<div class="modal fade" id="previewPdfModal" tabindex="-1" aria-labelledby="previewPdfModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exportPdfModalLabel">Filter Export Tabel ke PDF</h5>
+                <h5 class="modal-title" id="previewPdfModalLabel">Preview & Filter Export PDF</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form id="exportPdfForm" method="GET" action="{{ route(Auth::user()->role === 'super_user' ? 'admin.laporan.export-pdf' : (Auth::user()->role === 'divisi_user' ? 'divisi.laporan.export-pdf' : 'umum.laporan.export-pdf')) }}">
-                <div class="modal-body">
-                    <div class="mb-3">
+            <div class="modal-body">
+                {{-- Filter Section --}}
+                <div class="row mb-3">
+                    <div class="col-md-3">
                         <label for="pdfKantor" class="form-label">Kantor</label>
-                        <select class="form-select" id="pdfKantor" name="kantor">
-                            <option value="">-- Pilih Kantor --</option>
+                        <select class="form-select" id="pdfKantor">
+                            <option value="">-- Semua Kantor --</option>
                             @foreach($uniqueKantor as $k)
                                 <option value="{{ $k }}">{{ $k }}</option>
                             @endforeach
                         </select>
                     </div>
-                    <div class="mb-3">
+                    <div class="col-md-3">
                         <label for="pdfBulan" class="form-label">Bulan</label>
-                        <select class="form-select" id="pdfBulan" name="bulan">
-                            <option value="">-- Pilih Bulan --</option>
+                        <select class="form-select" id="pdfBulan">
+                            <option value="">-- Semua Bulan --</option>
                             @foreach($uniqueBulan as $b)
                                 <option value="{{ $b }}">{{ $b }}</option>
                             @endforeach
                         </select>
                     </div>
-                    <div class="mb-3">
+                    <div class="col-md-3">
                         <label for="pdfTahun" class="form-label">Tahun</label>
-                        <select class="form-select" id="pdfTahun" name="tahun">
-                            <option value="">-- Pilih Tahun --</option>
+                        <select class="form-select" id="pdfTahun">
+                            <option value="">-- Semua Tahun --</option>
                             @foreach($uniqueTahun as $t)
                                 <option value="{{ $t }}">{{ $t }}</option>
                             @endforeach
                         </select>
                     </div>
+                    <div class="col-md-3">
+                        <label class="form-label">&nbsp;</label>
+                        <button type="button" class="btn btn-primary w-100" onclick="updatePdfPreview()">
+                            <i class="bi bi-funnel"></i> Apply Filter
+                        </button>
+                    </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-danger">Export PDF</button>
+
+                {{-- Preview Table --}}
+                <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                    <table class="table table-bordered table-sm" id="pdfPreviewTable">
+                        <thead class="table-dark sticky-top">
+                            <tr>
+                                <th>No</th>
+                                <th>Kantor</th>
+                                <th>Bulan</th>
+                                <th>Tahun</th>
+                                <th>PERTALITE</th>
+                                <th>PERTAMAX</th>
+                                <th>SOLAR</th>
+                                <th>DEXLITE</th>
+                                <th>PERTAMINA DEX</th>
+                                <th>Listrik</th>
+                                <th>Daya Listrik</th>
+                                <th>Air</th>
+                                <th>Kertas</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pdfPreviewBody">
+                            {{-- Data akan diisi oleh JavaScript --}}
+                        </tbody>
+                    </table>
                 </div>
-            </form>
+
+                {{-- Summary Info --}}
+                <div class="mt-3">
+                    <div class="alert alert-info">
+                        <strong>Total Data: </strong><span id="pdfTotalDataCount">0</span> baris
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                <button type="button" class="btn btn-danger" onclick="downloadPdf()">
+                    <i class="bi bi-download"></i> Download PDF
+                </button>
+            </div>
         </div>
     </div>
 </div>
@@ -409,11 +453,11 @@
 }
 
 /* Modal preview table styles */
-#excelPreviewTable {
+#excelPreviewTable, #pdfPreviewTable {
     font-size: 0.875rem;
 }
 
-#excelPreviewTable th {
+#excelPreviewTable th, #pdfPreviewTable th {
     position: sticky;
     top: 0;
     z-index: 10;
@@ -442,6 +486,7 @@
 let chartEnergi;
 let allData = [];
 let filteredExcelData = [];
+let filteredPdfData = [];
 
 document.addEventListener('DOMContentLoaded', function() {
     const dataElement = document.getElementById('energiData');
@@ -469,13 +514,17 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Event Listener untuk Modal Export PDF (Tabel)
-    const exportPdfModal = document.getElementById('exportPdfModal');
-    if (exportPdfModal) {
-        exportPdfModal.addEventListener('show.bs.modal', function (event) {
+    // Event Listener untuk Modal Preview PDF
+    const previewPdfModal = document.getElementById('previewPdfModal');
+    if (previewPdfModal) {
+        previewPdfModal.addEventListener('show.bs.modal', function (event) {
+            // Set initial filter values from main filter
             document.getElementById('pdfKantor').value = document.getElementById('filterKantor').value;
             document.getElementById('pdfBulan').value = document.getElementById('filterBulan').value;
             document.getElementById('pdfTahun').value = document.getElementById('filterTahun').value;
+            
+            // Update preview
+            updatePdfPreview();
         });
     }
 
@@ -572,6 +621,53 @@ function updateExcelPreview() {
     document.getElementById('totalDataCount').textContent = filteredExcelData.length;
 }
 
+// Function to update PDF preview
+function updatePdfPreview() {
+    const kantor = document.getElementById('pdfKantor').value;
+    const bulan = document.getElementById('pdfBulan').value;
+    const tahun = document.getElementById('pdfTahun').value;
+    
+    // Filter data
+    filteredPdfData = allData.filter(item => {
+        let match = true;
+        if (kantor && item.kantor !== kantor) match = false;
+        if (bulan && item.bulan !== bulan) match = false;
+        if (tahun && item.tahun != tahun) match = false;
+        return match;
+    });
+    
+    // Update preview table
+    const tbody = document.getElementById('pdfPreviewBody');
+    tbody.innerHTML = '';
+    
+    if (filteredPdfData.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="13" class="text-center">Tidak ada data dengan filter yang dipilih</td></tr>';
+    } else {
+        filteredPdfData.forEach((row, index) => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${index + 1}</td>
+                <td>${row.kantor}</td>
+                <td>${row.bulan}</td>
+                <td>${row.tahun}</td>
+                <td>${row.pertalite || '0'}</td>
+                <td>${row.pertamax || '0'}</td>
+                <td>${row.solar || '0'}</td>
+                <td>${row.dexlite || '0'}</td>
+                <td>${row.pertamina_dex || '0'}</td>
+                <td>${row.listrik}</td>
+                <td>${row.daya_listrik || '-'}</td>
+                <td>${row.air}</td>
+                <td>${row.kertas}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+    
+    // Update count
+    document.getElementById('pdfTotalDataCount').textContent = filteredPdfData.length;
+}
+
 // Function to download Excel with selected filters
 function downloadExcel() {
     const kantor = document.getElementById('excelKantor').value;
@@ -579,15 +675,14 @@ function downloadExcel() {
     const tahun = document.getElementById('excelTahun').value;
     
     // Build URL with parameters
-   <?php
-$baseRoute = match($userRole) {
-    'super_user' => 'admin.laporan.export-excel',
-    'divisi_user' => 'divisi.laporan.export-excel', 
-    'user_umum' => 'umum.laporan.export-excel',
-    default => '',
-};
-?>
-
+    <?php
+    $baseRoute = match($userRole) {
+        'super_user' => 'admin.laporan.export-excel',
+        'divisi_user' => 'divisi.laporan.export-excel', 
+        'user_umum' => 'umum.laporan.export-excel',
+        default => '',
+    };
+    ?>
     
     let url = "{{ route($baseRoute) }}";
     const params = new URLSearchParams();
@@ -602,6 +697,41 @@ $baseRoute = match($userRole) {
     
     // Close modal and download
     const modal = bootstrap.Modal.getInstance(document.getElementById('previewExcelModal'));
+    modal.hide();
+    
+    // Download file
+    window.location.href = url;
+}
+
+// Function to download PDF with selected filters
+function downloadPdf() {
+    const kantor = document.getElementById('pdfKantor').value;
+    const bulan = document.getElementById('pdfBulan').value;
+    const tahun = document.getElementById('pdfTahun').value;
+    
+    // Build URL with parameters
+    <?php
+    $baseRoute = match($userRole) {
+        'super_user' => 'admin.laporan.export-pdf',
+        'divisi_user' => 'divisi.laporan.export-pdf', 
+        'user_umum' => 'umum.laporan.export-pdf',
+        default => '',
+    };
+    ?>
+    
+    let url = "{{ route($baseRoute) }}";
+    const params = new URLSearchParams();
+    
+    if (kantor) params.append('kantor', kantor);
+    if (bulan) params.append('bulan', bulan);
+    if (tahun) params.append('tahun', tahun);
+    
+    if (params.toString()) {
+        url += '?' + params.toString();
+    }
+    
+    // Close modal and download
+    const modal = bootstrap.Modal.getInstance(document.getElementById('previewPdfModal'));
     modal.hide();
     
     // Download file
@@ -672,7 +802,6 @@ function initChart() {
     
     updateChart();
 }
-
 
 function updateSummaryCards(filteredData) {
     const totals = {
