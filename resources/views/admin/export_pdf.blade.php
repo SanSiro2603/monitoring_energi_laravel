@@ -4,18 +4,18 @@
     <title>Laporan Konsumsi Energi Bank Lampung</title>
     <style>
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Font lebih modern */
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             font-size: 10px;
             margin: 20px;
-            color: #333; /* Warna teks umum */
+            color: #333;
         }
 
         /* HEADER SECTION */
         .header-container {
-            display: table; /* Gunakan table layout untuk kompatibilitas DomPDF */
+            display: table;
             width: 100%;
             margin-bottom: 15px;
-            border-bottom: 1px solid #eee; /* Garis tipis pemisah */
+            border-bottom: 1px solid #eee;
             padding-bottom: 10px;
         }
 
@@ -25,7 +25,7 @@
         }
 
         .header-column.left {
-            width: 60%; /* Alokasi lebih besar untuk logo dan judul */
+            width: 60%;
             text-align: left;
         }
 
@@ -37,27 +37,26 @@
         }
 
         .header-column.left img {
-            max-width: 120px; /* Ukuran logo disesuaikan */
+            max-width: 120px;
             height: auto;
-            display: block; /* Agar tidak ada spasi di bawah gambar */
+            display: block;
             margin-bottom: 5px;
         }
 
         .header-column.left .sub-title {
-            font-size: 14px; /* Ukuran lebih besar untuk judul utama */
+            font-size: 14px;
             font-weight: bold;
-            color: #2e7d32; /* Warna hijau senada dengan tema monitoring */
+            color: #2e7d32;
             margin: 0;
             padding: 0;
         }
 
         .header-column.left .tagline {
-            font-size: 10px; /* Tagline lebih kecil */
+            font-size: 10px;
             color: #555;
             margin: 0;
             padding: 0;
         }
-
 
         /* MAIN TITLE */
         h1 {
@@ -65,7 +64,7 @@
             margin-top: 10px;
             margin-bottom: 15px;
             font-size: 16px;
-            color: #2e7d32; /* Warna hijau */
+            color: #2e7d32;
             border-bottom: 1px solid #eee;
             padding-bottom: 5px;
         }
@@ -75,59 +74,57 @@
             text-align: center;
             margin-bottom: 20px;
             font-size: 10px;
-            background-color: #e8f5e9; /* Latar belakang hijau muda */
+            background-color: #e8f5e9;
             padding: 8px 15px;
             border-radius: 4px;
             border: 1px solid #c8e6c9;
-            color: #388e3c; /* Teks hijau gelap */
+            color: #388e3c;
         }
 
         .filter-info span {
             font-weight: bold;
-            color: #1b5e20; /* Lebih gelap untuk label */
+            color: #1b5e20;
         }
 
         /* TABLE STYLING */
         table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 9px; /* Ukuran font tabel sedikit lebih kecil lagi untuk kepadatan */
+            font-size: 9px;
             margin-top: 15px;
         }
 
         th {
-            background-color: #2e7d32; /* Hijau tua */
+            background-color: #2e7d32;
             color: #ffffff;
-            border: 1px solid #1b5e20; /* Border sedikit lebih gelap dari background */
-            padding: 8px 4px; /* Padding vertikal lebih besar, horizontal lebih kecil */
+            border: 1px solid #1b5e20;
+            padding: 8px 4px;
             text-align: center;
             vertical-align: middle;
             font-weight: bold;
-            text-transform: uppercase; /* Uppercase untuk header */
+            text-transform: uppercase;
         }
 
         td {
             border: 1px solid #ddd;
-            padding: 6px 4px; /* Padding yang disesuaikan */
+            padding: 6px 4px;
             text-align: center;
             vertical-align: top;
         }
 
-        /* Styling spesifik untuk kolom angka agar rata kanan */
         td.align-right {
             text-align: right;
-            padding-right: 8px; /* Tambahan padding di kanan untuk angka */
+            padding-right: 8px;
         }
 
         td.no-data {
             text-align: center;
             padding: 20px;
             font-style: italic;
-            color: #888; /* Warna abu-abu yang lebih lembut */
-            background-color: #f9f9f9; /* Latar belakang abu-abu muda */
+            color: #888;
+            background-color: #f9f9f9;
         }
 
-        /* Footer (opsional, jika ingin menambahkan) */
         .footer {
             position: fixed;
             bottom: 20px;
@@ -142,9 +139,14 @@
 <body>
     <div class="header-container">
         <div class="header-column left">
-            {{-- Menggunakan base64 encode untuk memastikan gambar tampil di DomPDF --}}
-            {{-- Pastikan path 'public_path('assets/img/banklpg.png')' benar --}}
-            <img src="data:image/png;base64,{{ base64_encode(file_get_contents(public_path('assets/img/banklpg.png'))) }}" alt="Bank Lampung">
+            {{-- Perbaikan pada bagian ini --}}
+            @if(file_exists(public_path('assets/img/banklpg.png')))
+                <img src="data:image/png;base64,{{ base64_encode(file_get_contents(public_path('assets/img/banklpg.png'))) }}" alt="Bank Lampung">
+            @else
+                <div style="height: 50px; background-color: #f0f0f0; display: flex; align-items: center; justify-content: center; width: 120px;">
+                    Logo tidak ditemukan
+                </div>
+            @endif
             <p class="sub-title">Laporan Konsumsi Energi</p>
             <p class="tagline">Pencatatan Pemakaian Air, Listrik, Kertas dan BBM</p>
         </div>
@@ -153,9 +155,6 @@
         </div>
     </div>
 
-    {{-- Hapus <h1> di sini karena sudah dipindahkan ke sub-title di header --}}
-
-    {{-- Informasi Filter yang Aktif --}}
     <div class="filter-info">
         <span>Filter Aktif:</span>
         Kantor: <span>{{ $kantor ?: 'Semua Kantor' }}</span> |
@@ -172,7 +171,7 @@
                 <th>Tahun</th>
                 <th>Listrik (kWh)</th>
                 <th>Daya Listrik (VA)</th>
-                <th>Air (m³)</th>
+                <th>Air (m&sup3;)</th>
                 <th>BBM (liter)</th>
                 <th>Jenis BBM</th>
                 <th>Kertas (rim)</th>
@@ -200,7 +199,6 @@
         </tbody>
     </table>
 
-    {{-- Opsi: Menambahkan footer --}}
     <div class="footer">
         Laporan ini dibuat secara otomatis oleh Sistem Monitoring Konsumsi Energi Bank Lampung.
     </div>
