@@ -175,40 +175,40 @@
     </div>
 
     {{-- Summary Cards --}}
-    <div class="row mt-4">
-        <div class="col-md-3">
-            <div class="card text-white bg-primary mb-3">
-                <div class="card-header">Total Listrik</div>
-                <div class="card-body">
-                    <h5 class="card-title">{{ number_format($totalListrik, 2) }} kWh</h5>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card text-white bg-info mb-3">
-                <div class="card-header">Total Air</div>
-                <div class="card-body">
-                    <h5 class="card-title">{{ number_format($totalAir, 2) }} m³</h5>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card text-white bg-warning mb-3">
-                <div class="card-header">Total BBM</div>
-                <div class="card-body">
-                    <h5 class="card-title">{{ number_format($totalBBM, 2) }} L</h5>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card text-white bg-success mb-3">
-                <div class="card-header">Total Kertas</div>
-                <div class="card-body">
-                    <h5 class="card-title">{{ number_format($totalKertas, 2) }} rim</h5>
-                </div>
+<div class="row mt-4">
+    <div class="col-md-3">
+        <div class="card text-white bg-primary mb-3">
+            <div class="card-header">Total Listrik</div>
+            <div class="card-body">
+                <h5 class="card-title" id="totalListrikCard">{{ number_format($totalListrik, 2) }} kWh</h5>
             </div>
         </div>
     </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-info mb-3">
+            <div class="card-header">Total Air</div>
+            <div class="card-body">
+                <h5 class="card-title" id="totalAirCard">{{ number_format($totalAir, 2) }} m³</h5>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-warning mb-3">
+            <div class="card-header">Total BBM</div>
+            <div class="card-body">
+                <h5 class="card-title" id="totalBBMCard">{{ number_format($totalBBM, 2) }} L</h5>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-success mb-3">
+            <div class="card-header">Total Kertas</div>
+            <div class="card-body">
+                <h5 class="card-title" id="totalKertasCard">{{ number_format($totalKertas, 2) }} rim</h5>
+            </div>
+        </div>
+    </div>
+</div>
 
     {{-- Menyimpan dataAll sebagai JSON tersembunyi untuk ChartJS --}}
     <div id="energiData" style="display: none;">{!! json_encode($dataAll) !!}</div>
@@ -660,6 +660,39 @@ function initChart() {
     updateChart();
 }
 
+
+function updateSummaryCards(filteredData) {
+    const totals = {
+        listrik: filteredData.reduce((sum, item) => sum + parseFloat(item.listrik || 0), 0),
+        air: filteredData.reduce((sum, item) => sum + parseFloat(item.air || 0), 0),
+        bbm: filteredData.reduce((sum, item) => sum + parseFloat(item.pertalite || 0) + parseFloat(item.pertamax || 0) + 
+                                       parseFloat(item.solar || 0) + parseFloat(item.dexlite || 0) + 
+                                       parseFloat(item.pertamina_dex || 0), 0),
+        kertas: filteredData.reduce((sum, item) => sum + parseFloat(item.kertas || 0), 0)
+    };
+    
+    // Update summary cards
+    document.getElementById('totalListrikCard').textContent = totals.listrik.toLocaleString('id-ID', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    }) + ' kWh';
+    
+    document.getElementById('totalAirCard').textContent = totals.air.toLocaleString('id-ID', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    }) + ' m³';
+    
+    document.getElementById('totalBBMCard').textContent = totals.bbm.toLocaleString('id-ID', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    }) + ' L';
+    
+    document.getElementById('totalKertasCard').textContent = totals.kertas.toLocaleString('id-ID', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    }) + ' rim';
+}
+
 function updateChart() {
     const kantor = document.getElementById('chartKantor').value;
     const tahun = document.getElementById('chartTahun').value;
@@ -680,6 +713,9 @@ function updateChart() {
     if (filterBulanUtama) {
         filteredData = filteredData.filter(item => item.bulan === filterBulanUtama);
     }
+
+    // Update summary cards dengan data yang sudah difilter
+    updateSummaryCards(filteredData);
 
     switch (chartType) {
         case 'monthly':
@@ -891,6 +927,10 @@ function resetChart() {
     document.getElementById('chartTahun').value = '';
     document.getElementById('chartType').value = 'monthly';
     document.getElementById('energyType').value = 'all';
+    
+    // Reset summary cards ke data asli (tanpa filter)
+    updateSummaryCards(allData);
+    
     updateChart();
 }
 
