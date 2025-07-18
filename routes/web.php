@@ -99,7 +99,6 @@ Route::middleware(['auth', 'verified', 'role:divisi_user'])->prefix('divisi')->n
 // USER UMUM
 Route::middleware(['auth', 'verified', 'role:user_umum'])->prefix('umum')->name('umum.')->group(function () {
     Route::get('/dashboard', fn() => view('dashboard.umum'))->name('dashboard');
-    Route::get('/energi', [EnergiController::class, 'index'])->name('energi.index');
     Route::get('/energi/create', [EnergiController::class, 'create'])->name('energi.create');
     Route::post('/energi', [EnergiController::class, 'store'])->name('energi.store');
 
