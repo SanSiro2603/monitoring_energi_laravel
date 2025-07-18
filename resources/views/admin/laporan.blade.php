@@ -269,7 +269,19 @@
                         </select>
                     </div>
                     <div class="col-md-3">
-                        <label class="form-label">&nbsp;</label>
+                        <label for="excelBBMType" class="form-label">Jenis BBM</label>
+                        <select class="form-select" id="excelBBMType">
+                            <option value="all">Semua Jenis</option>
+                            <option value="pertalite">PERTALITE</option>
+                            <option value="pertamax">PERTAMAX</option>
+                            <option value="solar">SOLAR</option>
+                            <option value="dexlite">DEXLITE</option>
+                            <option value="pertamina_dex">PERTAMINA DEX</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-12">
                         <button type="button" class="btn btn-primary w-100" onclick="updateExcelPreview()">
                             <i class="bi bi-funnel"></i> Apply Filter
                         </button>
@@ -280,7 +292,7 @@
                 <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
                     <table class="table table-bordered table-sm" id="excelPreviewTable">
                         <thead class="table-dark sticky-top">
-                            <tr>
+                            <tr id="excelPreviewHeader">
                                 <th>No</th>
                                 <th>Kantor</th>
                                 <th>Bulan</th>
@@ -358,7 +370,19 @@
                         </select>
                     </div>
                     <div class="col-md-3">
-                        <label class="form-label">&nbsp;</label>
+                        <label for="pdfBBMType" class="form-label">Jenis BBM</label>
+                        <select class="form-select" id="pdfBBMType">
+                            <option value="all">Semua Jenis</option>
+                            <option value="pertalite">PERTALITE</option>
+                            <option value="pertamax">PERTAMAX</option>
+                            <option value="solar">SOLAR</option>
+                            <option value="dexlite">DEXLITE</option>
+                            <option value="pertamina_dex">PERTAMINA DEX</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-12">
                         <button type="button" class="btn btn-primary w-100" onclick="updatePdfPreview()">
                             <i class="bi bi-funnel"></i> Apply Filter
                         </button>
@@ -369,7 +393,7 @@
                 <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
                     <table class="table table-bordered table-sm" id="pdfPreviewTable">
                         <thead class="table-dark sticky-top">
-                            <tr>
+                            <tr id="pdfPreviewHeader">
                                 <th>No</th>
                                 <th>Kantor</th>
                                 <th>Bulan</th>
@@ -508,6 +532,7 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('excelKantor').value = document.getElementById('filterKantor').value;
             document.getElementById('excelBulan').value = document.getElementById('filterBulan').value;
             document.getElementById('excelTahun').value = document.getElementById('filterTahun').value;
+            document.getElementById('excelBBMType').value = 'all';
             
             // Update preview
             updateExcelPreview();
@@ -522,6 +547,7 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('pdfKantor').value = document.getElementById('filterKantor').value;
             document.getElementById('pdfBulan').value = document.getElementById('filterBulan').value;
             document.getElementById('pdfTahun').value = document.getElementById('filterTahun').value;
+            document.getElementById('pdfBBMType').value = 'all';
             
             // Update preview
             updatePdfPreview();
@@ -579,6 +605,7 @@ function updateExcelPreview() {
     const kantor = document.getElementById('excelKantor').value;
     const bulan = document.getElementById('excelBulan').value;
     const tahun = document.getElementById('excelTahun').value;
+    const bbmType = document.getElementById('excelBBMType').value;
     
     // Filter data
     filteredExcelData = allData.filter(item => {
@@ -598,27 +625,86 @@ function updateExcelPreview() {
     } else {
         filteredExcelData.forEach((row, index) => {
             const tr = document.createElement('tr');
-            tr.innerHTML = `
+            
+            // Base columns (No, Kantor, Bulan, Tahun)
+            let html = `
                 <td>${index + 1}</td>
                 <td>${row.kantor}</td>
                 <td>${row.bulan}</td>
                 <td>${row.tahun}</td>
-                <td>${row.pertalite || '0'}</td>
-                <td>${row.pertamax || '0'}</td>
-                <td>${row.solar || '0'}</td>
-                <td>${row.dexlite || '0'}</td>
-                <td>${row.pertamina_dex || '0'}</td>
+            `;
+            
+            // BBM columns - show only the selected type or all if 'all' is selected
+            if (bbmType === 'all') {
+                html += `
+                    <td>${row.pertalite || '0'}</td>
+                    <td>${row.pertamax || '0'}</td>
+                    <td>${row.solar || '0'}</td>
+                    <td>${row.dexlite || '0'}</td>
+                    <td>${row.pertamina_dex || '0'}</td>
+                `;
+            } else {
+                // Show only the selected BBM type
+                html += `<td>${row[bbmType] || '0'}</td>`;
+            }
+            
+            // Other columns (Listrik, Daya Listrik, Air, Kertas)
+            html += `
                 <td>${row.listrik}</td>
                 <td>${row.daya_listrik || '-'}</td>
                 <td>${row.air}</td>
                 <td>${row.kertas}</td>
             `;
+            
+            tr.innerHTML = html;
             tbody.appendChild(tr);
         });
     }
     
     // Update count
     document.getElementById('totalDataCount').textContent = filteredExcelData.length;
+    
+    // Update table header based on BBM filter
+    updateExcelTableHeader(bbmType);
+}
+
+function updateExcelTableHeader(bbmType) {
+    const header = document.getElementById('excelPreviewHeader');
+    let headerHtml = `
+        <th>No</th>
+        <th>Kantor</th>
+        <th>Bulan</th>
+        <th>Tahun</th>
+    `;
+    
+    if (bbmType === 'all') {
+        headerHtml += `
+            <th>PERTALITE</th>
+            <th>PERTAMAX</th>
+            <th>SOLAR</th>
+            <th>DEXLITE</th>
+            <th>PERTAMINA DEX</th>
+        `;
+    } else {
+        // Show only the selected BBM type
+        const bbmLabels = {
+            'pertalite': 'PERTALITE',
+            'pertamax': 'PERTAMAX',
+            'solar': 'SOLAR',
+            'dexlite': 'DEXLITE',
+            'pertamina_dex': 'PERTAMINA DEX'
+        };
+        headerHtml += `<th>${bbmLabels[bbmType]}</th>`;
+    }
+    
+    headerHtml += `
+        <th>Listrik</th>
+        <th>Daya Listrik</th>
+        <th>Air</th>
+        <th>Kertas</th>
+    `;
+    
+    header.innerHTML = headerHtml;
 }
 
 // Function to update PDF preview
@@ -626,6 +712,7 @@ function updatePdfPreview() {
     const kantor = document.getElementById('pdfKantor').value;
     const bulan = document.getElementById('pdfBulan').value;
     const tahun = document.getElementById('pdfTahun').value;
+    const bbmType = document.getElementById('pdfBBMType').value;
     
     // Filter data
     filteredPdfData = allData.filter(item => {
@@ -645,27 +732,86 @@ function updatePdfPreview() {
     } else {
         filteredPdfData.forEach((row, index) => {
             const tr = document.createElement('tr');
-            tr.innerHTML = `
+            
+            // Base columns (No, Kantor, Bulan, Tahun)
+            let html = `
                 <td>${index + 1}</td>
                 <td>${row.kantor}</td>
                 <td>${row.bulan}</td>
                 <td>${row.tahun}</td>
-                <td>${row.pertalite || '0'}</td>
-                <td>${row.pertamax || '0'}</td>
-                <td>${row.solar || '0'}</td>
-                <td>${row.dexlite || '0'}</td>
-                <td>${row.pertamina_dex || '0'}</td>
+            `;
+            
+            // BBM columns - show only the selected type or all if 'all' is selected
+            if (bbmType === 'all') {
+                html += `
+                    <td>${row.pertalite || '0'}</td>
+                    <td>${row.pertamax || '0'}</td>
+                    <td>${row.solar || '0'}</td>
+                    <td>${row.dexlite || '0'}</td>
+                    <td>${row.pertamina_dex || '0'}</td>
+                `;
+            } else {
+                // Show only the selected BBM type
+                html += `<td>${row[bbmType] || '0'}</td>`;
+            }
+            
+            // Other columns (Listrik, Daya Listrik, Air, Kertas)
+            html += `
                 <td>${row.listrik}</td>
                 <td>${row.daya_listrik || '-'}</td>
                 <td>${row.air}</td>
                 <td>${row.kertas}</td>
             `;
+            
+            tr.innerHTML = html;
             tbody.appendChild(tr);
         });
     }
     
     // Update count
     document.getElementById('pdfTotalDataCount').textContent = filteredPdfData.length;
+    
+    // Update table header based on BBM filter
+    updatePdfTableHeader(bbmType);
+}
+
+function updatePdfTableHeader(bbmType) {
+    const header = document.getElementById('pdfPreviewHeader');
+    let headerHtml = `
+        <th>No</th>
+        <th>Kantor</th>
+        <th>Bulan</th>
+        <th>Tahun</th>
+    `;
+    
+    if (bbmType === 'all') {
+        headerHtml += `
+            <th>PERTALITE</th>
+            <th>PERTAMAX</th>
+            <th>SOLAR</th>
+            <th>DEXLITE</th>
+            <th>PERTAMINA DEX</th>
+        `;
+    } else {
+        // Show only the selected BBM type
+        const bbmLabels = {
+            'pertalite': 'PERTALITE',
+            'pertamax': 'PERTAMAX',
+            'solar': 'SOLAR',
+            'dexlite': 'DEXLITE',
+            'pertamina_dex': 'PERTAMINA DEX'
+        };
+        headerHtml += `<th>${bbmLabels[bbmType]}</th>`;
+    }
+    
+    headerHtml += `
+        <th>Listrik</th>
+        <th>Daya Listrik</th>
+        <th>Air</th>
+        <th>Kertas</th>
+    `;
+    
+    header.innerHTML = headerHtml;
 }
 
 // Function to download Excel with selected filters
@@ -673,6 +819,7 @@ function downloadExcel() {
     const kantor = document.getElementById('excelKantor').value;
     const bulan = document.getElementById('excelBulan').value;
     const tahun = document.getElementById('excelTahun').value;
+    const bbmType = document.getElementById('excelBBMType').value;
     
     // Build URL with parameters
     <?php
@@ -690,6 +837,7 @@ function downloadExcel() {
     if (kantor) params.append('kantor', kantor);
     if (bulan) params.append('bulan', bulan);
     if (tahun) params.append('tahun', tahun);
+    if (bbmType && bbmType !== 'all') params.append('bbm_type', bbmType);
     
     if (params.toString()) {
         url += '?' + params.toString();
@@ -708,6 +856,7 @@ function downloadPdf() {
     const kantor = document.getElementById('pdfKantor').value;
     const bulan = document.getElementById('pdfBulan').value;
     const tahun = document.getElementById('pdfTahun').value;
+    const bbmType = document.getElementById('pdfBBMType').value;
     
     // Build URL with parameters
     <?php
@@ -725,6 +874,7 @@ function downloadPdf() {
     if (kantor) params.append('kantor', kantor);
     if (bulan) params.append('bulan', bulan);
     if (tahun) params.append('tahun', tahun);
+    if (bbmType && bbmType !== 'all') params.append('bbm_type', bbmType);
     
     if (params.toString()) {
         url += '?' + params.toString();

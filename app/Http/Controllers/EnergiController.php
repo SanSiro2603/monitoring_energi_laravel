@@ -444,6 +444,7 @@ class EnergiController extends Controller
         $kantor = $request->input('kantor');
         $bulan = $request->input('bulan');
         $tahun = $request->input('tahun');
+        $bbm_type = $request->input('bbm_type'); // Tambahkan filter jenis BBM
 
         $query = Energi::query();
 
@@ -507,7 +508,7 @@ class EnergiController extends Controller
         };
 
         return view($viewName, compact(
-            'data', 'dataAll', 'kantor', 'bulan', 'tahun',
+            'data', 'dataAll', 'kantor', 'bulan', 'tahun', 'bbm_type',
             'uniqueKantor', 'uniqueBulan', 'uniqueTahun',
             'totalListrik', 'totalAir', 'totalBBM', 'totalKertas'
         ));
@@ -524,6 +525,7 @@ class EnergiController extends Controller
         $kantor = $request->input('kantor');
         $bulan = $request->input('bulan');
         $tahun = $request->input('tahun');
+        $bbm_type = $request->input('bbm_type'); // Tambahkan filter jenis BBM
 
         $query = Energi::query();
 
@@ -556,14 +558,16 @@ class EnergiController extends Controller
         $kantor = $request->input('kantor');
         $bulan = $request->input('bulan');
         $tahun = $request->input('tahun');
+        $bbm_type = $request->input('bbm_type'); // Tambahkan filter jenis BBM
 
         $filename = 'laporan_energi';
         if ($kantor) $filename .= "_$kantor";
         if ($bulan) $filename .= "_$bulan";
         if ($tahun) $filename .= "_$tahun";
+        if ($bbm_type) $filename .= "_$bbm_type";
         $filename .= ".xlsx";
 
-        return Excel::download(new EnergiExport($kantor, $bulan, $tahun), $filename);
+        return Excel::download(new EnergiExport($kantor, $bulan, $tahun, $bbm_type), $filename);
     }
 
     /**
@@ -578,6 +582,7 @@ class EnergiController extends Controller
         $kantor = $request->input('kantor');
         $bulan = $request->input('bulan');
         $tahun = $request->input('tahun');
+        $bbm_type = $request->input('bbm_type'); // Tambahkan filter jenis BBM
 
         $query = Energi::query();
 
@@ -609,6 +614,7 @@ class EnergiController extends Controller
         if ($kantor) $filename .= "_$kantor";
         if ($bulan) $filename .= "_$bulan";
         if ($tahun) $filename .= "_$tahun";
+        if ($bbm_type) $filename .= "_$bbm_type";
         $filename .= ".pdf";
 
         // Determine PDF view based on user role
@@ -621,7 +627,7 @@ class EnergiController extends Controller
         };
 
         $pdf = Pdf::loadView($pdfView, compact(
-            'data', 'kantor', 'bulan', 'tahun',
+            'data', 'kantor', 'bulan', 'tahun', 'bbm_type',
             'totalListrik', 'totalAir', 'totalBBM', 'totalKertas'
         ))->setPaper('A4', 'landscape');
 
@@ -641,6 +647,7 @@ class EnergiController extends Controller
             $kantor = $request->input('kantor');
             $bulan = $request->input('bulan');
             $tahun = $request->input('tahun');
+            $bbm_type = $request->input('bbm_type'); // Tambahkan filter jenis BBM
 
             $query = Energi::query();
             if ($kantor) $query->where('kantor', $kantor);
@@ -690,7 +697,7 @@ class EnergiController extends Controller
 
             // Render the view that contains the chart.js canvas
             $html = view($viewName, compact(
-                'data', 'dataAll', 'kantor', 'bulan', 'tahun',
+                'data', 'dataAll', 'kantor', 'bulan', 'tahun', 'bbm_type',
                 'uniqueKantor', 'uniqueBulan', 'uniqueTahun',
                 'totalListrik', 'totalAir', 'totalBBM', 'totalKertas'
             ))->render();

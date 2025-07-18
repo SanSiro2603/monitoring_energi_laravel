@@ -159,7 +159,8 @@
         <span>Filter Aktif:</span>
         Kantor: <span>{{ $kantor ?: 'Semua Kantor' }}</span> |
         Bulan: <span>{{ $bulan ?: 'Semua Bulan' }}</span> |
-        Tahun: <span>{{ $tahun ?: 'Semua Tahun' }}</span>
+        Tahun: <span>{{ $tahun ?: 'Semua Tahun' }}</span> |
+        Jenis BBM: <span>{{ $bbm_type ? ucfirst(str_replace('_', ' ', $bbm_type)) : 'Semua Jenis' }}</span>
     </div>
 
     <table>
@@ -169,11 +170,18 @@
                 <th>Kantor</th>
                 <th>Bulan</th>
                 <th>Tahun</th>
+                @if(!$bbm_type || $bbm_type == 'all')
+                    <th>PERTALITE (L)</th>
+                    <th>PERTAMAX (L)</th>
+                    <th>SOLAR (L)</th>
+                    <th>DEXLITE (L)</th>
+                    <th>PERTAMINA DEX (L)</th>
+                @else
+                    <th>{{ strtoupper(str_replace('_', ' ', $bbm_type)) }} (L)</th>
+                @endif
                 <th>Listrik (kWh)</th>
                 <th>Daya Listrik (VA)</th>
                 <th>Air (m&sup3;)</th>
-                <th>BBM (liter)</th>
-                <th>Jenis BBM</th>
                 <th>Kertas (rim)</th>
             </tr>
         </thead>
@@ -184,16 +192,23 @@
                 <td>{{ $row->kantor }}</td>
                 <td>{{ $row->bulan }}</td>
                 <td>{{ $row->tahun }}</td>
+                @if(!$bbm_type || $bbm_type == 'all')
+                    <td class="align-right">{{ number_format($row->pertalite ?? 0, 2, ',', '.') }}</td>
+                    <td class="align-right">{{ number_format($row->pertamax ?? 0, 2, ',', '.') }}</td>
+                    <td class="align-right">{{ number_format($row->solar ?? 0, 2, ',', '.') }}</td>
+                    <td class="align-right">{{ number_format($row->dexlite ?? 0, 2, ',', '.') }}</td>
+                    <td class="align-right">{{ number_format($row->pertamina_dex ?? 0, 2, ',', '.') }}</td>
+                @else
+                    <td class="align-right">{{ number_format($row->{$bbm_type} ?? 0, 2, ',', '.') }}</td>
+                @endif
                 <td class="align-right">{{ number_format($row->listrik, 2, ',', '.') }}</td>
-                <td class="align-right">{{ number_format($row->daya_listrik, 2, ',', '.') }}</td>
+                <td class="align-right">{{ $row->daya_listrik ? number_format($row->daya_listrik, 2, ',', '.') : '-' }}</td>
                 <td class="align-right">{{ number_format($row->air, 2, ',', '.') }}</td>
-                <td class="align-right">{{ number_format($row->bbm, 2, ',', '.') }}</td>
-                <td>{{ $row->jenis_bbm ?: '-' }}</td>
                 <td class="align-right">{{ number_format($row->kertas, 2, ',', '.') }}</td>
             </tr>
             @empty
             <tr>
-                <td colspan="10" class="no-data">Tidak ada data konsumsi energi yang ditemukan untuk filter yang dipilih.</td>
+                <td colspan="{{ !$bbm_type || $bbm_type == 'all' ? 13 : 9 }}" class="no-data">Tidak ada data konsumsi energi yang ditemukan untuk filter yang dipilih.</td>
             </tr>
             @endforelse
         </tbody>
