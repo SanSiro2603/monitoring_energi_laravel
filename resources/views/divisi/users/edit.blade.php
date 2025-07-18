@@ -17,7 +17,7 @@
     @endif
 
     {{-- ✅ Form untuk edit user --}}
-    <form action="{{ url('/divisi/users/' . $user->id) }}" method="POST">
+    <form action="{{ route('divisi.users.update', $user->id) }}" method="POST">
         @csrf
         @method('PUT')
 
@@ -37,12 +37,6 @@
         </div>
 
         <div class="mb-3">
-            <label>Password</label>
-            <input type="password" name="password" class="form-control" placeholder="Kosongkan jika tidak ingin mengubah password">
-            <small class="form-text text-muted">Kosongkan jika tidak ingin mengubah password</small>
-        </div>
-
-        <div class="mb-3">
             <label>Unit Kerja</label>
             <input type="text" name="unit_kerja" value="{{ old('unit_kerja', $user->unit_kerja) }}" class="form-control">
         </div>
@@ -52,7 +46,7 @@
 
         <div class="mt-4">
             <button type="submit" class="btn btn-success">Update</button>
-            <a href="{{ url('/divisi/users') }}" class="btn btn-secondary">Kembali</a>
+            <a href="{{ route('divisi.users.index') }}" class="btn btn-secondary">Kembali</a>
         </div>
     </form>
 </div>
