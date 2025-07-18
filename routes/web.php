@@ -85,7 +85,7 @@ Route::middleware(['auth', 'verified', 'role:super_user', 'no_cache'])->prefix('
 // DIVISI USER
 Route::middleware(['auth', 'verified', 'role:divisi_user'])->prefix('divisi')->name('divisi.')->group(function () {
     Route::get('/dashboard', fn() => view('dashboard.divisi'))->name('dashboard');
-    Route::resource('energi', EnergiController::class)->except(['show', 'edit', 'update']);
+    Route::resource('energi', EnergiController::class)->except(['index', 'show', 'edit', 'update']);
     Route::get('/users', [UserController::class, 'indexDivisi'])->name('users.index');
     Route::get('/users/create', [UserController::class, 'createDivisi'])->name('users.create');
     Route::post('/users', [UserController::class, 'storeDivisi'])->name('users.store');
