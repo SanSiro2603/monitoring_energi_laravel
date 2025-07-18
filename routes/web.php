@@ -89,6 +89,9 @@ Route::middleware(['auth', 'verified', 'role:divisi_user'])->prefix('divisi')->n
     Route::get('/users', [UserController::class, 'indexDivisi'])->name('users.index');
     Route::get('/users/create', [UserController::class, 'createDivisi'])->name('users.create');
     Route::post('/users', [UserController::class, 'storeDivisi'])->name('users.store');
+    Route::get('/users/{id}/edit', [UserController::class, 'editDivisi'])->name('users.edit');
+    Route::put('/users/{id}', [UserController::class, 'updateDivisi'])->name('users.update');
+    Route::delete('/users/{id}', [UserController::class, 'destroyDivisi'])->name('users.destroy');
 
     Route::get('/laporan', [EnergiController::class, 'laporan'])->name('laporan');
     Route::get('/laporan/export-excel', [EnergiController::class, 'exportExcel'])->name('laporan.export-excel');

@@ -179,4 +179,76 @@ class UserController extends Controller
     {
         return 50 - User::count();
     }
+
+    public function editDivisi($id)
+    {
+        $user = User::findOrFail($id);
+        
+        // Pastikan hanya user dengan role user_umum yang bisa diedit
+        if ($user->role !== 'user_umum') {
+            return redirect()->route('divisi.users.index')
+                ->with('error', 'Anda hanya bisa mengedit user umum.');
+        }
+        
+        return view('divisi.users.edit', compact('user'));
+    }
+
+    /**
+     * Update user (untuk divisi)
+     */
+    public function updateDivisi(Request $request, $id)
+    {
+        $user = User::findOrFail($id);
+        
+        // Pastikan hanya user dengan role user_umum yang bisa diupdate
+        if ($user->role !== 'user_umum') {
+            return redirect()->route('divisi.users.index')
+                ->with('error', 'Anda hanya bisa mengupdate user umum.');
+        }
+
+        // Validasi
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'username' => 'required|string|max:255|unique:users,username,' . $id,
+            'email' => 'required|email|unique:users,email,' . $id,
+            'password' => 'nullable|string|min:8',
+            'unit_kerja' => 'nullable|string|max:255',
+        ]);
+
+        // Update data user
+        $user->name = $request->name;
+        $user->username = $request->username;
+        $user->email = $request->email;
+        $user->unit_kerja = $request->unit_kerja;
+        $user->role = 'user_umum'; // tetap user_umum
+
+        // Update password hanya jika diisi
+        if ($request->filled('password')) {
+            $user->password = Hash::make($request->password);
+        }
+
+        $user->save();
+
+        return redirect()->route('divisi.users.index')
+            ->with('success', 'User berhasil diupdate!');
+    }
+
+    /**
+     * Delete user (untuk divisi)
+     */
+    public function destroyDivisi($id)
+    {
+        $user = User::findOrFail($id);
+        
+        // Pastikan hanya user dengan role user_umum yang bisa dihapus
+        if ($user->role !== 'user_umum') {
+            return redirect()->route('divisi.users.index')
+                ->with('error', 'Anda hanya bisa menghapus user umum.');
+        }
+        
+        $user->delete();
+
+        return redirect()->route('divisi.users.index')
+            ->with('success', 'User berhasil dihapus!');
+    }
 }
