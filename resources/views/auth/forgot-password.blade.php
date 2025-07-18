@@ -11,6 +11,16 @@
             margin: 0;
             padding: 0;
         }
+        /* Logo at the top */
+        .icon-group {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 15px; /* Reduced the margin for better proximity */
+        }
+        .icon-group img {
+            height: 100px; /* Adjusted size of logos */
+            margin: 0 10px; /* Reduced space between logos */
+        }
         .forgot-container {
             max-width: 400px;
             margin: 80px auto;
@@ -19,14 +29,6 @@
             border-radius: 20px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.1);
             text-align: center;
-        }
-        .icon-group {
-            display: flex;
-            justify-content: center;
-            margin-bottom: -30px;
-        }
-        .icon-group img {
-            height: 120px;
         }
         .title {
             font-size: 24px;
@@ -56,10 +58,12 @@
             border-radius: 8px;
         }
         .footer {
+            background-color: #e0e0e0; /* Background color for the footer */
             text-align: center;
             font-size: 13px;
             margin-top: 30px;
             color: #444;
+            padding: 10px 0;
         }
         .footer img {
             height: 28px;
