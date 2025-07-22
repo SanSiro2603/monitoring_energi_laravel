@@ -407,9 +407,6 @@
 
                 {{-- Menu Divisi --}}
                 @if(Auth::user()->role === 'divisi_user')
-                    <a href="/divisi/energi/create" class="{{ request()->is('divisi/energi/create') ? 'active' : '' }}">
-                        <i class="fas fa-plus-circle"></i> Input Data Energi
-                    </a>
                     <a href="/divisi/laporan" class="{{ request()->is('divisi/laporan') ? 'active' : '' }}">
                         <i class="fas fa-chart-bar"></i> Laporan
                     </a>
