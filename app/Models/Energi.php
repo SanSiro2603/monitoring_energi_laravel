@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;  // Menambahkan SoftDeletes
 
 class Energi extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;  // Menambahkan SoftDeletes
 
     protected $fillable = [
         'kantor',
@@ -46,7 +47,13 @@ class Energi extends Model
     // Relationship with User
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class)->withTrashed();  // Menambahkan withTrashed agar meskipun user dihapus, data tetap diambil
+    }
+
+    // Relationship with Log
+    public function logs()
+    {
+        return $this->hasMany(Log::class);  // Relasi ke model Log
     }
 
     // Accessor to get total BBM (calculated from individual fuel types)

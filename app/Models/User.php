@@ -7,10 +7,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Database\Eloquent\SoftDeletes;  // Tambahkan SoftDeletes
 
 class User extends Authenticatable implements MustVerifyEmail
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable, SoftDeletes;  // Tambahkan SoftDeletes
 
     /**
      * Kolom-kolom yang dapat diisi secara massal
@@ -38,7 +39,6 @@ class User extends Authenticatable implements MustVerifyEmail
     protected $hidden = [
         'password',
         'remember_token',
-
     ];
 
     /**
@@ -50,4 +50,17 @@ class User extends Authenticatable implements MustVerifyEmail
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+    /**
+     * Kolom yang termasuk dalam soft delete.
+     * Pastikan kolom `deleted_at` ada.
+     */
+    protected $dates = ['deleted_at'];
+
+    /**
+     * Relasi dengan tabel input data
+     */
+    public function inputs() {
+        return $this->hasMany(Input::class);  // Menambahkan relasi dengan Input
+    }
 }

@@ -26,7 +26,7 @@ class EnergiController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Energi::with('user'); // Load relasi user
+        $query = Energi::with('user')->withTrashed();
 
         // Filter parameters
         $cari_kantor = $request->input('cari_kantor');

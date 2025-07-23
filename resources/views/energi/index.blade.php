@@ -65,7 +65,13 @@
                         </small>
                     </td>
                     <td>{{ $row->user->email ?? '-' }}</td>
-                    <td>{{ $row->user->name ?? '-' }}</td>
+                    <td>
+                        @if($row->user)
+                            {{ $row->user->name }}
+                        @else
+                            <span class="text-danger">User dihapus</span>
+                        @endif
+                    </td>
                     <td>{{ $row->user->jabatan ?? '-' }}</td>
                     <td>{{ $row->kantor }}</td>
                     <td>{{ $row->bulan }}</td>
