@@ -42,15 +42,15 @@
                     <th>Kantor</th>
                     <th>Bulan</th>
                     <th>Tahun</th>
-                    <th>PERTALITE (L)</th>
-                    <th>PERTAMAX (L)</th>
-                    <th>SOLAR (L)</th>
-                    <th>DEXLITE (L)</th>
-                    <th>PERTAMINA DEX (L)</th>
-                    <th>Listrik (kWh)</th>
-                    <th>Daya Listrik (VA)</th>
-                    <th>Air (m³)</th>
-                    <th>Kertas (rim)</th>
+                    <th>PERTALITE </th>
+                    <th>PERTAMAX </th>
+                    <th>SOLAR </th>
+                    <th>DEXLITE </th>
+                    <th>PERTAMINA DEX </th>
+                    <th>Listrik /th>
+                    <th>Daya Listrik </th>
+                    <th>Air </th>
+                    <th>Kertas </th>
                     <th>Aksi</th>
                 </tr>
             </thead>

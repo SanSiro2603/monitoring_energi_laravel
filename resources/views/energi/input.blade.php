@@ -64,10 +64,10 @@
                             <th>Bulan</th>
                             <th>Tahun</th>
                             <th>Pilih BBM & Input</th>
-                            <th>Listrik (kWh)</th>
-                            <th>Daya Listrik (VA)</th>
-                            <th>Air (m³)</th>
-                            <th>Kertas (rim)</th>
+                            <th>Listrik </th>
+                            <th>Daya Listrik </th>
+                            <th>Air </th>
+                            <th>Kertas </th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
