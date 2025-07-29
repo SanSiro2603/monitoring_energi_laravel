@@ -567,9 +567,6 @@
             <a href="#contact" class="nav-link">
                 <i class="fas fa-envelope"></i> KONTAK
             </a>
-            <a href="/register" class="nav-link">
-                <i class="fas fa-id-card"></i> REGISTER
-            </a>
         </nav>
     </header>
 

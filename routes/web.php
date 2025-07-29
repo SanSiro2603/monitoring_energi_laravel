@@ -40,10 +40,6 @@ Route::middleware('guest')->group(function () {
     Route::post('reset-password', [ResetPasswordController::class, 'reset'])->name('password.update');
 });
 
-// REGISTER
-Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
-Route::post('/register', [RegisterController::class, 'register']);
-
 // Dashboard berdasarkan role
 Route::get('/dashboard', function () {
     if (!Auth::check()) {
@@ -116,11 +112,11 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/energi/export', [EnergiController::class, 'exportExcel'])->name('energi.export');
     Route::get('/energi/template', [EnergiController::class, 'downloadTemplate'])->name('energi.template');
 
-    // ✅ Tambahan route global chart PDF di sini:
+    // route global chart PDF di sini:
     Route::get('/laporan/export-chart-pdf', [EnergiController::class, 'exportChartToPDF'])->name('laporan.export-chart-pdf-global');
 });
 
-// ✅ TAMBAHAN: Route untuk users yang hilang
+// : Route untuk users yang hilang
 Route::middleware(['auth', 'verified', 'role:super_user', 'no_cache'])->group(function () {
     Route::get('/users', [UserController::class, 'index'])->name('users.index');
     Route::post('/users', [UserController::class, 'store'])->name('users.store');
