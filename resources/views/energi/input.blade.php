@@ -23,23 +23,47 @@
             <h5>🏢 Kelola Data Kantor</h5>
         </div>
         <div class="card-body">
-            <!-- Form Tambah Kantor dengan Dropdown Search -->
-            <div class="row align-items-end mb-3">
-                <div class="col-md-8">
-                    <label for="namaKantor" class="form-label">Nama Kantor</label>
-                    <div class="dropdown-search-container">
-                        <input type="text" 
-                               id="namaKantor" 
-                               class="form-control kantor-search-input" 
-                               placeholder="Ketik atau cari nama kantor..."
-                               autocomplete="off">
-                        <div class="dropdown-list" id="kantorDropdownList" style="display: none;"></div>
+            @if($role === 'super_user')
+                <!-- Form Tambah Kantor - Hanya untuk Super User -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h6 class="text-primary">➕ Tambah Kantor Baru</h6>
+                        <div class="row align-items-end">
+                            <div class="col-md-8">
+                                <label for="inputTambahKantor" class="form-label">Nama Kantor Baru</label>
+                                <input type="text" 
+                                       id="inputTambahKantor" 
+                                       class="form-control" 
+                                       placeholder="Masukkan nama kantor baru..."
+                                       autocomplete="off">
+                                <div class="form-text">Format: Huruf kapital hanya di awal kata</div>
+                            </div>
+                            <div class="col-md-4">
+                                <button type="button" class="btn btn-primary" onclick="tambahKantor()">
+                                    ➕ Tambah Kantor
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="col-md-4">
-                    <button type="button" class="btn btn-primary" onclick="tambahKantor()">
-                        ➕ Tambah Kantor
-                    </button>
+            @endif
+
+            <!-- Form Search/Pilih Kantor - Untuk Semua User -->
+            <div class="row mb-3">
+                <div class="col-12">
+                    <h6 class="text-success">🔍 {{ $role === 'super_user' ? 'Cari Kantor yang Sudah Ada' : 'Pilih Kantor' }}</h6>
+                    <div class="col-md-8">
+                        <label for="namaKantor" class="form-label">{{ $role === 'super_user' ? 'Cari Kantor' : 'Pilih Kantor' }}</label>
+                        <div class="dropdown-search-container">
+                            <input type="text" 
+                                   id="namaKantor" 
+                                   class="form-control kantor-search-input" 
+                                   placeholder="{{ $role === 'super_user' ? 'Ketik untuk mencari kantor yang sudah ada...' : 'Ketik untuk mencari dan memilih kantor...' }}"
+                                   autocomplete="off">
+                            <div class="dropdown-list" id="kantorDropdownList" style="display: none;"></div>
+                        </div>
+                        <div class="form-text">{{ $role === 'super_user' ? 'Pilih dari kantor yang sudah ditambahkan' : 'Cari dan pilih kantor dari daftar yang tersedia' }}</div>
+                    </div>
                 </div>
             </div>
 
@@ -50,6 +74,11 @@
                     <div id="daftarKantor" class="border rounded p-2 bg-light kantor-list-container" style="min-height: 100px;">
                         <!-- Kantor yang sudah ada akan muncul di sini -->
                     </div>
+                    @if($role !== 'super_user')
+                        <div class="form-text text-muted mt-2">
+                            <small>💡 Anda hanya dapat melihat dan memilih kantor. Untuk menambah kantor baru, hubungi Super User.</small>
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>
@@ -136,28 +165,61 @@ const bbmData = {
 // Fungsi untuk inisialisasi dropdown search pada input kantor
 function initializeKantorSearch() {
     const inputKantor = document.getElementById('namaKantor');
+    const inputTambahKantor = document.getElementById('inputTambahKantor');
     const dropdownList = document.getElementById('kantorDropdownList');
     
-    // Event listener untuk focus
+    // Event listener untuk search input
     inputKantor.addEventListener('focus', function() {
         showKantorDropdown();
     });
     
-    // Event listener untuk input (ketika user mengetik)
     inputKantor.addEventListener('input', function() {
         const searchTerm = this.value.toLowerCase();
         filterKantorOptions(searchTerm);
     });
     
-    // Event listener untuk keydown
     inputKantor.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            tambahKantor();
-        } else if (e.key === 'Escape') {
+        if (e.key === 'Escape') {
             dropdownList.style.display = 'none';
         }
     });
+    
+    // Event listener untuk tambah kantor input (hanya jika ada - super_user)
+    if (inputTambahKantor) {
+        inputTambahKantor.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                tambahKantor();
+            }
+        });
+        
+        // Real-time validation untuk input tambah kantor
+        inputTambahKantor.addEventListener('input', function() {
+            const namaKantor = this.value;
+            const validationErrors = validateKantorName(namaKantor);
+            
+            // Remove existing validation feedback
+            const existingFeedback = this.parentNode.querySelector('.validation-feedback');
+            if (existingFeedback) {
+                existingFeedback.remove();
+            }
+            
+            if (namaKantor.trim() !== '' && validationErrors.length > 0) {
+                this.classList.add('is-invalid');
+                const feedback = document.createElement('div');
+                feedback.className = 'validation-feedback invalid-feedback';
+                feedback.innerHTML = validationErrors.join('<br>');
+                this.parentNode.appendChild(feedback);
+            } else {
+                this.classList.remove('is-invalid');
+                if (namaKantor.trim() !== '') {
+                    this.classList.add('is-valid');
+                } else {
+                    this.classList.remove('is-valid');
+                }
+            }
+        });
+    }
     
     // Close dropdown when clicking outside
     document.addEventListener('click', function(e) {
@@ -180,12 +242,9 @@ function showKantorDropdown() {
 function filterKantorOptions(searchTerm) {
     const dropdownList = document.getElementById('kantorDropdownList');
     
-    // Gabungkan template kantor dengan kantor yang sudah ada
-    const allKantor = [...new Set([...kantorTemplate, ...daftarKantorArray])];
-    
-    // Filter berdasarkan search term
-    filteredKantorArray = allKantor.filter(kantor => 
-        kantor.toLowerCase().includes(searchTerm)
+    // Hanya tampilkan kantor yang sudah ditambahkan jika ada pencarian
+    filteredKantorArray = daftarKantorArray.filter(kantor => 
+        kantor.toLowerCase().includes(searchTerm.toLowerCase())
     );
     
     // Clear dropdown
@@ -193,9 +252,13 @@ function filterKantorOptions(searchTerm) {
     
     if (filteredKantorArray.length === 0) {
         if (searchTerm.trim() === '') {
-            dropdownList.innerHTML = '<div class="dropdown-list-item text-muted">Mulai ketik untuk mencari kantor...</div>';
+            if (daftarKantorArray.length === 0) {
+                dropdownList.innerHTML = '<div class="dropdown-list-item text-muted">Belum ada kantor. Ketik nama kantor baru...</div>';
+            } else {
+                dropdownList.innerHTML = '<div class="dropdown-list-item text-muted">Pilih kantor yang sudah ada atau ketik nama baru...</div>';
+            }
         } else {
-            dropdownList.innerHTML = '<div class="dropdown-list-item text-muted">Tidak ada kantor yang cocok</div>';
+            dropdownList.innerHTML = '<div class="dropdown-list-item text-muted">Tidak ada kantor yang cocok. Ketik nama baru...</div>';
         }
     } else {
         // Tampilkan maksimal 10 hasil
@@ -213,11 +276,9 @@ function filterKantorOptions(searchTerm) {
                 item.textContent = kantor;
             }
             
-            // Tambahkan indikator jika kantor sudah ada
-            if (daftarKantorArray.includes(kantor)) {
-                item.innerHTML += ' <span class="badge bg-success ms-1">✓</span>';
-                item.classList.add('already-added');
-            }
+            // Tambahkan indikator bahwa kantor sudah ada
+            item.innerHTML += ' <span class="badge bg-success ms-1">✓</span>';
+            item.classList.add('already-added');
             
             item.onclick = function() {
                 document.getElementById('namaKantor').value = kantor;
@@ -239,24 +300,81 @@ function filterKantorOptions(searchTerm) {
     dropdownList.style.display = 'block';
 }
 
-// Fungsi untuk menambah kantor
-function tambahKantor() {
-    const inputKantor = document.getElementById('namaKantor');
-    const namaKantor = inputKantor.value.trim();
+// Fungsi untuk validasi format nama kantor
+function validateKantorName(namaKantor) {
+    const errors = [];
     
-    if (namaKantor === '') {
-        alert('Silakan masukkan nama kantor!');
+    // Cek tidak boleh kosong
+    if (!namaKantor || namaKantor.trim() === '') {
+        errors.push('Nama kantor tidak boleh kosong');
+        return errors;
+    }
+    
+    // Cek huruf kapital di tengah kata (sebelum spasi)
+    const words = namaKantor.trim().split(' ');
+    for (let i = 0; i < words.length; i++) {
+        const word = words[i];
+        if (word.length > 1) {
+            // Cek apakah ada huruf kapital di tengah kata (posisi 1 sampai word.length-1)
+            for (let j = 1; j < word.length; j++) {
+                if (/[A-Z]/.test(word[j])) {
+                    errors.push(`Kata "${word}" tidak boleh ada huruf kapital di tengah kata`);
+                    break;
+                }
+            }
+        }
+    }
+    
+    return errors;
+}
+
+// Fungsi untuk format nama kantor yang benar
+function formatKantorName(namaKantor) {
+    return namaKantor.trim()
+        .split(' ')
+        .filter(word => word.length > 0) // Hapus spasi berlebih
+        .map(word => {
+            // Kapitalisasi huruf pertama, lowercase sisanya
+            return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+        })
+        .join(' ');
+}
+
+// Fungsi untuk menambah kantor - hanya untuk super_user
+function tambahKantor() {
+    // Cek apakah user adalah super_user
+    const userRole = '{{ Auth::user()->role }}';
+    if (userRole !== 'super_user') {
+        showErrorMessage('Anda tidak memiliki akses untuk menambah kantor baru!');
         return;
     }
     
+    const inputKantor = document.getElementById('inputTambahKantor');
+    if (!inputKantor) {
+        showErrorMessage('Form tambah kantor tidak tersedia!');
+        return;
+    }
+    
+    const namaKantor = inputKantor.value.trim();
+    
+    // Validasi format nama kantor
+    const validationErrors = validateKantorName(namaKantor);
+    if (validationErrors.length > 0) {
+        showErrorMessage(validationErrors.join('<br>'));
+        return;
+    }
+    
+    // Format nama kantor yang benar
+    const formattedName = formatKantorName(namaKantor);
+    
     // Cek apakah kantor sudah ada
-    if (daftarKantorArray.includes(namaKantor)) {
-        alert('Kantor sudah ada dalam daftar!');
+    if (daftarKantorArray.includes(formattedName)) {
+        showErrorMessage(`Kantor "${formattedName}" sudah ada dalam daftar!`);
         return;
     }
     
     // Tambah ke array
-    daftarKantorArray.push(namaKantor);
+    daftarKantorArray.push(formattedName);
     
     // Update tampilan daftar kantor
     updateDaftarKantor();
@@ -267,14 +385,62 @@ function tambahKantor() {
     // Kosongkan input
     inputKantor.value = '';
     
-    // Hide dropdown
-    document.getElementById('kantorDropdownList').style.display = 'none';
-    
     // Simpan ke localStorage untuk persistensi
     localStorage.setItem('daftarKantor', JSON.stringify(daftarKantorArray));
     
+    // TODO: Simpan juga ke database/server agar data terpusat
+    // Idealnya data kantor disimpan di database dan diakses via API
+    saveKantorToServer(formattedName);
+    
     // Show success message
-    showSuccessMessage(`Kantor "${namaKantor}" berhasil ditambahkan!`);
+    showSuccessMessage(`Kantor "${formattedName}" berhasil ditambahkan!`);
+}
+
+// Fungsi untuk menyimpan kantor ke server (placeholder)
+function saveKantorToServer(namaKantor) {
+    // TODO: Implementasikan AJAX call ke server untuk menyimpan kantor
+    // fetch('/api/kantor', {
+    //     method: 'POST',
+    //     headers: {
+    //         'Content-Type': 'application/json',
+    //         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+    //     },
+    //     body: JSON.stringify({ nama_kantor: namaKantor })
+    // });
+}
+
+// Fungsi untuk load kantor dari server (placeholder)
+function loadKantorFromServer() {
+    // TODO: Implementasikan AJAX call untuk mengambil data kantor dari server
+    // fetch('/api/kantor')
+    //     .then(response => response.json())
+    //     .then(data => {
+    //         daftarKantorArray = data.kantor || [];
+    //         updateDaftarKantor();
+    //         updateKantorDropdowns();
+    //     });
+}
+
+// Fungsi untuk menampilkan pesan error
+function showErrorMessage(message) {
+    // Create toast notification
+    const toast = document.createElement('div');
+    toast.className = 'alert alert-danger alert-dismissible fade show position-fixed';
+    toast.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+    toast.innerHTML = `
+        <strong>❌ Error!</strong><br>
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    document.body.appendChild(toast);
+    
+    // Auto remove after 5 seconds
+    setTimeout(() => {
+        if (toast.parentNode) {
+            toast.parentNode.removeChild(toast);
+        }
+    }, 5000);
 }
 
 // Fungsi untuk menampilkan pesan sukses
@@ -808,6 +974,35 @@ window.addEventListener('resize', function() {
 
 .alert.position-fixed {
     animation: slideInRight 0.3s ease-out;
+}
+
+/* Validation Styles */
+.validation-feedback {
+    display: block;
+    width: 100%;
+    margin-top: 0.25rem;
+    font-size: 0.875em;
+    color: #dc3545;
+}
+
+.form-control.is-invalid {
+    border-color: #dc3545;
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+}
+
+.form-control.is-valid {
+    border-color: #198754;
+    box-shadow: 0 0 0 0.2rem rgba(25, 135, 84, 0.25);
+}
+
+.form-control.is-invalid:focus {
+    border-color: #dc3545;
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+}
+
+.form-control.is-valid:focus {
+    border-color: #198754;
+    box-shadow: 0 0 0 0.2rem rgba(25, 135, 84, 0.25);
 }
 </style>
 @endsection
