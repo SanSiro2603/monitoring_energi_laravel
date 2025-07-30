@@ -23,11 +23,18 @@
             <h5>🏢 Kelola Data Kantor</h5>
         </div>
         <div class="card-body">
-            <!-- Form Tambah Kantor -->
+            <!-- Form Tambah Kantor dengan Dropdown Search -->
             <div class="row align-items-end mb-3">
                 <div class="col-md-8">
                     <label for="namaKantor" class="form-label">Nama Kantor</label>
-                    <input type="text" id="namaKantor" class="form-control" placeholder="Masukkan nama kantor...">
+                    <div class="dropdown-search-container">
+                        <input type="text" 
+                               id="namaKantor" 
+                               class="form-control kantor-search-input" 
+                               placeholder="Ketik atau cari nama kantor..."
+                               autocomplete="off">
+                        <div class="dropdown-list" id="kantorDropdownList" style="display: none;"></div>
+                    </div>
                 </div>
                 <div class="col-md-4">
                     <button type="button" class="btn btn-primary" onclick="tambahKantor()">
@@ -40,7 +47,7 @@
             <div class="row">
                 <div class="col-12">
                     <label class="form-label">Daftar Kantor:</label>
-                    <div id="daftarKantor" class="border rounded p-2 bg-light" style="min-height: 100px;">
+                    <div id="daftarKantor" class="border rounded p-2 bg-light kantor-list-container" style="min-height: 100px;">
                         <!-- Kantor yang sudah ada akan muncul di sini -->
                     </div>
                 </div>
@@ -111,7 +118,11 @@
 <script>
 // Array untuk menyimpan daftar kantor
 let daftarKantorArray = [];
+let filteredKantorArray = [];
 let rowCounter = 0;
+
+// Daftar kantor default/template - kosong di awal
+const kantorTemplate = [];
 
 // Mapping BBM untuk kemudahan
 const bbmData = {
@@ -121,6 +132,112 @@ const bbmData = {
     'dexlite': { name: 'DEXLITE', unit: 'L' },
     'pertamina_dex': { name: 'PERTAMINA DEX', unit: 'L' }
 };
+
+// Fungsi untuk inisialisasi dropdown search pada input kantor
+function initializeKantorSearch() {
+    const inputKantor = document.getElementById('namaKantor');
+    const dropdownList = document.getElementById('kantorDropdownList');
+    
+    // Event listener untuk focus
+    inputKantor.addEventListener('focus', function() {
+        showKantorDropdown();
+    });
+    
+    // Event listener untuk input (ketika user mengetik)
+    inputKantor.addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase();
+        filterKantorOptions(searchTerm);
+    });
+    
+    // Event listener untuk keydown
+    inputKantor.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            tambahKantor();
+        } else if (e.key === 'Escape') {
+            dropdownList.style.display = 'none';
+        }
+    });
+    
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.dropdown-search-container')) {
+            dropdownList.style.display = 'none';
+        }
+    });
+}
+
+// Fungsi untuk menampilkan dropdown kantor
+function showKantorDropdown() {
+    const inputKantor = document.getElementById('namaKantor');
+    const dropdownList = document.getElementById('kantorDropdownList');
+    const searchTerm = inputKantor.value.toLowerCase();
+    
+    filterKantorOptions(searchTerm);
+}
+
+// Fungsi untuk filter opsi kantor berdasarkan pencarian
+function filterKantorOptions(searchTerm) {
+    const dropdownList = document.getElementById('kantorDropdownList');
+    
+    // Gabungkan template kantor dengan kantor yang sudah ada
+    const allKantor = [...new Set([...kantorTemplate, ...daftarKantorArray])];
+    
+    // Filter berdasarkan search term
+    filteredKantorArray = allKantor.filter(kantor => 
+        kantor.toLowerCase().includes(searchTerm)
+    );
+    
+    // Clear dropdown
+    dropdownList.innerHTML = '';
+    
+    if (filteredKantorArray.length === 0) {
+        if (searchTerm.trim() === '') {
+            dropdownList.innerHTML = '<div class="dropdown-list-item text-muted">Mulai ketik untuk mencari kantor...</div>';
+        } else {
+            dropdownList.innerHTML = '<div class="dropdown-list-item text-muted">Tidak ada kantor yang cocok</div>';
+        }
+    } else {
+        // Tampilkan maksimal 10 hasil
+        const displayKantor = filteredKantorArray.slice(0, 10);
+        
+        displayKantor.forEach(kantor => {
+            const item = document.createElement('div');
+            item.className = 'dropdown-list-item';
+            
+            // Highlight text yang cocok dengan pencarian
+            if (searchTerm.trim() !== '') {
+                const regex = new RegExp(`(${searchTerm})`, 'gi');
+                item.innerHTML = kantor.replace(regex, '<strong>$1</strong>');
+            } else {
+                item.textContent = kantor;
+            }
+            
+            // Tambahkan indikator jika kantor sudah ada
+            if (daftarKantorArray.includes(kantor)) {
+                item.innerHTML += ' <span class="badge bg-success ms-1">✓</span>';
+                item.classList.add('already-added');
+            }
+            
+            item.onclick = function() {
+                document.getElementById('namaKantor').value = kantor;
+                dropdownList.style.display = 'none';
+            };
+            
+            dropdownList.appendChild(item);
+        });
+        
+        // Tampilkan info jika ada lebih dari 10 hasil
+        if (filteredKantorArray.length > 10) {
+            const moreInfo = document.createElement('div');
+            moreInfo.className = 'dropdown-list-item text-muted text-center';
+            moreInfo.innerHTML = `<small>Dan ${filteredKantorArray.length - 10} kantor lainnya...</small>`;
+            dropdownList.appendChild(moreInfo);
+        }
+    }
+    
+    dropdownList.style.display = 'block';
+}
 
 // Fungsi untuk menambah kantor
 function tambahKantor() {
@@ -144,14 +261,41 @@ function tambahKantor() {
     // Update tampilan daftar kantor
     updateDaftarKantor();
     
-    // Update semua dropdown kantor
+    // Update semua dropdown kantor di tabel
     updateKantorDropdowns();
     
     // Kosongkan input
     inputKantor.value = '';
     
+    // Hide dropdown
+    document.getElementById('kantorDropdownList').style.display = 'none';
+    
     // Simpan ke localStorage untuk persistensi
     localStorage.setItem('daftarKantor', JSON.stringify(daftarKantorArray));
+    
+    // Show success message
+    showSuccessMessage(`Kantor "${namaKantor}" berhasil ditambahkan!`);
+}
+
+// Fungsi untuk menampilkan pesan sukses
+function showSuccessMessage(message) {
+    // Create toast notification
+    const toast = document.createElement('div');
+    toast.className = 'alert alert-success alert-dismissible fade show position-fixed';
+    toast.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+    toast.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    document.body.appendChild(toast);
+    
+    // Auto remove after 3 seconds
+    setTimeout(() => {
+        if (toast.parentNode) {
+            toast.parentNode.removeChild(toast);
+        }
+    }, 3000);
 }
 
 // Fungsi untuk update tampilan daftar kantor
@@ -163,33 +307,42 @@ function updateDaftarKantor() {
         return;
     }
     
-    let html = '';
+    let html = '<div class="kantor-badges">';
     daftarKantorArray.forEach((kantor, index) => {
         html += `
-            <span class="badge bg-primary me-2 mb-2 d-inline-flex align-items-center">
-                ${kantor}
+            <span class="badge bg-primary me-2 mb-2 d-inline-flex align-items-center kantor-badge">
+                <span class="kantor-name">${kantor}</span>
                 <button type="button" class="btn-close btn-close-white ms-2" 
-                        onclick="hapusKantor(${index})" style="font-size: 0.7em;"></button>
+                        onclick="hapusKantor(${index})" 
+                        style="font-size: 0.7em;"
+                        title="Hapus kantor"></button>
             </span>
         `;
     });
+    html += '</div>';
+    
+    // Tambahkan info total
+    html += `<div class="mt-2"><small class="text-muted">Total: ${daftarKantorArray.length} kantor</small></div>`;
     
     container.innerHTML = html;
 }
 
 // Fungsi untuk menghapus kantor
 function hapusKantor(index) {
-    if (confirm('Apakah Anda yakin ingin menghapus kantor ini?')) {
+    const namaKantor = daftarKantorArray[index];
+    if (confirm(`Apakah Anda yakin ingin menghapus kantor "${namaKantor}"?`)) {
         daftarKantorArray.splice(index, 1);
         updateDaftarKantor();
         updateKantorDropdowns();
         
         // Update localStorage
         localStorage.setItem('daftarKantor', JSON.stringify(daftarKantorArray));
+        
+        showSuccessMessage(`Kantor "${namaKantor}" berhasil dihapus!`);
     }
 }
 
-// Fungsi untuk update semua dropdown kantor
+// Fungsi untuk update semua dropdown kantor di tabel
 function updateKantorDropdowns() {
     const dropdowns = document.querySelectorAll('.kantor-dropdown');
     
@@ -361,17 +514,8 @@ function hapusRow(button) {
     }
 }
 
-// Event listener untuk Enter key pada input kantor
+// Event listener saat halaman dimuat
 document.addEventListener('DOMContentLoaded', function() {
-    const inputKantor = document.getElementById('namaKantor');
-    
-    inputKantor.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            tambahKantor();
-        }
-    });
-    
     // Load data kantor dari localStorage
     const savedKantor = localStorage.getItem('daftarKantor');
     if (savedKantor) {
@@ -379,6 +523,9 @@ document.addEventListener('DOMContentLoaded', function() {
         updateDaftarKantor();
         updateKantorDropdowns();
     }
+    
+    // Initialize search dropdown untuk input kantor
+    initializeKantorSearch();
 });
 
 // Auto-resize table pada window resize
@@ -447,6 +594,99 @@ window.addEventListener('resize', function() {
     width: 120px;
 }
 
+/* Dropdown Search Styles untuk Input Kantor */
+.dropdown-search-container {
+    position: relative;
+}
+
+.dropdown-list {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #dee2e6;
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    max-height: 250px;
+    overflow-y: auto;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    margin-top: -1px;
+}
+
+.dropdown-list-item {
+    padding: 10px 15px;
+    cursor: pointer;
+    border-bottom: 1px solid #f1f1f1;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.dropdown-list-item:hover {
+    background-color: #f8f9fa;
+    border-left: 3px solid #007bff;
+    padding-left: 12px;
+}
+
+.dropdown-list-item:last-child {
+    border-bottom: none;
+    border-radius: 0 0 8px 8px;
+}
+
+.dropdown-list-item.text-muted {
+    cursor: default;
+    font-style: italic;
+    justify-content: center;
+}
+
+.dropdown-list-item.text-muted:hover {
+    background-color: transparent;
+    border-left: none;
+    padding-left: 15px;
+}
+
+.dropdown-list-item.already-added {
+    background-color: #f8f9fa;
+    color: #6c757d;
+}
+
+.dropdown-list-item strong {
+    color: #007bff;
+    font-weight: 600;
+}
+
+/* Styling untuk daftar kantor */
+.kantor-list-container {
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.kantor-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+.kantor-badge {
+    font-size: 0.9em;
+    padding: 8px 12px;
+    transition: all 0.2s ease;
+    cursor: default;
+}
+
+.kantor-badge:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.kantor-name {
+    margin-right: 8px;
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
     .table-responsive {
@@ -480,6 +720,40 @@ window.addEventListener('resize', function() {
     .input-group-sm {
         width: 100px;
     }
+    
+    .dropdown-list {
+        max-height: 200px;
+        font-size: 13px;
+    }
+    
+    .dropdown-list-item {
+        padding: 8px 12px;
+        font-size: 13px;
+    }
+    
+    .kantor-badge {
+        font-size: 0.8em;
+        padding: 6px 10px;
+    }
+}
+
+/* Custom scrollbar untuk dropdown list */
+.dropdown-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.dropdown-list::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+.dropdown-list::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 3px;
+}
+
+.dropdown-list::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
 }
 
 /* Custom scrollbar untuk BBM container */
@@ -499,6 +773,41 @@ window.addEventListener('resize', function() {
 
 .bbm-selection-container::-webkit-scrollbar-thumb:hover {
     background: #a8a8a8;
+}
+
+/* Custom scrollbar untuk kantor list */
+.kantor-list-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.kantor-list-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+.kantor-list-container::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 3px;
+}
+
+.kantor-list-container::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+/* Animation untuk toast notification */
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.alert.position-fixed {
+    animation: slideInRight 0.3s ease-out;
 }
 </style>
 @endsection
