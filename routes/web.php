@@ -12,6 +12,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\OtpController; 
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
+use App\Http\Controllers\JenisEnergiController;
 
 /*
 |--------------------------------------------------------------------------|
@@ -100,6 +101,11 @@ Route::middleware(['auth', 'verified', 'role:user_umum'])->prefix('umum')->name(
     Route::get('/dashboard', fn() => view('dashboard.umum'))->name('dashboard');
     Route::get('/energi/create', [EnergiController::class, 'create'])->name('energi.create');
     Route::post('/energi', [EnergiController::class, 'store'])->name('energi.store');
+
+    Route::get('/energi', [EnergiController::class, 'index'])->name('energi.index');
+    Route::get('/energi/create', [EnergiController::class, 'create'])->name('energi.create');
+    Route::post('/energi', [EnergiController::class, 'store'])->name('energi.store');
+    
 
     Route::get('/laporan', [EnergiController::class, 'laporan'])->name('laporan');
     Route::get('/laporan/export-excel', [EnergiController::class, 'exportExcel'])->name('laporan.export-excel');
