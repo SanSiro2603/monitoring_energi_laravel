@@ -8,6 +8,10 @@
     <div class="alert alert-success">{{ session('success') }}</div>
     @endif
 
+    @if(session('error'))
+    <div class="alert alert-danger">{{ session('error') }}</div>
+    @endif
+
     <form method="GET" action="{{ url()->current() }}" class="row g-2 mb-3">
         <div class="col-md-2">
             <input type="text" name="cari_kantor" class="form-control" placeholder="Cari Kantor" value="{{ request('cari_kantor') }}">
@@ -42,20 +46,20 @@
                     <th>Kantor</th>
                     <th>Bulan</th>
                     <th>Tahun</th>
-                    <th>PERTALITE </th>
-                    <th>PERTAMAX </th>
-                    <th>SOLAR </th>
-                    <th>DEXLITE </th>
-                    <th>PERTAMINA DEX </th>
-                    <th>Listrik /th>
-                    <th>Daya Listrik </th>
-                    <th>Air </th>
-                    <th>Kertas </th>
+                    <th>PERTALITE</th>
+                    <th>PERTAMAX</th>
+                    <th>SOLAR</th>
+                    <th>DEXLITE</th>
+                    <th>PERTAMINA DEX</th>
+                    <th>Listrik</th> {{-- Fixed: Added missing < --}}
+                    <th>Daya Listrik</th>
+                    <th>Air</th>
+                    <th>Kertas</th>
                     <th>Aksi</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach($data as $row)
+                @forelse($data as $row)
                 <tr>
                     <td>{{ $loop->iteration + ($data->currentPage() - 1) * $data->perPage() }}</td>
                     <td>
@@ -87,19 +91,28 @@
                     <td>{{ $row->kertas }}</td>
                     <td>
                         @if(Auth::user()->role === 'super_user')
-                            <a href="/admin/energi/{{ $row->id }}/edit" class="btn btn-sm btn-warning mb-1">
+                            <a href="{{ route('admin.energi.edit', $row->id) }}" class="btn btn-sm btn-warning mb-1">
                                 <i class="fa fa-edit"></i> Edit
                             </a>
                         @endif
-                        <form action="{{ (Auth::user()->role === 'super_user') ? '/admin/energi/'.$row->id : '/divisi/energi/'.$row->id }}" method="POST" class="d-inline">
-                            @csrf @method('DELETE')
-                            <button onclick="return confirm('Yakin ingin menghapus data ini?')" class="btn btn-sm btn-danger">
+                        
+                        {{-- Fixed Delete Form with proper route handling --}}
+                        <form action="{{ route(Auth::user()->role === 'super_user' ? 'admin.energi.destroy' : 'divisi.energi.destroy', $row->id) }}" 
+                              method="POST" 
+                              class="d-inline delete-form">
+                            @csrf 
+                            @method('DELETE')
+                            <button type="submit" class="btn btn-sm btn-danger delete-btn">
                                 <i class="fa fa-trash"></i> Hapus
                             </button>
                         </form>
                     </td>
                 </tr>
-                @endforeach
+                @empty
+                <tr>
+                    <td colspan="18" class="text-center">Tidak ada data ditemukan</td>
+                </tr>
+                @endforelse
             </tbody>
         </table>
     </div>
@@ -174,4 +187,28 @@
     font-size: 0.75rem;
 }
 </style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Handle delete confirmation
+    const deleteForms = document.querySelectorAll('.delete-form');
+    
+    deleteForms.forEach(form => {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            if (confirm('⚠️ Yakin ingin menghapus data ini? Data yang dihapus tidak dapat dikembalikan.')) {
+                // Show loading state
+                const deleteBtn = form.querySelector('.delete-btn');
+                const originalText = deleteBtn.innerHTML;
+                deleteBtn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Menghapus...';
+                deleteBtn.disabled = true;
+                
+                // Submit form
+                form.submit();
+            }
+        });
+    });
+});
+</script>
 @endsection

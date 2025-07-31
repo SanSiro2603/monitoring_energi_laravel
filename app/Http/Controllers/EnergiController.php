@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 
+
 class EnergiController extends Controller
 {
     /**
@@ -254,15 +255,43 @@ class EnergiController extends Controller
      * @return \Illuminate\Http\RedirectResponse
      */
     public function destroy($id)
-    {
-        try {
-            $item = Energi::findOrFail($id);
-            $item->delete();
-            return back()->with('success', '✅ Data berhasil dihapus!');
-        } catch (\Exception $e) {
-            return back()->with('error', '❌ Gagal menghapus data: ' . $e->getMessage());
+{
+    try {
+        // Find the record including soft deleted ones
+        $item = Energi::withTrashed()->findOrFail($id);
+        
+        // Check permission - only allow deletion if:
+        // 1. User is super_user, OR
+        // 2. User owns the record (created it)
+        $user = Auth::user();
+        if ($user->role !== 'super_user' && $item->user_id !== $user->id) {
+            return back()->with('error', '❌ Anda tidak memiliki izin untuk menghapus data ini.');
         }
+        
+        // If already soft deleted, perform permanent deletion
+        if ($item->trashed()) {
+            $item->forceDelete();
+            $message = '✅ Data berhasil dihapus permanen!';
+        } else {
+            // Perform soft delete
+            $item->delete();
+            $message = '✅ Data berhasil dihapus!';
+        }
+        
+        return back()->with('success', $message);
+        
+    } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+        return back()->with('error', '❌ Data tidak ditemukan.');
+    } catch (\Exception $e) {
+        \Log::error('Error deleting energi data: ' . $e->getMessage(), [
+            'user_id' => Auth::id(),
+            'energi_id' => $id,
+            'trace' => $e->getTraceAsString()
+        ]);
+        
+        return back()->with('error', '❌ Gagal menghapus data: ' . $e->getMessage());
     }
+}
 
     /**
      * Menampilkan ringkasan data energi.

@@ -19,50 +19,110 @@
 
     <!-- Section Kelola Kantor -->
     <div class="card mb-4">
-        <div class="card-header">
+        <div class="card-header d-flex justify-content-between align-items-center">
             <h5>🏢 Kelola Data Kantor</h5>
+            <span class="badge bg-info">{{ ucfirst(str_replace('_', ' ', $role)) }}</span>
         </div>
         <div class="card-body">
             @if($role === 'super_user')
                 <!-- Form Tambah Kantor - Hanya untuk Super User -->
                 <div class="row mb-4">
                     <div class="col-12">
-                        <h6 class="text-primary">➕ Tambah Kantor Baru</h6>
+                        <div class="alert alert-primary" role="alert">
+                            <i class="fas fa-crown me-2"></i>
+                            <strong>Super User Access:</strong> Anda dapat menambah kantor baru yang akan tersedia untuk semua user.
+                        </div>
+                        <h6 class="text-primary mb-3">
+                            <i class="fas fa-plus-circle me-2"></i>Tambah Kantor Baru
+                        </h6>
                         <div class="row align-items-end">
                             <div class="col-md-8">
-                                <label for="inputTambahKantor" class="form-label">Nama Kantor Baru</label>
+                                <label for="inputTambahKantor" class="form-label fw-bold">Nama Kantor Baru</label>
                                 <input type="text" 
                                        id="inputTambahKantor" 
-                                       class="form-control" 
-                                       placeholder="Masukkan nama kantor baru..."
+                                       class="form-control form-control-lg" 
+                                       placeholder="Contoh: Kantor Pusat Jakarta"
                                        autocomplete="off">
-                                <div class="form-text">Format: Huruf kapital hanya di awal kata</div>
+                                <div class="form-text">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    Format: Huruf kapital hanya di awal kata. Contoh: "Kantor Cabang Surabaya"
+                                </div>
                             </div>
                             <div class="col-md-4">
-                                <button type="button" class="btn btn-primary" onclick="tambahKantor()">
-                                    ➕ Tambah Kantor
+                                <button type="button" class="btn btn-primary btn-lg w-100" onclick="tambahKantor()">
+                                    <i class="fas fa-plus me-2"></i>Tambah Kantor
                                 </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <hr class="my-4">
+                
+                <!-- Form Search Kantor untuk Super User -->
+                <div class="row mb-3">
+                    <div class="col-12">
+                        <h6 class="text-success mb-3">
+                            <i class="fas fa-search me-2"></i>Cari Kantor yang Sudah Ada
+                        </h6>
+                        <div class="col-md-8">
+                            <label for="namaKantor" class="form-label fw-bold">Cari Kantor</label>
+                            <div class="dropdown-search-container">
+                                <input type="text" 
+                                       id="namaKantor" 
+                                       class="form-control form-control-lg kantor-search-input" 
+                                       placeholder="Ketik nama kantor untuk mencari..."
+                                       autocomplete="off">
+                                <div class="dropdown-list" id="kantorDropdownList" style="display: none;"></div>
+                            </div>
+                            <div class="form-text">
+                                <i class="fas fa-lightbulb me-1"></i>
+                                Ketik untuk mencari kantor yang sudah ditambahkan sebelumnya
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @else
+                <!-- Form Pilih Kantor untuk Non-Super User -->
+                <div class="row mb-3">
+                    <div class="col-12">
+                        <div class="alert alert-info" role="alert">
+                            <i class="fas fa-user me-2"></i>
+                            <strong>User Access:</strong> Anda dapat memilih kantor dari daftar yang tersedia. Untuk menambah kantor baru, hubungi Super User.
+                        </div>
+                        <h6 class="text-success mb-3">
+                            <i class="fas fa-building me-2"></i>Pilih Kantor untuk Input Data
+                        </h6>
+                        <div class="col-md-8">
+                            <label for="namaKantor" class="form-label fw-bold">Pilih Kantor</label>
+                            <div class="dropdown-search-container">
+                                <input type="text" 
+                                       id="namaKantor" 
+                                       class="form-control form-control-lg kantor-search-input" 
+                                       placeholder="Ketik untuk mencari kantor..."
+                                       autocomplete="off">
+                                <div class="dropdown-list" id="kantorDropdownList" style="display: none;"></div>
+                            </div>
+                            <div class="form-text">
+                                <i class="fas fa-search me-1"></i>
+                                Cari dan pilih kantor dari daftar yang tersedia. Suggestion akan muncul saat Anda mengetik.
                             </div>
                         </div>
                     </div>
                 </div>
             @endif
 
-            <!-- Form Search/Pilih Kantor - Untuk Semua User -->
-            <div class="row mb-3">
+            <!-- Kantor yang Dipilih -->
+            <div class="row mb-3" id="selectedKantorSection" style="display: none;">
                 <div class="col-12">
-                    <h6 class="text-success">🔍 {{ $role === 'super_user' ? 'Cari Kantor yang Sudah Ada' : 'Pilih Kantor' }}</h6>
-                    <div class="col-md-8">
-                        <label for="namaKantor" class="form-label">{{ $role === 'super_user' ? 'Cari Kantor' : 'Pilih Kantor' }}</label>
-                        <div class="dropdown-search-container">
-                            <input type="text" 
-                                   id="namaKantor" 
-                                   class="form-control kantor-search-input" 
-                                   placeholder="{{ $role === 'super_user' ? 'Ketik untuk mencari kantor yang sudah ada...' : 'Ketik untuk mencari dan memilih kantor...' }}"
-                                   autocomplete="off">
-                            <div class="dropdown-list" id="kantorDropdownList" style="display: none;"></div>
+                    <div class="alert alert-success d-flex justify-content-between align-items-center">
+                        <div>
+                            <i class="fas fa-check-circle me-2"></i>
+                            <strong>Kantor Dipilih:</strong> <span id="selectedKantorName"></span>
                         </div>
-                        <div class="form-text">{{ $role === 'super_user' ? 'Pilih dari kantor yang sudah ditambahkan' : 'Cari dan pilih kantor dari daftar yang tersedia' }}</div>
+                        <button type="button" class="btn btn-outline-success btn-sm" onclick="clearSelectedKantor()">
+                            <i class="fas fa-times me-1"></i>Ganti
+                        </button>
                     </div>
                 </div>
             </div>
@@ -70,88 +130,157 @@
             <!-- Daftar Kantor -->
             <div class="row">
                 <div class="col-12">
-                    <label class="form-label">Daftar Kantor:</label>
-                    <div id="daftarKantor" class="border rounded p-2 bg-light kantor-list-container" style="min-height: 100px;">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <label class="form-label fw-bold">
+                            <i class="fas fa-list me-2"></i>Daftar Kantor:
+                        </label>
+                        @if($role === 'super_user')
+                            <small class="text-muted">
+                                <i class="fas fa-edit me-1"></i>Klik x untuk menghapus kantor
+                            </small>
+                        @endif
+                    </div>
+                    <div id="daftarKantor" class="border rounded p-3 bg-light kantor-list-container" style="min-height: 120px;">
                         <!-- Kantor yang sudah ada akan muncul di sini -->
                     </div>
                     @if($role !== 'super_user')
                         <div class="form-text text-muted mt-2">
-                            <small>💡 Anda hanya dapat melihat dan memilih kantor. Untuk menambah kantor baru, hubungi Super User.</small>
+                            <i class="fas fa-info-circle me-1"></i>
+                            <small>Anda hanya dapat melihat dan memilih kantor. Untuk menambah kantor baru, hubungi Super User.</small>
                         </div>
                     @endif
+                </div>
+            </div>
+
+            <!-- Statistik Kantor -->
+            <div class="row mt-3">
+                <div class="col-md-6">
+                    <div class="card bg-light">
+                        <div class="card-body text-center">
+                            <h6 class="card-title text-muted mb-1">Total Kantor</h6>
+                            <h4 class="text-primary mb-0" id="totalKantorCount">0</h4>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card bg-light">
+                        <div class="card-body text-center">
+                            <h6 class="card-title text-muted mb-1">Kantor Dipilih</h6>
+                            <h4 class="text-success mb-0" id="selectedKantorCount">0</h4>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Tombol Toggle -->
-    <button class="btn btn-success mb-3" onclick="toggleForm()">➕ Tambah Data Manual</button>
+    <!-- Tombol Toggle Form Manual -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <button class="btn btn-success btn-lg" onclick="toggleForm()">
+            <i class="fas fa-plus-circle me-2"></i>Tambah Data Manual
+        </button>
+        <div class="text-muted">
+            <small><i class="fas fa-info-circle me-1"></i>Pastikan sudah memilih kantor sebelum input data</small>
+        </div>
+    </div>
 
     <!-- Form Manual -->
     <div id="formManual" style="display: none;">
-        <form method="POST" action="{{ url("$prefix/energi") }}">
-            @csrf
-            <div class="table-responsive">
-                <table class="table table-bordered">
-                    <thead class="table-light">
-                        <tr>
-                            <th style="width: 50px;">#</th>
-                            <th>Kantor</th>
-                            <th>Bulan</th>
-                            <th>Tahun</th>
-                            <th>Pilih BBM & Input</th>
-                            <th>Listrik </th>
-                            <th>Daya Listrik </th>
-                            <th>Air </th>
-                            <th>Kertas </th>
-                            <th>Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody id="data-table-body">
-                        <!-- Baris akan ditambahkan secara dinamis -->
-                    </tbody>
-                </table>
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-table me-2"></i>Input Data Manual</h5>
             </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url("$prefix/energi") }}">
+                    @csrf
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover">
+                            <thead class="table-primary">
+                                <tr>
+                                    <th style="width: 50px;" class="text-center">#</th>
+                                    <th><i class="fas fa-building me-1"></i>Kantor</th>
+                                    <th><i class="fas fa-calendar me-1"></i>Bulan</th>
+                                    <th><i class="fas fa-calendar-alt me-1"></i>Tahun</th>
+                                    <th><i class="fas fa-gas-pump me-1"></i>Pilih BBM & Input</th>
+                                    <th><i class="fas fa-bolt me-1"></i>Listrik (kWh)</th>
+                                    <th><i class="fas fa-plug me-1"></i>Daya Listrik (VA)</th>
+                                    <th><i class="fas fa-tint me-1"></i>Air (m³)</th>
+                                    <th><i class="fas fa-file me-1"></i>Kertas (rim)</th>
+                                    <th><i class="fas fa-cogs me-1"></i>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="data-table-body">
+                                <!-- Baris akan ditambahkan secara dinamis -->
+                            </tbody>
+                        </table>
+                    </div>
 
-            <!-- Tombol Tambah dan Simpan -->
-            <div class="d-flex justify-content-between align-items-center mt-3 mb-3">
-                <button type="submit" class="btn btn-success">💾 Simpan Data</button>
-                <button type="button" class="btn btn-outline-primary" onclick="tambahRow()">
-                    ➕ Tambah Baris
+                    <!-- Tombol Tambah dan Simpan -->
+                    <div class="d-flex justify-content-between align-items-center mt-3 mb-3">
+                        <button type="submit" class="btn btn-success btn-lg">
+                            <i class="fas fa-save me-2"></i>Simpan Data
+                        </button>
+                        <button type="button" class="btn btn-outline-primary btn-lg" onclick="tambahRow()">
+                            <i class="fas fa-plus me-2"></i>Tambah Baris
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <hr class="my-4">
+
+    <!-- Import Excel Section -->
+    <div class="card">
+        <div class="card-header">
+            <h5><i class="fas fa-file-excel me-2"></i>Import Data Energi dari Excel</h5>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i>
+                <strong>Format Excel yang diharapkan:</strong><br>
+                Kolom: Kantor | Bulan | Tahun | PERTALITE | PERTAMAX | SOLAR | DEXLITE | PERTAMINA DEX | Listrik (kWh) | Daya Listrik (VA) | Air (m³) | Kertas (rim)
+            </div>
+            <form method="POST" action="{{ url('/energi/import') }}" enctype="multipart/form-data">
+                @csrf
+                <div class="mb-3">
+                    <label for="fileexcel" class="form-label fw-bold">Pilih File Excel</label>
+                    <input type="file" name="fileexcel" id="fileexcel" accept=".xlsx, .xls" class="form-control form-control-lg" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-lg">
+                    <i class="fas fa-upload me-2"></i>Import Excel
                 </button>
+            </form>
+
+            <!-- Template Excel Download -->
+            <div class="mt-3">
+                <a href="{{ url('/energi/template') }}" class="btn btn-outline-secondary btn-lg">
+                    <i class="fas fa-download me-2"></i>Download Template Excel
+                </a>
             </div>
-        </form>
-    </div>
-
-    <hr>
-
-    <h5>⬆️ Import Data Energi dari Excel</h5>
-    <div class="alert alert-info">
-        <strong>Format Excel yang diharapkan:</strong><br>
-        Kolom: Kantor | Bulan | Tahun | PERTALITE | PERTAMAX | SOLAR | DEXLITE | PERTAMINA DEX | Listrik (kWh) | Daya Listrik (VA) | Air (m³) | Kertas (rim)
-    </div>
-    <form method="POST" action="{{ url('/energi/import') }}" enctype="multipart/form-data">
-        @csrf
-        <input type="file" name="fileexcel" accept=".xlsx, .xls" class="form-control mb-3" required>
-        <button type="submit" class="btn btn-primary">📥 Import Excel</button>
-    </form>
-
-    <!-- Template Excel Download -->
-    <div class="mt-3">
-        <a href="{{ url('/energi/template') }}" class="btn btn-outline-secondary">
-            📄 Download Template Excel
-        </a>
+        </div>
     </div>
 </div>
 
 <script>
-// Array untuk menyimpan daftar kantor
+// Global variables
 let daftarKantorArray = [];
 let filteredKantorArray = [];
+let selectedKantor = null;
 let rowCounter = 0;
+const userRole = '{{ Auth::user()->role }}';
 
-// Daftar kantor default/template - kosong di awal
-const kantorTemplate = [];
+// Daftar kantor default (simulasi data dari database)
+const defaultKantorList = [
+    'Kantor Pusat Jakarta',
+    'Kantor Cabang Surabaya',
+    'Kantor Cabang Bandung',
+    'Kantor Cabang Medan',
+    'Kantor Cabang Semarang',
+    'Kantor Wilayah Barat',
+    'Kantor Wilayah Timur'
+];
 
 // Mapping BBM untuk kemudahan
 const bbmData = {
@@ -162,7 +291,31 @@ const bbmData = {
     'pertamina_dex': { name: 'PERTAMINA DEX', unit: 'L' }
 };
 
-// Fungsi untuk inisialisasi dropdown search pada input kantor
+// Inisialisasi saat halaman dimuat
+document.addEventListener('DOMContentLoaded', function() {
+    loadInitialData();
+    initializeKantorSearch();
+    updateStatistics();
+});
+
+// Load data awal
+function loadInitialData() {
+    // Load dari localStorage atau gunakan default
+    const savedKantor = localStorage.getItem('daftarKantor');
+    if (savedKantor) {
+        daftarKantorArray = JSON.parse(savedKantor);
+    } else {
+        // Gunakan data default untuk simulasi
+        daftarKantorArray = [...defaultKantorList];
+        saveToLocalStorage();
+    }
+    
+    updateDaftarKantor();
+    updateKantorDropdowns();
+    updateStatistics();
+}
+
+// Inisialisasi pencarian kantor
 function initializeKantorSearch() {
     const inputKantor = document.getElementById('namaKantor');
     const inputTambahKantor = document.getElementById('inputTambahKantor');
@@ -182,10 +335,17 @@ function initializeKantorSearch() {
         if (e.key === 'Escape') {
             dropdownList.style.display = 'none';
         }
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            const firstOption = dropdownList.querySelector('.dropdown-list-item:not(.text-muted)');
+            if (firstOption) {
+                firstOption.click();
+            }
+        }
     });
     
-    // Event listener untuk tambah kantor input (hanya jika ada - super_user)
-    if (inputTambahKantor) {
+    // Event listener untuk tambah kantor input (super_user only)
+    if (inputTambahKantor && userRole === 'super_user') {
         inputTambahKantor.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 e.preventDefault();
@@ -193,31 +353,8 @@ function initializeKantorSearch() {
             }
         });
         
-        // Real-time validation untuk input tambah kantor
         inputTambahKantor.addEventListener('input', function() {
-            const namaKantor = this.value;
-            const validationErrors = validateKantorName(namaKantor);
-            
-            // Remove existing validation feedback
-            const existingFeedback = this.parentNode.querySelector('.validation-feedback');
-            if (existingFeedback) {
-                existingFeedback.remove();
-            }
-            
-            if (namaKantor.trim() !== '' && validationErrors.length > 0) {
-                this.classList.add('is-invalid');
-                const feedback = document.createElement('div');
-                feedback.className = 'validation-feedback invalid-feedback';
-                feedback.innerHTML = validationErrors.join('<br>');
-                this.parentNode.appendChild(feedback);
-            } else {
-                this.classList.remove('is-invalid');
-                if (namaKantor.trim() !== '') {
-                    this.classList.add('is-valid');
-                } else {
-                    this.classList.remove('is-valid');
-                }
-            }
+            validateKantorInput(this);
         });
     }
     
@@ -229,70 +366,106 @@ function initializeKantorSearch() {
     });
 }
 
-// Fungsi untuk menampilkan dropdown kantor
+// Validasi input kantor real-time
+function validateKantorInput(input) {
+    const namaKantor = input.value;
+    const validationErrors = validateKantorName(namaKantor);
+    
+    // Remove existing validation feedback
+    const existingFeedback = input.parentNode.querySelector('.validation-feedback');
+    if (existingFeedback) {
+        existingFeedback.remove();
+    }
+    
+    if (namaKantor.trim() !== '' && validationErrors.length > 0) {
+        input.classList.add('is-invalid');
+        input.classList.remove('is-valid');
+        const feedback = document.createElement('div');
+        feedback.className = 'validation-feedback invalid-feedback';
+        feedback.innerHTML = '<i class="fas fa-exclamation-triangle me-1"></i>' + validationErrors.join('<br>');
+        input.parentNode.appendChild(feedback);
+    } else {
+        input.classList.remove('is-invalid');
+        if (namaKantor.trim() !== '') {
+            input.classList.add('is-valid');
+        } else {
+            input.classList.remove('is-valid');
+        }
+    }
+}
+
+// Tampilkan dropdown kantor
 function showKantorDropdown() {
     const inputKantor = document.getElementById('namaKantor');
-    const dropdownList = document.getElementById('kantorDropdownList');
     const searchTerm = inputKantor.value.toLowerCase();
-    
     filterKantorOptions(searchTerm);
 }
 
-// Fungsi untuk filter opsi kantor berdasarkan pencarian
+// Filter opsi kantor berdasarkan pencarian
 function filterKantorOptions(searchTerm) {
     const dropdownList = document.getElementById('kantorDropdownList');
     
-    // Hanya tampilkan kantor yang sudah ditambahkan jika ada pencarian
     filteredKantorArray = daftarKantorArray.filter(kantor => 
         kantor.toLowerCase().includes(searchTerm.toLowerCase())
     );
     
-    // Clear dropdown
     dropdownList.innerHTML = '';
     
     if (filteredKantorArray.length === 0) {
         if (searchTerm.trim() === '') {
-            if (daftarKantorArray.length === 0) {
-                dropdownList.innerHTML = '<div class="dropdown-list-item text-muted">Belum ada kantor. Ketik nama kantor baru...</div>';
-            } else {
-                dropdownList.innerHTML = '<div class="dropdown-list-item text-muted">Pilih kantor yang sudah ada atau ketik nama baru...</div>';
-            }
+            dropdownList.innerHTML = `
+                <div class="dropdown-list-item text-muted">
+                    <i class="fas fa-search me-2"></i>
+                    ${daftarKantorArray.length === 0 ? 'Belum ada kantor yang tersedia' : 'Ketik untuk mencari kantor...'}
+                </div>
+            `;
         } else {
-            dropdownList.innerHTML = '<div class="dropdown-list-item text-muted">Tidak ada kantor yang cocok. Ketik nama baru...</div>';
+            dropdownList.innerHTML = `
+                <div class="dropdown-list-item text-muted">
+                    <i class="fas fa-search-minus me-2"></i>
+                    Tidak ada kantor yang cocok dengan "${searchTerm}"
+                </div>
+            `;
         }
     } else {
-        // Tampilkan maksimal 10 hasil
         const displayKantor = filteredKantorArray.slice(0, 10);
         
         displayKantor.forEach(kantor => {
             const item = document.createElement('div');
-            item.className = 'dropdown-list-item';
+            item.className = 'dropdown-list-item kantor-option';
             
-            // Highlight text yang cocok dengan pencarian
+            let displayText = kantor;
             if (searchTerm.trim() !== '') {
                 const regex = new RegExp(`(${searchTerm})`, 'gi');
-                item.innerHTML = kantor.replace(regex, '<strong>$1</strong>');
-            } else {
-                item.textContent = kantor;
+                displayText = kantor.replace(regex, '<strong>$1</strong>');
             }
             
-            // Tambahkan indikator bahwa kantor sudah ada
-            item.innerHTML += ' <span class="badge bg-success ms-1">✓</span>';
-            item.classList.add('already-added');
+            item.innerHTML = `
+                <div>
+                    <i class="fas fa-building me-2 text-primary"></i>
+                    ${displayText}
+                </div>
+                <span class="badge bg-success">
+                    <i class="fas fa-check"></i>
+                </span>
+            `;
             
             item.onclick = function() {
-                document.getElementById('namaKantor').value = kantor;
-                dropdownList.style.display = 'none';
+                selectKantor(kantor);
             };
             
             dropdownList.appendChild(item);
         });
         
-        // Tampilkan info jika ada lebih dari 10 hasil
         if (filteredKantorArray.length > 10) {
             const moreInfo = document.createElement('div');
             moreInfo.className = 'dropdown-list-item text-muted text-center';
-            moreInfo.innerHTML = `<small>Dan ${filteredKantorArray.length - 10} kantor lainnya...</small>`;
+            moreInfo.innerHTML = `
+                <small>
+                    <i class="fas fa-ellipsis-h me-1"></i>
+                    Dan ${filteredKantorArray.length - 10} kantor lainnya...
+                </small>
+            `;
             dropdownList.appendChild(moreInfo);
         }
     }
@@ -300,22 +473,51 @@ function filterKantorOptions(searchTerm) {
     dropdownList.style.display = 'block';
 }
 
-// Fungsi untuk validasi format nama kantor
+// Pilih kantor
+function selectKantor(namaKantor) {
+    selectedKantor = namaKantor;
+    document.getElementById('namaKantor').value = namaKantor;
+    document.getElementById('kantorDropdownList').style.display = 'none';
+    
+    // Update tampilan kantor yang dipilih
+    document.getElementById('selectedKantorName').textContent = namaKantor;
+    document.getElementById('selectedKantorSection').style.display = 'block';
+    
+    // Update dropdown di form manual
+    updateKantorDropdowns();
+    updateStatistics();
+    
+    showSuccessMessage(`Kantor "${namaKantor}" berhasil dipilih!`);
+}
+
+// Clear kantor yang dipilih
+function clearSelectedKantor() {
+    selectedKantor = null;
+    document.getElementById('namaKantor').value = '';
+    document.getElementById('selectedKantorSection').style.display = 'none';
+    updateStatistics();
+}
+
+// Validasi nama kantor
 function validateKantorName(namaKantor) {
     const errors = [];
     
-    // Cek tidak boleh kosong
     if (!namaKantor || namaKantor.trim() === '') {
         errors.push('Nama kantor tidak boleh kosong');
         return errors;
     }
     
-    // Cek huruf kapital di tengah kata (sebelum spasi)
+    // Cek duplikasi
+    const formattedName = formatKantorName(namaKantor);
+    if (daftarKantorArray.includes(formattedName)) {
+        errors.push(`Kantor "${formattedName}" sudah ada dalam daftar`);
+    }
+    
+    // Cek format kata
     const words = namaKantor.trim().split(' ');
     for (let i = 0; i < words.length; i++) {
         const word = words[i];
         if (word.length > 1) {
-            // Cek apakah ada huruf kapital di tengah kata (posisi 1 sampai word.length-1)
             for (let j = 1; j < word.length; j++) {
                 if (/[A-Z]/.test(word[j])) {
                     errors.push(`Kata "${word}" tidak boleh ada huruf kapital di tengah kata`);
@@ -328,210 +530,163 @@ function validateKantorName(namaKantor) {
     return errors;
 }
 
-// Fungsi untuk format nama kantor yang benar
+// Format nama kantor
 function formatKantorName(namaKantor) {
     return namaKantor.trim()
         .split(' ')
-        .filter(word => word.length > 0) // Hapus spasi berlebih
-        .map(word => {
-            // Kapitalisasi huruf pertama, lowercase sisanya
-            return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
-        })
+        .filter(word => word.length > 0)
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
         .join(' ');
 }
 
-// Fungsi untuk menambah kantor - hanya untuk super_user
+// Tambah kantor baru (super_user only)
 function tambahKantor() {
-    // Cek apakah user adalah super_user
-    const userRole = '{{ Auth::user()->role }}';
     if (userRole !== 'super_user') {
         showErrorMessage('Anda tidak memiliki akses untuk menambah kantor baru!');
         return;
     }
     
     const inputKantor = document.getElementById('inputTambahKantor');
-    if (!inputKantor) {
-        showErrorMessage('Form tambah kantor tidak tersedia!');
-        return;
-    }
+    if (!inputKantor) return;
     
     const namaKantor = inputKantor.value.trim();
-    
-    // Validasi format nama kantor
     const validationErrors = validateKantorName(namaKantor);
+    
     if (validationErrors.length > 0) {
         showErrorMessage(validationErrors.join('<br>'));
         return;
     }
     
-    // Format nama kantor yang benar
     const formattedName = formatKantorName(namaKantor);
-    
-    // Cek apakah kantor sudah ada
-    if (daftarKantorArray.includes(formattedName)) {
-        showErrorMessage(`Kantor "${formattedName}" sudah ada dalam daftar!`);
-        return;
-    }
     
     // Tambah ke array
     daftarKantorArray.push(formattedName);
+    daftarKantorArray.sort(); // Sort alfabetical
     
-    // Update tampilan daftar kantor
+    // Update tampilan
     updateDaftarKantor();
-    
-    // Update semua dropdown kantor di tabel
     updateKantorDropdowns();
+    updateStatistics();
     
-    // Kosongkan input
+    // Reset input
     inputKantor.value = '';
+    inputKantor.classList.remove('is-valid', 'is-invalid');
     
-    // Simpan ke localStorage untuk persistensi
-    localStorage.setItem('daftarKantor', JSON.stringify(daftarKantorArray));
+    // Save to localStorage
+    saveToLocalStorage();
     
-    // TODO: Simpan juga ke database/server agar data terpusat
-    // Idealnya data kantor disimpan di database dan diakses via API
-    saveKantorToServer(formattedName);
-    
-    // Show success message
     showSuccessMessage(`Kantor "${formattedName}" berhasil ditambahkan!`);
 }
 
-// Fungsi untuk menyimpan kantor ke server (placeholder)
-function saveKantorToServer(namaKantor) {
-    // TODO: Implementasikan AJAX call ke server untuk menyimpan kantor
-    // fetch('/api/kantor', {
-    //     method: 'POST',
-    //     headers: {
-    //         'Content-Type': 'application/json',
-    //         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-    //     },
-    //     body: JSON.stringify({ nama_kantor: namaKantor })
-    // });
-}
-
-// Fungsi untuk load kantor dari server (placeholder)
-function loadKantorFromServer() {
-    // TODO: Implementasikan AJAX call untuk mengambil data kantor dari server
-    // fetch('/api/kantor')
-    //     .then(response => response.json())
-    //     .then(data => {
-    //         daftarKantorArray = data.kantor || [];
-    //         updateDaftarKantor();
-    //         updateKantorDropdowns();
-    //     });
-}
-
-// Fungsi untuk menampilkan pesan error
-function showErrorMessage(message) {
-    // Create toast notification
-    const toast = document.createElement('div');
-    toast.className = 'alert alert-danger alert-dismissible fade show position-fixed';
-    toast.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
-    toast.innerHTML = `
-        <strong>❌ Error!</strong><br>
-        ${message}
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    `;
-    
-    document.body.appendChild(toast);
-    
-    // Auto remove after 5 seconds
-    setTimeout(() => {
-        if (toast.parentNode) {
-            toast.parentNode.removeChild(toast);
-        }
-    }, 5000);
-}
-
-// Fungsi untuk menampilkan pesan sukses
-function showSuccessMessage(message) {
-    // Create toast notification
-    const toast = document.createElement('div');
-    toast.className = 'alert alert-success alert-dismissible fade show position-fixed';
-    toast.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
-    toast.innerHTML = `
-        ${message}
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    `;
-    
-    document.body.appendChild(toast);
-    
-    // Auto remove after 3 seconds
-    setTimeout(() => {
-        if (toast.parentNode) {
-            toast.parentNode.removeChild(toast);
-        }
-    }, 3000);
-}
-
-// Fungsi untuk update tampilan daftar kantor
+// Update tampilan daftar kantor
 function updateDaftarKantor() {
     const container = document.getElementById('daftarKantor');
     
     if (daftarKantorArray.length === 0) {
-        container.innerHTML = '<em class="text-muted">Belum ada kantor yang ditambahkan.</em>';
+        container.innerHTML = `
+            <div class="text-center text-muted py-3">
+                <i class="fas fa-building fa-3x mb-3 opacity-50"></i>
+                <p class="mb-0">Belum ada kantor yang ditambahkan.</p>
+                ${userRole === 'super_user' ? '<small>Tambahkan kantor baru menggunakan form di atas.</small>' : '<small>Hubungi Super User untuk menambah kantor baru.</small>'}
+            </div>
+        `;
         return;
     }
     
     let html = '<div class="kantor-badges">';
     daftarKantorArray.forEach((kantor, index) => {
+        const isSelected = selectedKantor === kantor;
+        const badgeClass = isSelected ? 'bg-success' : 'bg-primary';
+        const selectedIcon = isSelected ? '<i class="fas fa-check me-1"></i>' : '';
+        
         html += `
-            <span class="badge bg-primary me-2 mb-2 d-inline-flex align-items-center kantor-badge">
+            <span class="badge ${badgeClass} me-2 mb-2 d-inline-flex align-items-center kantor-badge ${isSelected ? 'selected' : ''}" 
+                  onclick="selectKantor('${kantor}')" style="cursor: pointer;">
+                ${selectedIcon}
                 <span class="kantor-name">${kantor}</span>
-                <button type="button" class="btn-close btn-close-white ms-2" 
-                        onclick="hapusKantor(${index})" 
-                        style="font-size: 0.7em;"
-                        title="Hapus kantor"></button>
+                ${userRole === 'super_user' ? `
+                    <button type="button" class="btn-close btn-close-white ms-2" 
+                            onclick="event.stopPropagation(); hapusKantor(${index})" 
+                            style="font-size: 0.7em;"
+                            title="Hapus kantor"></button>
+                ` : ''}
             </span>
         `;
     });
     html += '</div>';
     
-    // Tambahkan info total
-    html += `<div class="mt-2"><small class="text-muted">Total: ${daftarKantorArray.length} kantor</small></div>`;
-    
     container.innerHTML = html;
 }
 
-// Fungsi untuk menghapus kantor
+// Hapus kantor (super_user only)
 function hapusKantor(index) {
+    if (userRole !== 'super_user') {
+        showErrorMessage('Anda tidak memiliki akses untuk menghapus kantor!');
+        return;
+    }
+    
     const namaKantor = daftarKantorArray[index];
-    if (confirm(`Apakah Anda yakin ingin menghapus kantor "${namaKantor}"?`)) {
+    if (confirm(`Apakah Anda yakin ingin menghapus kantor "${namaKantor}"?\n\nHati-hati: Data yang sudah diinput untuk kantor ini mungkin akan terpengaruh.`)) {
         daftarKantorArray.splice(index, 1);
+        
+        // Clear selection jika kantor yang dihapus sedang dipilih
+        if (selectedKantor === namaKantor) {
+            clearSelectedKantor();
+        }
+        
         updateDaftarKantor();
         updateKantorDropdowns();
+        updateStatistics();
         
-        // Update localStorage
-        localStorage.setItem('daftarKantor', JSON.stringify(daftarKantorArray));
-        
+        saveToLocalStorage();
         showSuccessMessage(`Kantor "${namaKantor}" berhasil dihapus!`);
     }
 }
 
-// Fungsi untuk update semua dropdown kantor di tabel
+// Update dropdown kantor di form manual
 function updateKantorDropdowns() {
     const dropdowns = document.querySelectorAll('.kantor-dropdown');
     
     dropdowns.forEach(dropdown => {
         const currentValue = dropdown.value;
-        
-        // Hapus semua option kecuali yang pertama
         dropdown.innerHTML = '<option value="">-- Pilih Kantor --</option>';
         
-        // Tambah option dari daftar kantor
-        daftarKantorArray.forEach(kantor => {
+        // Jika ada kantor yang dipilih, prioritaskan itu
+        if (selectedKantor) {
             const option = document.createElement('option');
-            option.value = kantor;
-            option.textContent = kantor;
-            if (kantor === currentValue) {
-                option.selected = true;
-            }
+            option.value = selectedKantor;
+            option.textContent = selectedKantor;
+            option.selected = true;
             dropdown.appendChild(option);
+        }
+        
+        // Tambahkan kantor lainnya
+        daftarKantorArray.forEach(kantor => {
+            if (kantor !== selectedKantor) {
+                const option = document.createElement('option');
+                option.value = kantor;
+                option.textContent = kantor;
+                if (kantor === currentValue) {
+                    option.selected = true;
+                }
+                dropdown.appendChild(option);
+            }
         });
     });
 }
 
-// Fungsi untuk toggle BBM input pada baris tertentu
+// Update statistik
+function updateStatistics() {
+    document.getElementById('totalKantorCount').textContent = daftarKantorArray.length;
+    document.getElementById('selectedKantorCount').textContent = selectedKantor ? '1' : '0';
+}
+
+// Save to localStorage
+function saveToLocalStorage() {
+    localStorage.setItem('daftarKantor', JSON.stringify(daftarKantorArray));
+}
+
+// Fungsi untuk toggle BBM input
 function toggleBBMInput(rowId, bbmType, checkbox) {
     const inputContainer = document.getElementById(`bbm-input-${rowId}-${bbmType}`);
     const hiddenInput = document.getElementById(`hidden-${rowId}-${bbmType}`);
@@ -539,6 +694,7 @@ function toggleBBMInput(rowId, bbmType, checkbox) {
     if (checkbox.checked) {
         inputContainer.style.display = 'block';
         hiddenInput.disabled = false;
+        hiddenInput.focus();
     } else {
         inputContainer.style.display = 'none';
         hiddenInput.disabled = true;
@@ -546,7 +702,7 @@ function toggleBBMInput(rowId, bbmType, checkbox) {
     }
 }
 
-// Fungsi untuk membuat BBM section
+// Buat BBM section
 function createBBMSection(rowId) {
     let bbmHtml = '<div class="bbm-selection-container">';
     
@@ -583,7 +739,7 @@ function createBBMSection(rowId) {
     return bbmHtml;
 }
 
-// Fungsi untuk membuat baris baru
+// Buat baris baru untuk tabel
 function createNewRow() {
     rowCounter++;
     const rowId = rowCounter;
@@ -615,48 +771,73 @@ function createNewRow() {
             </select>
         </td>
         <td>
-            <input name="tahun[]" type="number" class="form-control form-control-sm" required min="2020" max="2030">
+            <input name="tahun[]" type="number" class="form-control form-control-sm" required min="2020" max="2030" placeholder="2024">
         </td>
         <td style="min-width: 300px;">
             ${createBBMSection(rowId)}
         </td>
         <td>
-            <input name="listrik[]" type="number" class="form-control form-control-sm" step="0.01" min="0" required>
+            <div class="input-group input-group-sm">
+                <input name="listrik[]" type="number" class="form-control form-control-sm" step="0.01" min="0" required placeholder="100">
+                <span class="input-group-text">kWh</span>
+            </div>
         </td>
         <td>
-            <input name="daya_listrik[]" type="number" class="form-control form-control-sm" step="0.01" min="0" placeholder="1300">
+            <div class="input-group input-group-sm">
+                <input name="daya_listrik[]" type="number" class="form-control form-control-sm" step="0.01" min="0" placeholder="1300">
+                <span class="input-group-text">VA</span>
+            </div>
         </td>
         <td>
-            <input name="air[]" type="number" class="form-control form-control-sm" step="0.01" min="0" required>
+            <div class="input-group input-group-sm">
+                <input name="air[]" type="number" class="form-control form-control-sm" step="0.01" min="0" required placeholder="10">
+                <span class="input-group-text">m³</span>
+            </div>
         </td>
         <td>
-            <input name="kertas[]" type="number" class="form-control form-control-sm" step="0.01" min="0" required>
+            <div class="input-group input-group-sm">
+                <input name="kertas[]" type="number" class="form-control form-control-sm" step="0.01" min="0" required placeholder="5">
+                <span class="input-group-text">rim</span>
+            </div>
         </td>
-        <td>
-            <button type="button" class="btn btn-danger btn-sm" onclick="hapusRow(this)">
-                <i class="fa fa-trash"></i>
+        <td class="text-center">
+            <button type="button" class="btn btn-danger btn-sm" onclick="hapusRow(this)" title="Hapus baris">
+                <i class="fas fa-trash"></i>
             </button>
         </td>
     `;
 }
 
-// Fungsi toggle form
+// Toggle form manual
 function toggleForm() {
     const formDiv = document.getElementById("formManual");
+    const toggleBtn = event.target;
     const isVisible = formDiv.style.display !== "none";
     
     if (!isVisible) {
+        // Cek apakah sudah memilih kantor
+        if (!selectedKantor && daftarKantorArray.length > 0) {
+            showErrorMessage('Silakan pilih kantor terlebih dahulu sebelum menambah data manual!');
+            return;
+        }
+        
         // Jika form akan ditampilkan, pastikan ada minimal 1 baris
         const tbody = document.getElementById('data-table-body');
         if (tbody.children.length === 0) {
             tambahRow();
         }
+        
+        formDiv.style.display = "block";
+        toggleBtn.innerHTML = '<i class="fas fa-minus-circle me-2"></i>Tutup Form Manual';
+        toggleBtn.className = 'btn btn-outline-secondary btn-lg';
+    } else {
+        formDiv.style.display = "none";
+        toggleBtn.innerHTML = '<i class="fas fa-plus-circle me-2"></i>Tambah Data Manual';
+        toggleBtn.className = 'btn btn-success btn-lg';
     }
-    
-    formDiv.style.display = isVisible ? "none" : "block";
 }
 
-// Fungsi tambah row
+// Tambah baris ke tabel
 function tambahRow() {
     const tbody = document.getElementById('data-table-body');
     const newRow = document.createElement('tr');
@@ -665,38 +846,89 @@ function tambahRow() {
     
     // Update dropdown kantor untuk row baru
     updateKantorDropdowns();
+    
+    // Smooth scroll ke row baru
+    newRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
 
-// Fungsi hapus row
+// Hapus baris dari tabel
 function hapusRow(button) {
     const row = button.closest('tr');
     const tbody = document.getElementById('data-table-body');
     
-    // Pastikan minimal ada 1 baris
     if (tbody.children.length > 1) {
-        row.remove();
+        if (confirm('Apakah Anda yakin ingin menghapus baris ini?')) {
+            row.remove();
+            updateRowNumbers();
+        }
     } else {
-        alert('Minimal harus ada 1 baris data!');
+        showErrorMessage('Minimal harus ada 1 baris data!');
     }
 }
 
-// Event listener saat halaman dimuat
-document.addEventListener('DOMContentLoaded', function() {
-    // Load data kantor dari localStorage
-    const savedKantor = localStorage.getItem('daftarKantor');
-    if (savedKantor) {
-        daftarKantorArray = JSON.parse(savedKantor);
-        updateDaftarKantor();
-        updateKantorDropdowns();
-    }
+// Update nomor baris setelah penghapusan
+function updateRowNumbers() {
+    const tbody = document.getElementById('data-table-body');
+    const rows = tbody.querySelectorAll('tr');
     
-    // Initialize search dropdown untuk input kantor
-    initializeKantorSearch();
-});
+    rows.forEach((row, index) => {
+        const numberBadge = row.querySelector('.badge');
+        if (numberBadge) {
+            numberBadge.textContent = index + 1;
+        }
+    });
+}
+
+// Fungsi untuk menampilkan pesan error
+function showErrorMessage(message) {
+    const toast = document.createElement('div');
+    toast.className = 'alert alert-danger alert-dismissible fade show position-fixed';
+    toast.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px; max-width: 400px;';
+    toast.innerHTML = `
+        <div class="d-flex align-items-center">
+            <i class="fas fa-exclamation-circle me-2 fa-lg"></i>
+            <div>
+                <strong>Error!</strong><br>
+                ${message}
+            </div>
+        </div>
+        <button type="button" class="btn-close" onclick="this.parentElement.remove()"></button>
+    `;
+    
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        if (toast.parentNode) {
+            toast.remove();
+        }
+    }, 5000);
+}
+
+// Fungsi untuk menampilkan pesan sukses
+function showSuccessMessage(message) {
+    const toast = document.createElement('div');
+    toast.className = 'alert alert-success alert-dismissible fade show position-fixed';
+    toast.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px; max-width: 400px;';
+    toast.innerHTML = `
+        <div class="d-flex align-items-center">
+            <i class="fas fa-check-circle me-2 fa-lg"></i>
+            <div>${message}</div>
+        </div>
+        <button type="button" class="btn-close" onclick="this.parentElement.remove()"></button>
+    `;
+    
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        if (toast.parentNode) {
+            toast.remove();
+        }
+    }, 3000);
+}
 
 // Auto-resize table pada window resize
 window.addEventListener('resize', function() {
-    const table = document.querySelector('.table-responsive');
+    const table = document.querySelector('.table-responsive'); 
     if (table) {
         table.style.overflowX = 'auto';
     }
@@ -704,8 +936,11 @@ window.addEventListener('resize', function() {
 </script>
 
 <style>
+/* Base Styles */
 .table-responsive {
     overflow-x: auto;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .table th, .table td {
@@ -713,43 +948,78 @@ window.addEventListener('resize', function() {
     vertical-align: middle;
 }
 
+.table-hover tbody tr:hover {
+    background-color: rgba(0,123,255,0.05);
+}
+
 .form-control-sm, .form-select-sm {
     min-width: 100px;
 }
 
 .card {
-    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+    border: none;
+    border-radius: 12px;
+}
+
+.card-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 12px 12px 0 0 !important;
+    padding: 1rem 1.5rem;
 }
 
 .badge {
     font-size: 0.85em;
+    padding: 0.5em 0.75em;
 }
 
 .btn-close-white {
     filter: invert(1) grayscale(100%) brightness(200%);
 }
 
+/* BBM Selection Styles */
 .bbm-selection-container {
     max-height: 300px;
     overflow-y: auto;
-    padding: 10px;
-    border: 1px solid #dee2e6;
-    border-radius: 4px;
-    background-color: #f8f9fa;
+    padding: 15px;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    position: relative;
+}
+
+.bbm-selection-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #007bff, #28a745, #ffc107, #dc3545, #6f42c1);
+    border-radius: 8px 8px 0 0;
 }
 
 .bbm-item {
-    padding: 5px 0;
-    border-bottom: 1px solid #e9ecef;
+    padding: 8px 0;
+    border-bottom: 1px solid #dee2e6;
+    transition: all 0.2s ease;
 }
 
 .bbm-item:last-child {
     border-bottom: none;
 }
 
+.bbm-item:hover {
+    background-color: rgba(0,123,255,0.05);
+    border-radius: 4px;
+    padding-left: 5px;
+}
+
 .bbm-input-container {
-    margin-top: 5px;
-    margin-left: 20px;
+    margin-top: 8px;
+    margin-left: 25px;
+    transition: all 0.3s ease;
 }
 
 .form-check-inline {
@@ -757,12 +1027,23 @@ window.addEventListener('resize', function() {
 }
 
 .input-group-sm {
-    width: 120px;
+    width: 140px;
 }
 
-/* Dropdown Search Styles untuk Input Kantor */
+/* Dropdown Search Styles */
 .dropdown-search-container {
     position: relative;
+}
+
+.kantor-search-input {
+    transition: all 0.3s ease;
+    border: 2px solid #dee2e6;
+}
+
+.kantor-search-input:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
+    transform: translateY(-1px);
 }
 
 .dropdown-list {
@@ -771,20 +1052,20 @@ window.addEventListener('resize', function() {
     left: 0;
     right: 0;
     background: white;
-    border: 1px solid #dee2e6;
+    border: 2px solid #007bff;
     border-top: none;
-    border-radius: 0 0 8px 8px;
-    max-height: 250px;
+    border-radius: 0 0 12px 12px;
+    max-height: 300px;
     overflow-y: auto;
     z-index: 1000;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    margin-top: -1px;
+    box-shadow: 0 8px 25px rgba(0,123,255,0.15);
+    margin-top: -2px;
 }
 
 .dropdown-list-item {
-    padding: 10px 15px;
+    padding: 12px 18px;
     cursor: pointer;
-    border-bottom: 1px solid #f1f1f1;
+    border-bottom: 1px solid #f1f3f4;
     font-size: 14px;
     transition: all 0.2s ease;
     display: flex;
@@ -793,67 +1074,198 @@ window.addEventListener('resize', function() {
 }
 
 .dropdown-list-item:hover {
-    background-color: #f8f9fa;
-    border-left: 3px solid #007bff;
-    padding-left: 12px;
+    background: linear-gradient(135deg, #f8f9ff 0%, #e3f2fd 100%);
+    border-left: 4px solid #007bff;
+    padding-left: 14px;
+    transform: translateX(2px);
 }
 
 .dropdown-list-item:last-child {
     border-bottom: none;
-    border-radius: 0 0 8px 8px;
+    border-radius: 0 0 12px 12px;
 }
 
 .dropdown-list-item.text-muted {
     cursor: default;
     font-style: italic;
     justify-content: center;
+    background-color: #f8f9fa;
 }
 
 .dropdown-list-item.text-muted:hover {
-    background-color: transparent;
+    background-color: #f8f9fa;
     border-left: none;
-    padding-left: 15px;
+    padding-left: 18px;
+    transform: none;
 }
 
-.dropdown-list-item.already-added {
-    background-color: #f8f9fa;
-    color: #6c757d;
+.dropdown-list-item.kantor-option {
+    position: relative;
 }
 
 .dropdown-list-item strong {
     color: #007bff;
     font-weight: 600;
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
-/* Styling untuk daftar kantor */
+/* Kantor List Container */
 .kantor-list-container {
-    max-height: 200px;
+    max-height: 250px;
     overflow-y: auto;
+    border: 2px solid #e9ecef;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
 }
 
 .kantor-badges {
     display: flex;
     flex-wrap: wrap;
-    gap: 5px;
+    gap: 8px;
 }
 
 .kantor-badge {
     font-size: 0.9em;
-    padding: 8px 12px;
-    transition: all 0.2s ease;
-    cursor: default;
+    padding: 10px 15px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border-radius: 25px;
+    position: relative;
+    overflow: hidden;
+}
+
+.kantor-badge::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s;
+}
+
+.kantor-badge:hover::before {
+    left: 100%;
 }
 
 .kantor-badge:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.kantor-badge.selected {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.7); }
+    70% { box-shadow: 0 0 0 10px rgba(40, 167, 69, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0); }
 }
 
 .kantor-name {
     margin-right: 8px;
 }
 
-/* Responsive adjustments */
+/* Statistics Cards */
+.card.bg-light {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%) !important;
+    border: 2px solid #e9ecef;
+    transition: all 0.3s ease;
+}
+
+.card.bg-light:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+/* Toast Notifications */
+.alert.position-fixed {
+    animation: slideInRight 0.4s ease-out;
+    backdrop-filter: blur(10px);
+    border: none;
+    border-radius: 12px;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Validation Styles */
+.validation-feedback {
+    display: block;
+    width: 100%;
+    margin-top: 0.25rem;
+    font-size: 0.875em;
+    color: #dc3545;
+    background-color: rgba(220, 53, 69, 0.1);
+    padding: 8px 12px;
+    border-radius: 6px;
+    border-left: 4px solid #dc3545;
+}
+
+.form-control.is-invalid {
+    border-color: #dc3545;
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+    animation: shake 0.5s ease-in-out;
+}
+
+.form-control.is-valid {
+    border-color: #198754;
+    box-shadow: 0 0 0 0.2rem rgba(25, 135, 84, 0.25);
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
+/* Button Enhancements */
+.btn {
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s;
+}
+
+.btn:hover::before {
+    left: 100%;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.btn-lg {
+    padding: 12px 24px;
+    font-size: 1.1rem;
+}
+
+/* Responsive Design */
 @media (max-width: 768px) {
     .table-responsive {
         font-size: 12px;
@@ -876,15 +1288,15 @@ window.addEventListener('resize', function() {
     
     .bbm-selection-container {
         max-height: 200px;
-        padding: 5px;
+        padding: 10px;
     }
     
     .bbm-input-container {
-        margin-left: 10px;
+        margin-left: 15px;
     }
     
     .input-group-sm {
-        width: 100px;
+        width: 110px;
     }
     
     .dropdown-list {
@@ -893,116 +1305,141 @@ window.addEventListener('resize', function() {
     }
     
     .dropdown-list-item {
-        padding: 8px 12px;
+        padding: 10px 15px;
         font-size: 13px;
     }
     
     .kantor-badge {
         font-size: 0.8em;
-        padding: 6px 10px;
+        padding: 8px 12px;
+    }
+    
+    .card-header {
+        padding: 0.75rem 1rem;
+    }
+    
+    .btn-lg {
+        padding: 10px 20px;
+        font-size: 1rem;
+    }
+    
+    .container {
+        padding-left: 10px;
+        padding-right: 10px;
     }
 }
 
-/* Custom scrollbar untuk dropdown list */
-.dropdown-list::-webkit-scrollbar {
-    width: 6px;
-}
-
-.dropdown-list::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 3px;
-}
-
-.dropdown-list::-webkit-scrollbar-thumb {
-    background: #c1c1c1;
-    border-radius: 3px;
-}
-
-.dropdown-list::-webkit-scrollbar-thumb:hover {
-    background: #a8a8a8;
-}
-
-/* Custom scrollbar untuk BBM container */
-.bbm-selection-container::-webkit-scrollbar {
-    width: 6px;
-}
-
-.bbm-selection-container::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 3px;
-}
-
-.bbm-selection-container::-webkit-scrollbar-thumb {
-    background: #c1c1c1;
-    border-radius: 3px;
-}
-
-.bbm-selection-container::-webkit-scrollbar-thumb:hover {
-    background: #a8a8a8;
-}
-
-/* Custom scrollbar untuk kantor list */
+/* Custom Scrollbars */
+.dropdown-list::-webkit-scrollbar,
+.bbm-selection-container::-webkit-scrollbar,
 .kantor-list-container::-webkit-scrollbar {
-    width: 6px;
+    width: 8px;
 }
 
+.dropdown-list::-webkit-scrollbar-track,
+.bbm-selection-container::-webkit-scrollbar-track,
 .kantor-list-container::-webkit-scrollbar-track {
     background: #f1f1f1;
-    border-radius: 3px;
+    border-radius: 4px;
 }
 
+.dropdown-list::-webkit-scrollbar-thumb,
+.bbm-selection-container::-webkit-scrollbar-thumb,
 .kantor-list-container::-webkit-scrollbar-thumb {
-    background: #c1c1c1;
-    border-radius: 3px;
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    border-radius: 4px;
 }
 
+.dropdown-list::-webkit-scrollbar-thumb:hover,
+.bbm-selection-container::-webkit-scrollbar-thumb:hover,
 .kantor-list-container::-webkit-scrollbar-thumb:hover {
-    background: #a8a8a8;
+    background: linear-gradient(135deg, #0056b3, #004085);
 }
 
-/* Animation untuk toast notification */
-@keyframes slideInRight {
-    from {
-        transform: translateX(100%);
-        opacity: 0;
-    }
-    to {
-        transform: translateX(0);
-        opacity: 1;
-    }
+/* Loading States */
+.loading {
+    opacity: 0.6;
+    pointer-events: none;
+    position: relative;
 }
 
-.alert.position-fixed {
-    animation: slideInRight 0.3s ease-out;
+.loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #007bff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
 }
 
-/* Validation Styles */
-.validation-feedback {
-    display: block;
-    width: 100%;
-    margin-top: 0.25rem;
-    font-size: 0.875em;
-    color: #dc3545;
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
 
-.form-control.is-invalid {
-    border-color: #dc3545;
-    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+/* Focus States */
+.form-control:focus,
+.form-select:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
 }
 
-.form-control.is-valid {
-    border-color: #198754;
-    box-shadow: 0 0 0 0.2rem rgba(25, 135, 84, 0.25);
+/* Table Enhancements */
+.table-primary th {
+    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+    color: white;
+    border: none;
+    font-weight: 600;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.1);
 }
 
-.form-control.is-invalid:focus {
-    border-color: #dc3545;
-    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+.table-bordered {
+    border: 2px solid #dee2e6;
 }
 
-.form-control.is-valid:focus {
-    border-color: #198754;
-    box-shadow: 0 0 0 0.2rem rgba(25, 135, 84, 0.25);
+.table-bordered td,
+.table-bordered th {
+    border: 1px solid #dee2e6;
+}
+
+/* Input Group Enhancements */
+.input-group-text {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-color: #dee2e6;
+    font-weight: 500;
+    color: #495057;
+}
+
+/* Alert Enhancements */
+.alert {
+    border: none;
+    border-radius: 12px;
+    border-left: 4px solid;
+}
+
+.alert-primary {
+    border-left-color: #007bff;
+    background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+}
+
+.alert-info {
+    border-left-color: #17a2b8;
+    background: linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 100%);
+}
+
+.alert-success {
+    border-left-color: #28a745;
+    background: linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%);
+}
+
+.alert-danger {
+    border-left-color: #dc3545;
+    background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
 }
 </style>
 @endsection
