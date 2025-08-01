@@ -15,7 +15,6 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 
-
 class EnergiController extends Controller
 {
     /**
@@ -78,95 +77,105 @@ class EnergiController extends Controller
     }
 
     /**
-     * Menyimpan data energi baru ke database.
-     * Updated untuk mendukung multiple rows dan format BBM terpisah.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\RedirectResponse
-     */
-    public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'kantor' => 'required|array|min:1',
-            'kantor.*' => 'required|string|max:255',
-            'bulan' => 'required|array|min:1',
-            'bulan.*' => 'required|string|max:50',
-            'tahun' => 'required|array|min:1',
-            'tahun.*' => 'required|numeric|integer|min:1900|max:' . (date('Y') + 5),
-            'listrik' => 'required|array|min:1',
-            'listrik.*' => 'required|numeric|min:0',
-            'daya_listrik' => 'nullable|array',
-            'daya_listrik.*' => 'nullable|numeric|min:0',
-            'air' => 'required|array|min:1',
-            'air.*' => 'required|numeric|min:0',
-            'kertas' => 'required|array|min:1',
-            'kertas.*' => 'required|numeric|min:0',
-            'pertalite' => 'nullable|array',
-            'pertalite.*' => 'nullable|numeric|min:0',
-            'pertamax' => 'nullable|array',
-            'pertamax.*' => 'nullable|numeric|min:0',
-            'solar' => 'nullable|array',
-            'solar.*' => 'nullable|numeric|min:0',
-            'dexlite' => 'nullable|array',
-            'dexlite.*' => 'nullable|numeric|min:0',
-            'pertamina_dex' => 'nullable|array',
-            'pertamina_dex.*' => 'nullable|numeric|min:0',
-        ]);
+ * Menyimpan data energi baru ke database.
+ * Updated untuk mendukung multiple rows dan format BBM terpisah.
+ *
+ * @param  \Illuminate\Http\Request  $request
+ * @return \Illuminate\Http\RedirectResponse
+ */
+public function store(Request $request)
+{
+    $validated = $request->validate([
+        'kantor' => 'required|array|min:1',
+        'kantor.*' => 'required|string|max:255',
+        'bulan' => 'required|array|min:1',
+        'bulan.*' => 'required|string|max:50',
+        'tahun' => 'required|array|min:1',
+        'tahun.*' => 'required|numeric|integer|min:1900|max:' . (date('Y') + 5),
+        'listrik' => 'required|array|min:1',
+        'listrik.*' => 'required|numeric|min:0',
+        'daya_listrik' => 'nullable|array',
+        'daya_listrik.*' => 'nullable|numeric|min:0',
+        'air' => 'required|array|min:1',
+        'air.*' => 'required|numeric|min:0',
+        'kertas' => 'required|array|min:1',
+        'kertas.*' => 'required|numeric|min:0',
+        'pertalite' => 'nullable|array',
+        'pertalite.*' => 'nullable|numeric|min:0',
+        'pertamax' => 'nullable|array',
+        'pertamax.*' => 'nullable|numeric|min:0',
+        'solar' => 'nullable|array',
+        'solar.*' => 'nullable|numeric|min:0',
+        'dexlite' => 'nullable|array',
+        'dexlite.*' => 'nullable|numeric|min:0',
+        'pertamina_dex' => 'nullable|array',
+        'pertamina_dex.*' => 'nullable|numeric|min:0',
+    ]);
 
-        try {
-            $savedCount = 0;
-            $totalRows = count($request->kantor);
+    try {
+        $savedCount = 0;
+        $totalRows = count($request->kantor);
 
-            for ($i = 0; $i < $totalRows; $i++) {
-                // Hitung total BBM
-                $totalBBM = ($request->pertalite[$i] ?? 0) + 
-                           ($request->pertamax[$i] ?? 0) + 
-                           ($request->solar[$i] ?? 0) + 
-                           ($request->dexlite[$i] ?? 0) + 
-                           ($request->pertamina_dex[$i] ?? 0);
+        for ($i = 0; $i < $totalRows; $i++) {
+            // Hitung total BBM
+            $totalBBM = ($request->pertalite[$i] ?? 0) + 
+                       ($request->pertamax[$i] ?? 0) + 
+                       ($request->solar[$i] ?? 0) + 
+                       ($request->dexlite[$i] ?? 0) + 
+                       ($request->pertamina_dex[$i] ?? 0);
 
-                // Buat array jenis BBM yang digunakan
-                $jenis_bbm = [];
-                if (($request->pertalite[$i] ?? 0) > 0) $jenis_bbm[] = 'Pertalite';
-                if (($request->pertamax[$i] ?? 0) > 0) $jenis_bbm[] = 'Pertamax';
-                if (($request->solar[$i] ?? 0) > 0) $jenis_bbm[] = 'Solar';
-                if (($request->dexlite[$i] ?? 0) > 0) $jenis_bbm[] = 'Dexlite';
-                if (($request->pertamina_dex[$i] ?? 0) > 0) $jenis_bbm[] = 'Pertamina Dex';
+            // Buat array jenis BBM yang digunakan
+            $jenis_bbm = [];
+            if (($request->pertalite[$i] ?? 0) > 0) $jenis_bbm[] = 'Pertalite';
+            if (($request->pertamax[$i] ?? 0) > 0) $jenis_bbm[] = 'Pertamax';
+            if (($request->solar[$i] ?? 0) > 0) $jenis_bbm[] = 'Solar';
+            if (($request->dexlite[$i] ?? 0) > 0) $jenis_bbm[] = 'Dexlite';
+            if (($request->pertamina_dex[$i] ?? 0) > 0) $jenis_bbm[] = 'Pertamina Dex';
 
-                Energi::create([
-                    'kantor' => $request->kantor[$i],
-                    'bulan' => $request->bulan[$i],
-                    'tahun' => $request->tahun[$i],
-                    'listrik' => $request->listrik[$i],
-                    'daya_listrik' => $request->daya_listrik[$i] ?? null,
-                    'air' => $request->air[$i],
-                    'pertalite' => $request->pertalite[$i] ?? 0,
-                    'pertamax' => $request->pertamax[$i] ?? 0,
-                    'solar' => $request->solar[$i] ?? 0,
-                    'dexlite' => $request->dexlite[$i] ?? 0,
-                    'pertamina_dex' => $request->pertamina_dex[$i] ?? 0,
-                    'bbm' => $totalBBM, // Total BBM untuk kompatibilitas
-                    'jenis_bbm' => implode(', ', $jenis_bbm), // String jenis BBM
-                    'kertas' => $request->kertas[$i],
-                    'user_id' => auth()->id(),
-                ]);
+            Energi::create([
+                'kantor' => $request->kantor[$i],
+                'bulan' => $request->bulan[$i],
+                'tahun' => $request->tahun[$i],
+                'listrik' => $request->listrik[$i],
+                'daya_listrik' => $request->daya_listrik[$i] ?? null,
+                'air' => $request->air[$i],
+                'pertalite' => $request->pertalite[$i] ?? 0,
+                'pertamax' => $request->pertamax[$i] ?? 0,
+                'solar' => $request->solar[$i] ?? 0,
+                'dexlite' => $request->dexlite[$i] ?? 0,
+                'pertamina_dex' => $request->pertamina_dex[$i] ?? 0,
+                'bbm' => $totalBBM, // Total BBM untuk kompatibilitas
+                'jenis_bbm' => implode(', ', $jenis_bbm), // String jenis BBM
+                'kertas' => $request->kertas[$i],
+                'user_id' => auth()->id(),
+            ]);
 
-                $savedCount++;
-            }
+            $savedCount++;
+        }
 
-            $user = Auth::user();
+        $user = Auth::user();
+        
+        // Redirect kembali ke form input dengan pesan sukses
+        // Tidak perlu redirect ke index karena user_umum tidak punya akses ke index
+        $successMessage = "✅ Berhasil menambahkan {$savedCount} data energi!";
+        
+        if ($user->role === 'user_umum') {
+            // Untuk user_umum, kembali ke form create
+            return redirect()->route('umum.energi.create')->with('success', $successMessage);
+        } else {
+            // Untuk role lain, redirect sesuai role
             $redirectRoute = match($user->role) {
                 'super_user' => 'admin.energi.index',
                 'divisi_user' => 'divisi.energi.index',
-                'user_umum' => 'umum.energi.index',
                 default => 'dashboard',
             };
-
-            return redirect()->route($redirectRoute)->with('success', "✅ Berhasil menambahkan {$savedCount} data energi!");
-        } catch (\Exception $e) {
-            return back()->with('error', '❌ Gagal menambahkan data: ' . $e->getMessage())->withInput();
+            return redirect()->route($redirectRoute)->with('success', $successMessage);
         }
+        
+    } catch (\Exception $e) {
+        return back()->with('error', '❌ Gagal menambahkan data: ' . $e->getMessage())->withInput();
     }
+}
 
     /**
      * Menampilkan form untuk mengedit data energi.
@@ -255,43 +264,15 @@ class EnergiController extends Controller
      * @return \Illuminate\Http\RedirectResponse
      */
     public function destroy($id)
-{
-    try {
-        // Find the record including soft deleted ones
-        $item = Energi::withTrashed()->findOrFail($id);
-        
-        // Check permission - only allow deletion if:
-        // 1. User is super_user, OR
-        // 2. User owns the record (created it)
-        $user = Auth::user();
-        if ($user->role !== 'super_user' && $item->user_id !== $user->id) {
-            return back()->with('error', '❌ Anda tidak memiliki izin untuk menghapus data ini.');
-        }
-        
-        // If already soft deleted, perform permanent deletion
-        if ($item->trashed()) {
-            $item->forceDelete();
-            $message = '✅ Data berhasil dihapus permanen!';
-        } else {
-            // Perform soft delete
+    {
+        try {
+            $item = Energi::findOrFail($id);
             $item->delete();
-            $message = '✅ Data berhasil dihapus!';
+            return back()->with('success', '✅ Data berhasil dihapus!');
+        } catch (\Exception $e) {
+            return back()->with('error', '❌ Gagal menghapus data: ' . $e->getMessage());
         }
-        
-        return back()->with('success', $message);
-        
-    } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-        return back()->with('error', '❌ Data tidak ditemukan.');
-    } catch (\Exception $e) {
-        \Log::error('Error deleting energi data: ' . $e->getMessage(), [
-            'user_id' => Auth::id(),
-            'energi_id' => $id,
-            'trace' => $e->getTraceAsString()
-        ]);
-        
-        return back()->with('error', '❌ Gagal menghapus data: ' . $e->getMessage());
     }
-}
 
     /**
      * Menampilkan ringkasan data energi.

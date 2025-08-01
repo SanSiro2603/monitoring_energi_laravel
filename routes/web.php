@@ -102,7 +102,7 @@ Route::middleware(['auth', 'verified', 'role:user_umum'])->prefix('umum')->name(
     Route::get('/energi/create', [EnergiController::class, 'create'])->name('energi.create');
     Route::post('/energi', [EnergiController::class, 'store'])->name('energi.store');
 
-    Route::get('/energi', [EnergiController::class, 'index'])->name('energi.index');
+  
     Route::get('/energi/create', [EnergiController::class, 'create'])->name('energi.create');
     Route::post('/energi', [EnergiController::class, 'store'])->name('energi.store');
     
